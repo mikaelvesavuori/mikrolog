@@ -41,7 +41,7 @@ export class MikroLog {
    */
   public debug(message: Message): LogOutput {
     const createdLog = this.createLog({ message, level: 'DEBUG', httpStatusCode: 200 });
-    process.stdout.write(JSON.stringify(createdLog) + '\n');
+    this.writeLog(createdLog);
     return createdLog;
   }
 
@@ -59,7 +59,7 @@ export class MikroLog {
    */
   public log(message: Message): LogOutput {
     const createdLog = this.createLog({ message, level: 'INFO', httpStatusCode: 200 });
-    process.stdout.write(JSON.stringify(createdLog) + '\n');
+    this.writeLog(createdLog);
     return createdLog;
   }
 
@@ -69,7 +69,7 @@ export class MikroLog {
    */
   public warn(message: Message): LogOutput {
     const createdLog = this.createLog({ message, level: 'WARN', httpStatusCode: 200 });
-    process.stdout.write(JSON.stringify(createdLog) + '\n');
+    this.writeLog(createdLog);
     return createdLog;
   }
 
@@ -79,8 +79,15 @@ export class MikroLog {
    */
   public error(message: Message): LogOutput {
     const createdLog = this.createLog({ message, level: 'ERROR', httpStatusCode: 400 });
-    process.stdout.write(JSON.stringify(createdLog) + '\n');
+    this.writeLog(createdLog);
     return createdLog;
+  }
+
+  /**
+   * @description Call STDOUT to write the log.
+   */
+  private writeLog(createdLog: LogOutput) {
+    process.stdout.write(JSON.stringify(createdLog) + '\n');
   }
 
   /**
