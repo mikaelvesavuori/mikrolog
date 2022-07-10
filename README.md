@@ -1,4 +1,6 @@
 # MikroLog
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmikaelvesavuori%2Fmikrolog.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmikaelvesavuori%2Fmikrolog?ref=badge_shield)
+
 
 **The JSON logger you always wanted for Lambda**.
 
@@ -227,3 +229,7 @@ const log = logger.log('Checking...');
 }
 */
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmikaelvesavuori%2Fmikrolog.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmikaelvesavuori%2Fmikrolog?ref=badge_large)
