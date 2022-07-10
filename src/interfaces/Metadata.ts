@@ -2,7 +2,9 @@
  * @description User-provided static metadata input.
  */
 export type StaticMetadataConfigInput = {
+  //
   // REQUIRED FIELDS
+  //
   /**
    * @description The version of the logged service.
    */
@@ -35,7 +37,9 @@ export type StaticMetadataConfigInput = {
    * @description Team responsible for emitting this log.
    */
   team: string;
+  //
   // OPTIONAL FIELDS
+  //
   /**
    * @description Tags for the logged system.
    */
