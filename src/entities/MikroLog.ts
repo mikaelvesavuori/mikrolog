@@ -26,7 +26,7 @@ logger.log({
 ```
  */
 export class MikroLog {
-  metadataConfig: any;
+  metadataConfig: StaticMetadataConfigInput | Record<string, any>;
 
   constructor(metadataConfig?: StaticMetadataConfigInput | Record<string, any>) {
     this.metadataConfig = metadataConfig || {};
@@ -101,7 +101,7 @@ export class MikroLog {
       timestampHuman
     } = produceDynamicMetadata();
 
-    const metadataConfig = this.metadataConfig;
+    const metadataConfig: any = this.metadataConfig;
     const redactedKeys = metadataConfig['redactedKeys']
       ? metadataConfig['redactedKeys']
       : undefined;
