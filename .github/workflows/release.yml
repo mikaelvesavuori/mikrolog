@@ -32,11 +32,11 @@ jobs:
       - name: Codecov
         uses: codecov/codecov-action@v2.1.0
 
-      - name: Send coverage report with Code Climate
-        uses: paambaati/codeclimate-action@v3
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          coverageLocations: ${{ github.workspace }}/coverage/lcov.info:lcov
+      #- name: Send coverage report with Code Climate
+      #  uses: paambaati/codeclimate-action@v3
+      #  env:
+      #    CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      #    coverageLocations: ${{ github.workspace }}/coverage/lcov.info:lcov
 
   publish-npm:
     needs: ['build-unix']
