@@ -422,6 +422,46 @@ test('It should accept a custom metadata configuration', async (t) => {
   t.deepEqual(response, expected);
 });
 
+test('It should retain falsy but defined values in logs', async (t) => {
+  const message = 'Hello World';
+
+  const logger = new MikroLog({
+    metadataConfig: {
+      falsyTest1: false,
+      falsyTest2: 0
+    }
+  });
+  const response: any = logger.info(message);
+
+  const expected: any = {
+    error: false,
+    httpStatusCode: 200,
+    falsyTest1: false,
+    falsyTest2: 0,
+    level: 'INFO',
+    message: 'Hello World'
+  };
+
+  // Ensure exactness of message field
+  t.is(response['message'], message);
+
+  // Check presence of dynamic fields
+  t.true(response['id'] !== null);
+  t.true(response['timestamp'] !== null);
+  t.true(response['timestampHuman'] !== null);
+
+  // Drop dynamic fields for test validation
+  delete response['id'];
+  delete response['timestamp'];
+  delete response['timestampHuman'];
+  delete expected['id'];
+  delete expected['timestamp'];
+  delete expected['timestampHuman'];
+
+  // @ts-ignore
+  t.deepEqual(response, expected);
+});
+
 /**
  * NEGATIVE TESTS
  */

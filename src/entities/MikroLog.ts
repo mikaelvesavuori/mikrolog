@@ -119,7 +119,7 @@ export class MikroLog {
       ...metadataConfig,
       // Dynamic metadata
       message: log.message,
-      error: log.level === 'ERROR' ? true : false,
+      error: log.level === 'ERROR',
       level: log.level,
       httpStatusCode: log.httpStatusCode,
       id,
@@ -159,14 +159,11 @@ export class MikroLog {
         return;
       }
 
-      // Since `error` is an actual boolean we will return it as-is
-      if (key === 'error') {
-        filteredOutput[key] = value;
-        return;
-      }
-
-      // Only add key-value pairs that are not undefined, null or empty
-      if (value) filteredOutput[key] = value;
+      /**
+       * Only add key-value pairs that are not actually undefined, null or empty.
+       * For example, since `error` is an actual boolean we will return it as-is.
+       */
+      if (value || value === 0 || value === false) filteredOutput[key] = value;
     });
 
     return filteredOutput;
