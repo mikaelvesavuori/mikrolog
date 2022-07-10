@@ -2,7 +2,19 @@
 
 **The JSON logger you always wanted for Lambda**.
 
-MikroLog is like serverless: There is still a logger ("server"), but you get to think a lot less about it and you get the full "It Just Works"™ experience.
+_MikroLog is like serverless: There is still a logger ("server"), but you get to think a lot less about it and you get the full "It Just Works"™ experience._
+
+![Build Status](https://github.com/mikaelvesavuori/mikrolog/workflows/main/badge.svg)
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmikaelvesavuori%2Fmikrolog.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmikaelvesavuori%2Fmikrolog?ref=badge_shield)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mikaelvesavuori_mikrolog&metric=alert_status)](https://sonarcloud.io/dashboard?id=mikaelvesavuori_mikrolog)
+
+[![codecov](https://codecov.io/gh/mikaelvesavuori/mikrolog/branch/master/graph/badge.svg)](https://codecov.io/gh/mikaelvesavuori/mikrolog)
+
+[![Maintainability](https://api.codeclimate.com/v1/badges/d960f299a99a79f781d3/maintainability)](https://codeclimate.com/github/mikaelvesavuori/mikrolog/maintainability)
+
+---
 
 Loggers have become too opinionated, bloated and complicated. MikroLog provides an option that is:
 
