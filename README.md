@@ -29,7 +29,7 @@ Loggers have become too opinionated, bloated and complicated. MikroLog provides 
 - Outside of AWS itself, logs carry across perfectly to observability solutions like Datadog, New Relic, Honeycomb...
 - Easy to redact or mask sensitive data
 - Uses `process.stdout.write()` rather than `console.log()` so you can safely use it in Lambda
-- Tiny (~6 KB gzipped)
+- Tiny (1.7 KB gzipped)
 - Has zero dependencies
 - Has 100% test coverage
 
