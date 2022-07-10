@@ -181,10 +181,12 @@ function produceRequestTimeEpoch(event: any) {
  * @description Get dynamic user metadata from process environment.
  */
 export function produceDynamicMetadata(): DynamicMetadataOutput {
+  const timeNow = Date.now();
+
   const metadata = {
     id: randomUUID(),
-    timestamp: `${Date.now()}`,
-    timestampHuman: new Date().toISOString(),
+    timestamp: `${timeNow}`,
+    timestampHuman: new Date(timeNow).toISOString(),
     correlationId: process.env.__CORRELATIONID__ || '',
     user: process.env.__USER__ || '',
     route: process.env.__ROUTE__ || '',
