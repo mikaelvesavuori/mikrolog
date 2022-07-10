@@ -247,6 +247,7 @@ const log = logger.log('Checking...');
 /**
  * The log will be similar to:
 {
+  message: 'Checking...',
   secretValue: 'MASKED'
 }
 */
