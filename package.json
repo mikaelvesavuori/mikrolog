@@ -32,6 +32,7 @@
   "scripts": {
     "start": "npx ts-node src/index.ts",
     "test": "npx c8 ava",
+    "test:ci": "npx c8 --reporter=lcov ava",
     "build": "npm run clean && npx tsc --project tsconfig.build.json",
     "clean": "rm -rf lib",
     "package": "npm pack",
