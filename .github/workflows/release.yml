@@ -27,19 +27,16 @@ jobs:
           npm audit fix
 
       - name: Test
-        run: npm run test:ci
+        run: npm test
 
       - name: Codecov
         uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ./coverage/lcov-report/
 
-      #- name: Send coverage report with Code Climate
-      #  uses: paambaati/codeclimate-action@v3
-      #  env:
-      #    CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-      #    coverageLocations: ${{ github.workspace }}/coverage/lcov.info:lcov
+      - name: Send coverage report with Code Climate
+        uses: paambaati/codeclimate-action@v3.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+          coverageLocations: ${{ github.workspace }}/coverage/lcov.info:lcov
 
   publish-npm:
     needs: ['build-unix']
