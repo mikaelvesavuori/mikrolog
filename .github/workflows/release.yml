@@ -41,7 +41,7 @@ jobs:
           #coverageLocations: ${{github.workspace}}/jest-coverage/lcov.info:lcov
 
   publish-npm:
-    needs: ['build-unix', 'build-windows']
+    needs: ['build-unix']
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
