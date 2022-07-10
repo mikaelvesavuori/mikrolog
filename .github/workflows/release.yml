@@ -27,7 +27,7 @@ jobs:
           npm audit fix
 
       - name: Test
-        run: npm test:ci
+        run: npm run test:ci
 
       - name: Codecov
         uses: codecov/codecov-action@v3
