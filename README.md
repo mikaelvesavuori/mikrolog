@@ -135,7 +135,7 @@ This is the metadata that you may provide at the time of instantiation. These fi
 Under the hood, MikroLog is built and tested around practically the same metadata format as seen in [catalogist](https://github.com/mikaelvesavuori/catalogist) which might look like:
 
 ```typescript
-const config = {
+const metadataConfig = {
   version: 1,
   lifecycleStage: 'production',
   owner: 'MyCompany',
@@ -148,7 +148,7 @@ const config = {
   dataSensitivity: 'public'
 };
 
-const logger = new MikroLog(config);
+const logger = new MikroLog({ metadataConfig });
 ```
 
 _However, you are free to use whatever static metadata you want._
