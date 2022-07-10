@@ -1,6 +1,5 @@
 /**
  * @description User-provided static metadata input.
- * @todo Update descriptions
  */
 export type StaticMetadataConfigInput = {
   // REQUIRED FIELDS
@@ -26,7 +25,6 @@ export type StaticMetadataConfigInput = {
   domain: string;
   /**
    * @description System of the producer.
-   * @todo ???
    */
   system: string;
   /**
