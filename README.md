@@ -43,7 +43,7 @@ MikroLog accepts certain static metadata from you (user input) and will infer dy
 
 ## Usage
 
-### Importing and using
+### Basic importing and usage
 
 ```typescript
 // ES5 format
@@ -69,7 +69,19 @@ You may also optionally instantiate MikroLog using a custom metadata object:
 
 ```typescript
 const metadata = { service: 'MyService' };
-const logger = new MikroLog(metadata);
+const logger = new MikroLog({ metadataConfig: metadata });
+```
+
+To use the full set of features, including deriving dynamic metadata from AWS Lambda, you would add the `event` and `context` objects like so:
+
+```typescript
+// Your Lambda handler doing whatever it does
+exports async function handler(event: any, context: any) {
+  // {...}
+  const metadata = { service: 'MyService' };
+  const logger = new MikroLog({ metadataConfig: metadata, event, context });
+  // {...}
+}
 ```
 
 See more in the [Metadata](#metadata) section.
@@ -145,7 +157,7 @@ Ideally you store this static metadata configuration in its own file and have un
 
 ### Dynamic metadata
 
-The dynamic metadata fields are picked up automatically. Most of them relate to unique value types available in AWS Lambda.
+The dynamic metadata fields are picked up automatically if you pass them in during instantiation. Most of those metadata fields will relate to unique value types available in AWS Lambda.
 
 If these values are not available, they will be dropped at the time of log output. In effect, this means you won't have to deal with them (being empty or otherwise) if you use MikroLog in another type of context.
 

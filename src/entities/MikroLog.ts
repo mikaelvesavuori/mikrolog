@@ -1,7 +1,7 @@
-import { LogInput, LogOutput, Message } from '../interfaces/MikroLog';
+import { LogInput, LogOutput, Message, MikroLogInput } from '../interfaces/MikroLog';
 import { StaticMetadataConfigInput } from '../interfaces/Metadata';
 
-import { produceDynamicMetadata } from '../utils/metadataUtils';
+import { setMetadata, produceDynamicMetadata } from '../utils/metadataUtils';
 
 /**
  * @description MikroLog is a Lambda-oriented lightweight JSON logger.
@@ -28,8 +28,11 @@ logger.log({
 export class MikroLog {
   metadataConfig: StaticMetadataConfigInput | Record<string, any>;
 
-  constructor(metadataConfig?: StaticMetadataConfigInput | Record<string, any>) {
-    this.metadataConfig = metadataConfig || {};
+  constructor(input?: MikroLogInput) {
+    this.metadataConfig = input?.metadataConfig || {};
+    const event = input?.event || {};
+    const context = input?.context || {};
+    setMetadata(event, context);
   }
 
   /**

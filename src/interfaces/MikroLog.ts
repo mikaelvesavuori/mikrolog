@@ -1,6 +1,24 @@
 import { StaticMetadataConfigInput, DynamicMetadataOutput } from './Metadata';
 
 /**
+ * @description Input when instantiating a new MikroLog instance.
+ */
+export interface MikroLogInput {
+  /**
+   * Static metadata configuration object.
+   */
+  metadataConfig?: StaticMetadataConfigInput | Record<string, any>;
+  /**
+   * AWS Lambda event object. Used to gather dynamic metadata.
+   */
+  event?: any;
+  /**
+   * AWS Lambda context object. Used to gather dynamic metadata.
+   */
+  context?: any;
+}
+
+/**
  * @description Interface for log messages.
  */
 export interface LogInput {

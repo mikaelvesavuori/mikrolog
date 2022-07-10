@@ -5,37 +5,6 @@ import { MikroLog } from '../src/entities/MikroLog';
 import { metadataConfig } from '../testdata/config';
 
 /**
- * Utilities for testing
- */
-function setTestingProcessEnv() {
-  process.env.__CORRELATIONID__ = 'SOME_VALUE';
-  process.env.__USER__ = 'SOME_VALUE';
-  process.env.__ROUTE__ = 'SOME_VALUE';
-  process.env.__REGION__ = 'SOME_VALUE';
-  process.env.__RUNTIME__ = 'SOME_VALUE';
-  process.env.__FUNCTIONNAME__ = 'SOME_VALUE';
-  process.env.__FUNCTIONMEMSIZE__ = 'SOME_VALUE';
-  process.env.__FUNCTIONVERSION__ = 'SOME_VALUE';
-  process.env.__STAGE__ = 'SOME_VALUE';
-  process.env.__ACCOUNTID__ = 'SOME_VALUE';
-  process.env.__REQTIMEEPOCH__ = 'SOME_VALUE';
-}
-
-function clearProcessEnv() {
-  process.env.__CORRELATIONID__ = '';
-  process.env.__USER__ = '';
-  process.env.__ROUTE__ = '';
-  process.env.__REGION__ = '';
-  process.env.__RUNTIME__ = '';
-  process.env.__FUNCTIONNAME__ = '';
-  process.env.__FUNCTIONMEMSIZE__ = '';
-  process.env.__FUNCTIONVERSION__ = '';
-  process.env.__STAGE__ = '';
-  process.env.__ACCOUNTID__ = '';
-  process.env.__REQTIMEEPOCH__ = '';
-}
-
-/**
  * POSITIVE TESTS
  */
 test('It should print out a structured log when given a string message but having no custom static metadata or process environment', async (t) => {
@@ -75,10 +44,9 @@ test('It should print out a structured log when given a string message but havin
 });
 
 test('It should print out a structured log when given a string message', async (t) => {
-  setTestingProcessEnv();
   const message = 'Hello World';
 
-  const logger = new MikroLog(metadataConfig);
+  const logger = new MikroLog({ metadataConfig });
   const response: any = logger.log(message);
 
   const expected: any = {
@@ -98,18 +66,7 @@ test('It should print out a structured log when given a string message', async (
     level: 'INFO',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
     timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
-    correlationId: 'SOME_VALUE',
-    user: 'SOME_VALUE',
-    route: 'SOME_VALUE',
-    region: 'SOME_VALUE',
-    runtime: 'SOME_VALUE',
-    functionName: 'SOME_VALUE',
-    functionMemorySize: 'SOME_VALUE',
-    functionVersion: 'SOME_VALUE',
-    stage: 'SOME_VALUE',
-    accountId: 'SOME_VALUE',
-    requestTimeEpoch: 'SOME_VALUE'
+    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)'
   };
 
   // Ensure exactness of message field
@@ -130,14 +87,12 @@ test('It should print out a structured log when given a string message', async (
 
   // @ts-ignore
   t.deepEqual(response, expected);
-  clearProcessEnv();
 });
 
 test('It should print out a structured informational log when given a string message', async (t) => {
-  setTestingProcessEnv();
   const message = 'Hello World';
 
-  const logger = new MikroLog(metadataConfig);
+  const logger = new MikroLog({ metadataConfig });
   const response: any = logger.info(message);
 
   const expected: any = {
@@ -157,18 +112,7 @@ test('It should print out a structured informational log when given a string mes
     level: 'INFO',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
     timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
-    correlationId: 'SOME_VALUE',
-    user: 'SOME_VALUE',
-    route: 'SOME_VALUE',
-    region: 'SOME_VALUE',
-    runtime: 'SOME_VALUE',
-    functionName: 'SOME_VALUE',
-    functionMemorySize: 'SOME_VALUE',
-    functionVersion: 'SOME_VALUE',
-    stage: 'SOME_VALUE',
-    accountId: 'SOME_VALUE',
-    requestTimeEpoch: 'SOME_VALUE'
+    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)'
   };
 
   // Ensure exactness of message field
@@ -189,14 +133,12 @@ test('It should print out a structured informational log when given a string mes
 
   // @ts-ignore
   t.deepEqual(response, expected);
-  clearProcessEnv();
 });
 
 test('It should print out a structured debug log when given a string message', async (t) => {
-  setTestingProcessEnv();
   const message = 'Hello World';
 
-  const logger = new MikroLog(metadataConfig);
+  const logger = new MikroLog({ metadataConfig });
   const response: any = logger.debug(message);
 
   const expected: any = {
@@ -216,18 +158,7 @@ test('It should print out a structured debug log when given a string message', a
     level: 'DEBUG',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
     timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
-    correlationId: 'SOME_VALUE',
-    user: 'SOME_VALUE',
-    route: 'SOME_VALUE',
-    region: 'SOME_VALUE',
-    runtime: 'SOME_VALUE',
-    functionName: 'SOME_VALUE',
-    functionMemorySize: 'SOME_VALUE',
-    functionVersion: 'SOME_VALUE',
-    stage: 'SOME_VALUE',
-    accountId: 'SOME_VALUE',
-    requestTimeEpoch: 'SOME_VALUE'
+    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)'
   };
 
   // Ensure exactness of message field
@@ -248,14 +179,12 @@ test('It should print out a structured debug log when given a string message', a
 
   // @ts-ignore
   t.deepEqual(response, expected);
-  clearProcessEnv();
 });
 
 test('It should print out a structured warning log when given a string message', async (t) => {
-  setTestingProcessEnv();
   const message = 'Hello World';
 
-  const logger = new MikroLog(metadataConfig);
+  const logger = new MikroLog({ metadataConfig });
   const response: any = logger.warn(message);
 
   const expected: any = {
@@ -275,18 +204,7 @@ test('It should print out a structured warning log when given a string message',
     level: 'WARN',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
     timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
-    correlationId: 'SOME_VALUE',
-    user: 'SOME_VALUE',
-    route: 'SOME_VALUE',
-    region: 'SOME_VALUE',
-    runtime: 'SOME_VALUE',
-    functionName: 'SOME_VALUE',
-    functionMemorySize: 'SOME_VALUE',
-    functionVersion: 'SOME_VALUE',
-    stage: 'SOME_VALUE',
-    accountId: 'SOME_VALUE',
-    requestTimeEpoch: 'SOME_VALUE'
+    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)'
   };
 
   // Ensure exactness of message field
@@ -307,14 +225,12 @@ test('It should print out a structured warning log when given a string message',
 
   // @ts-ignore
   t.deepEqual(response, expected);
-  clearProcessEnv();
 });
 
 test('It should print out a structured error log when given a string message', async (t) => {
-  setTestingProcessEnv();
   const message = 'Hello World';
 
-  const logger = new MikroLog(metadataConfig);
+  const logger = new MikroLog({ metadataConfig });
   const response: any = logger.error(message);
 
   const expected: any = {
@@ -334,18 +250,7 @@ test('It should print out a structured error log when given a string message', a
     level: 'ERROR',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
     timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
-    correlationId: 'SOME_VALUE',
-    user: 'SOME_VALUE',
-    route: 'SOME_VALUE',
-    region: 'SOME_VALUE',
-    runtime: 'SOME_VALUE',
-    functionName: 'SOME_VALUE',
-    functionMemorySize: 'SOME_VALUE',
-    functionVersion: 'SOME_VALUE',
-    stage: 'SOME_VALUE',
-    accountId: 'SOME_VALUE',
-    requestTimeEpoch: 'SOME_VALUE'
+    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)'
   };
 
   // Ensure exactness of message field
@@ -366,7 +271,6 @@ test('It should print out a structured error log when given a string message', a
 
   // @ts-ignore
   t.deepEqual(response, expected);
-  clearProcessEnv();
 });
 
 /**
@@ -386,7 +290,7 @@ test('It should redact keys when given a "redactedKeys" list', async (t) => {
   const _metadataConfig: any = metadataConfig;
   _metadataConfig['redactedKeys'] = ['team', 'id'];
 
-  const logger = new MikroLog(_metadataConfig);
+  const logger = new MikroLog({ metadataConfig: _metadataConfig });
   const response: any = logger.error(message);
 
   const expected: any = {
@@ -434,27 +338,24 @@ test('It should mask values when given a "maskedValues" list', async (t) => {
   const _metadataConfig: any = metadataConfig;
   _metadataConfig['maskedValues'] = ['team', 'id'];
 
-  const logger = new MikroLog(_metadataConfig);
+  const logger = new MikroLog({ metadataConfig: _metadataConfig });
   const response: any = logger.error(message);
 
   const expected: any = {
-    version: 1,
-    lifecycleStage: 'production',
-    owner: 'MyCompany',
-    hostPlatform: 'aws',
-    domain: 'CustomerAcquisition',
-    system: 'ShowroomActivities',
-    service: 'UserSignUp',
-    team: 'MASKED',
-    tags: [''],
     dataSensitivity: 'public',
-    message: 'Hello World',
+    domain: 'CustomerAcquisition',
     error: true,
+    hostPlatform: 'aws',
     httpStatusCode: 400,
     level: 'ERROR',
-    id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-    timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)'
+    lifecycleStage: 'production',
+    message: 'Hello World',
+    owner: 'MyCompany',
+    service: 'UserSignUp',
+    system: 'ShowroomActivities',
+    tags: [''],
+    team: 'MASKED',
+    version: 1
   };
 
   // Ensure exactness of message field
@@ -487,7 +388,7 @@ test('It should accept a custom metadata configuration', async (t) => {
     }
   };
 
-  const logger = new MikroLog(customMetadata);
+  const logger = new MikroLog({ metadataConfig: customMetadata });
   const response: any = logger.info(message);
 
   const expected: any = {
