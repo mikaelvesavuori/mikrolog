@@ -1,0 +1,65 @@
+{
+  "name": "mikrolog",
+  "description": "The JSON logger you always wanted for Lambda.",
+  "version": "1.0.0",
+  "author": "Mikael Vesavuori",
+  "license": "MIT",
+  "main": "./lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikaelvesavuori/mikrolog.git"
+  },
+  "keywords": [
+    "logger",
+    "json-logger",
+    "node",
+    "node-logger",
+    "lambda",
+    "lambda-logger",
+    "serverless",
+    "serverless-logger",
+    "minimal"
+  ],
+  "bugs": {
+    "url": "https://github.com/mikaelvesavuori/mikrolog/issues"
+  },
+  "homepage": "https://github.com/mikaelvesavuori/mikrolog#readme",
+  "files": [
+    "/lib",
+    "!/lib/**/*.map",
+    "!/tests"
+  ],
+  "scripts": {
+    "start": "npx ts-node src/index.ts",
+    "test": "npx c8 ava",
+    "build": "npm run clean && npx tsc --project tsconfig.build.json",
+    "clean": "rm -rf lib",
+    "package": "npm pack",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@ava/typescript": "3",
+    "@types/node": "18",
+    "@typescript-eslint/eslint-plugin": "5",
+    "@typescript-eslint/parser": "5",
+    "ava": "4",
+    "c8": "7",
+    "eslint": "8",
+    "eslint-config-prettier": "8",
+    "eslint-plugin-prettier": "4",
+    "prettier": "2",
+    "ts-node": "10",
+    "typescript": "4"
+  },
+  "ava": {
+    "typescript": {
+      "rewritePaths": {
+        "src/": "lib/"
+      },
+      "compile": false
+    },
+    "require": [
+      "ts-node/register"
+    ]
+  }
+}

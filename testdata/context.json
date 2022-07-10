@@ -1,0 +1,16 @@
+{
+  "callbackWaitsForEmptyEventLoop": {},
+  "succeed": {},
+  "fail": {},
+  "done": {},
+  "functionVersion": "$LATEST",
+  "functionName": "somestack-FunctionName",
+  "memoryLimitInMB": "1024",
+  "logGroupName": "/aws/lambda/somestack-FunctionName",
+  "logStreamName": "2022/07/09/[$LATEST]159282acddb84ca0bc0d5f325ea01343",
+  "clientContext": "",
+  "identity": "",
+  "invokedFunctionArn": "arn:aws:lambda:eu-north-1:123412341234:function:somestack-FunctionName",
+  "awsRequestId": "6c933bd2-9535-45a8-b09c-84d00b4f50cc",
+  "getRemainingTimeInMillis": {}
+}
