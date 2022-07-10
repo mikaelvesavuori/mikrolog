@@ -235,13 +235,13 @@ These will only be able to redact or mask top-level fields, not nested items.
 Example usage:
 
 ```typescript
-const metadata = {
+const metadataConfig = {
   userId: 'Sam Person',
   secretValue: 'sj02jd-m3982',
   redactedKeys: ['userId'],
   maskedValues: ['secretValue']
 };
-const logger = new MikroLog(metadata);
+const logger = new MikroLog({ metadataConfig });
 const log = logger.log('Checking...');
 
 /**
