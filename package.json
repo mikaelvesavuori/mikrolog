@@ -35,7 +35,11 @@
     "build": "npm run clean && npx tsc --project tsconfig.build.json",
     "clean": "rm -rf lib",
     "package": "npm pack",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "prepare": "husky install",
+    "docs": "npm run docs:clean && npm run docs:typedoc",
+    "docs:clean": "rm -rf docs",
+    "docs:typedoc": "npx typedoc --entryPoints src --entryPointStrategy expand --exclude '**/*+(test).ts' --externalPattern 'node_modules/**/*' --excludeExternals --out docs/"
   },
   "devDependencies": {
     "@ava/typescript": "3",
@@ -47,8 +51,10 @@
     "eslint": "8",
     "eslint-config-prettier": "8",
     "eslint-plugin-prettier": "4",
+    "husky": "8",
     "prettier": "2",
     "ts-node": "10",
+    "typedoc": "^0.23.7",
     "typescript": "4"
   },
   "ava": {
