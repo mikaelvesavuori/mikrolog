@@ -76,7 +76,7 @@ To use the full set of features, including deriving dynamic metadata from AWS La
 
 ```typescript
 // Your Lambda handler doing whatever it does
-exports async function handler(event: any, context: any) {
+export async function handler(event: any, context: any) {
   // {...}
   const metadata = { service: 'MyService' };
   const logger = new MikroLog({ metadataConfig: metadata, event, context });
