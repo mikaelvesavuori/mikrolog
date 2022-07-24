@@ -1,7 +1,24 @@
-import { LogInput, LogOutput, Message, MikroLogInput } from '../interfaces/MikroLog';
-import { StaticMetadataConfigInput } from '../interfaces/Metadata';
+import { APIGatewayEvent, Context } from 'aws-lambda';
+import { randomUUID } from 'crypto';
 
-import { setMetadata, produceDynamicMetadata } from '../utils/metadataUtils';
+import { MikroLogInput, LogInput, LogOutput, Message } from '../interfaces/MikroLog';
+import { StaticMetadataConfigInput, DynamicMetadataOutput } from '../interfaces/Metadata';
+
+import {
+  produceStartTime,
+  produceRegion,
+  produceRuntime,
+  produceFunctionName,
+  produceFunctionMemorySize,
+  produceFunctionVersion,
+  produceCorrelationId,
+  produceRoute,
+  produceUser,
+  produceStage,
+  produceViewerCountry,
+  produceAccountId,
+  produceRequestTimeEpoch
+} from './metadataUtils';
 
 /**
  * @description MikroLog is a Lambda-oriented lightweight JSON logger.
@@ -13,7 +30,7 @@ const { MikroLog } = require('mikrolog');
 // ES6 format
 import { MikroLog } from 'mikrolog';
 
-const logger = new MikroLog();
+const logger = MikroLog.start();
 
 // String message
 logger.log('Hello World!');
@@ -26,13 +43,115 @@ logger.log({
 ```
  */
 export class MikroLog {
-  metadataConfig: StaticMetadataConfigInput | Record<string, any>;
+  private static instance: MikroLog;
+  private static metadataConfig: StaticMetadataConfigInput | Record<string, any> = {};
+  // @ts-ignore
+  private static event: APIGatewayEvent = {};
+  // @ts-ignore
+  private static context: Context = {};
 
-  constructor(input?: MikroLogInput) {
-    this.metadataConfig = input?.metadataConfig || {};
-    const event = input?.event || {};
-    const context = input?.context || {};
-    setMetadata(event, context);
+  /**
+   * @description This instantiates MikroLog. In order to be able
+   * to "remember" event and context we use a singleton pattern to
+   * reuse the same logical instance.
+   *
+   * If the `start` method receives any input, that input will
+   * overwrite any existing metadata, event, and context.
+   *
+   * If you want to "add" to these, you should instead call
+   * `enrich()` and pass in your additional data there.
+   */
+  public static start(input?: MikroLogInput): MikroLog {
+    if (!MikroLog.instance) MikroLog.instance = new MikroLog();
+    if (input) {
+      MikroLog.metadataConfig = input.metadataConfig || {};
+      MikroLog.event = input.event || {};
+      MikroLog.context = input.context || {};
+    }
+    return MikroLog.instance;
+  }
+
+  /**
+   * @description Enrich MikroLog with metadata, AWS Lambda event and/or context.
+   * @todo Replace or merge intersections of input with existing data?
+   */
+  public static enrich(input: MikroLogInput) {
+    try {
+      MikroLog.metadataConfig = Object.assign(MikroLog.metadataConfig, input.metadataConfig || {});
+      const fixed = Object.assign(MikroLog.event, input.event || {});
+      console.log('---->', fixed);
+      MikroLog.event = fixed;
+      MikroLog.context = Object.assign(MikroLog.context, input.context || {});
+    } catch (error: any) {
+      throw new Error('TODO error enriching', error.message);
+    }
+  }
+
+  /**
+   * @description TODO
+   */
+  public config() {
+    console.log(MikroLog.metadataConfig);
+    console.log(MikroLog.event);
+    console.log(MikroLog.context);
+  }
+
+  /**
+   * @description An emergency mechanism if you absolutely need to
+   * reset the instance to its empty default state.
+   */
+  public static reset() {
+    MikroLog.metadataConfig = {};
+    MikroLog.event = {} as any;
+    MikroLog.context = {} as any;
+  }
+
+  /**
+   * @description Retrieve all stored data from process environment.
+   * @todo Perhaps store this stringified as one large blob instead?
+   * @todo For security reasons perhaps a check needs to be done on
+   * IP/country/viewer match before restoring?
+   */
+  private loadEnrichedEnvironment() {
+    return {
+      startTime: produceStartTime(),
+      region: produceRegion(MikroLog.context),
+      runtime: produceRuntime(),
+      functionName: produceFunctionName(MikroLog.context),
+      functionMemorySize: produceFunctionMemorySize(MikroLog.context),
+      functionVersion: produceFunctionVersion(MikroLog.context),
+      correlationId: produceCorrelationId(MikroLog.event, MikroLog.context),
+      route: produceRoute(MikroLog.event),
+      user: produceUser(MikroLog.event),
+      stage: produceStage(MikroLog.event),
+      viewerCountry: produceViewerCountry(MikroLog.event),
+      accountId: produceAccountId(MikroLog.event),
+      requestTimeEpoch: produceRequestTimeEpoch(MikroLog.event)
+    };
+  }
+
+  /**
+   * @description Get dynamic user metadata from process environment.
+   */
+  private produceDynamicMetadata(): DynamicMetadataOutput {
+    const timeNow = Date.now();
+    const env = this.loadEnrichedEnvironment();
+
+    const metadata = {
+      id: randomUUID(),
+      timestamp: `${timeNow}`,
+      timestampHuman: new Date(timeNow).toISOString(),
+      ...env
+    };
+
+    const filteredMetadata: any = {};
+
+    Object.entries(metadata).forEach((entry: any) => {
+      const [key, value] = entry;
+      if (value) filteredMetadata[key] = value;
+    });
+
+    return filteredMetadata;
   }
 
   /**
@@ -94,58 +213,65 @@ export class MikroLog {
    * @description Create the log envelope.
    */
   private createLog(log: LogInput): LogOutput {
-    const {
-      correlationId,
-      user,
-      route,
-      region,
-      runtime,
-      functionName,
-      functionMemorySize,
-      functionVersion,
-      stage,
-      accountId,
-      requestTimeEpoch,
-      id,
-      timestamp,
-      timestampHuman
-    } = produceDynamicMetadata();
+    try {
+      const {
+        correlationId,
+        user,
+        route,
+        region,
+        runtime,
+        functionName,
+        functionMemorySize,
+        functionVersion,
+        stage,
+        viewerCountry,
+        accountId,
+        requestTimeEpoch,
+        id,
+        timestamp,
+        timestampHuman
+      } = this.produceDynamicMetadata();
 
-    const metadataConfig: any = this.metadataConfig;
-    const redactedKeys = metadataConfig['redactedKeys']
-      ? metadataConfig['redactedKeys']
-      : undefined;
-    const maskedValues = metadataConfig['maskedValues']
-      ? metadataConfig['maskedValues']
-      : undefined;
-    if (redactedKeys) delete metadataConfig['redactedKeys'];
-    if (maskedValues) delete metadataConfig['maskedValues'];
+      const metadataConfig: any = MikroLog.metadataConfig;
+      const redactedKeys = metadataConfig['redactedKeys']
+        ? metadataConfig['redactedKeys']
+        : undefined;
+      const maskedValues = metadataConfig['maskedValues']
+        ? metadataConfig['maskedValues']
+        : undefined;
+      if (redactedKeys) delete metadataConfig['redactedKeys'];
+      if (maskedValues) delete metadataConfig['maskedValues'];
 
-    const logOutput = {
-      // Static metadata
-      ...metadataConfig,
-      // Dynamic metadata
-      message: log.message,
-      error: log.level === 'ERROR',
-      level: log.level,
-      httpStatusCode: log.httpStatusCode,
-      id,
-      timestamp,
-      timestampHuman,
-      correlationId,
-      user,
-      route,
-      region,
-      runtime,
-      functionName,
-      functionMemorySize,
-      functionVersion,
-      stage,
-      accountId,
-      requestTimeEpoch
-    };
+      const logOutput = {
+        // Static metadata
+        ...metadataConfig,
+        // Dynamic metadata
+        message: log.message,
+        error: log.level === 'ERROR',
+        level: log.level,
+        httpStatusCode: log.httpStatusCode,
+        id,
+        timestamp,
+        timestampHuman,
+        correlationId,
+        user,
+        route,
+        region,
+        runtime,
+        functionName,
+        functionMemorySize,
+        functionVersion,
+        stage,
+        viewerCountry,
+        accountId,
+        requestTimeEpoch
+      };
 
-    return this.filterOutput(logOutput, redactedKeys, maskedValues);
+      return this.filterOutput(logOutput, redactedKeys, maskedValues);
+    } catch (error) {
+      console.error(error);
+      throw new Error('TODO custom error');
+    }
   }
 
   /**

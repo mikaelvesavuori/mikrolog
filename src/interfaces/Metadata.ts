@@ -146,6 +146,10 @@ export type DynamicMetadataOutput = {
    */
   stage: string;
   /**
+   * @description Which country did AWS CloudFront infer the user to be in?
+   */
+  viewerCountry: string;
+  /**
    * @description The AWS account ID that the system is running in.
    */
   accountId: string;

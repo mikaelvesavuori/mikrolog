@@ -51,7 +51,7 @@ const { MikroLog } = require('mikrolog');
 // ES6 format
 import { MikroLog } from 'mikrolog';
 
-const logger = new MikroLog();
+const logger = MikroLog.getInstance();
 
 // String message
 logger.log('Hello World!');
@@ -69,7 +69,7 @@ You may also optionally instantiate MikroLog using a custom metadata object:
 
 ```typescript
 const metadata = { service: 'MyService' };
-const logger = new MikroLog({ metadataConfig: metadata });
+const logger = MikroLog.getInstance({ metadataConfig: metadata });
 ```
 
 To use the full set of features, including deriving dynamic metadata from AWS Lambda, you would add the `event` and `context` objects like so:
@@ -79,7 +79,7 @@ To use the full set of features, including deriving dynamic metadata from AWS La
 export async function handler(event: any, context: any) {
   // {...}
   const metadata = { service: 'MyService' };
-  const logger = new MikroLog({ metadataConfig: metadata, event, context });
+  const logger = MikroLog.getInstance({ metadataConfig: metadata, { event, context } });
   // {...}
 }
 ```
@@ -148,7 +148,7 @@ const metadataConfig = {
   dataSensitivity: 'public'
 };
 
-const logger = new MikroLog({ metadataConfig });
+const logger = MikroLog.getInstance({ metadataConfig });
 ```
 
 _However, you are free to use whatever static metadata you want._
@@ -241,7 +241,7 @@ const metadataConfig = {
   redactedKeys: ['userId'],
   maskedValues: ['secretValue']
 };
-const logger = new MikroLog({ metadataConfig });
+const logger = MikroLog.getInstance({ metadataConfig });
 const log = logger.log('Checking...');
 
 /**
