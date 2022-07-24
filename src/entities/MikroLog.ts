@@ -76,24 +76,9 @@ export class MikroLog {
    * @todo Replace or merge intersections of input with existing data?
    */
   public static enrich(input: MikroLogInput) {
-    try {
-      MikroLog.metadataConfig = Object.assign(MikroLog.metadataConfig, input.metadataConfig || {});
-      const fixed = Object.assign(MikroLog.event, input.event || {});
-      console.log('---->', fixed);
-      MikroLog.event = fixed;
-      MikroLog.context = Object.assign(MikroLog.context, input.context || {});
-    } catch (error: any) {
-      throw new Error('TODO error enriching', error.message);
-    }
-  }
-
-  /**
-   * @description TODO
-   */
-  public config() {
-    console.log(MikroLog.metadataConfig);
-    console.log(MikroLog.event);
-    console.log(MikroLog.context);
+    MikroLog.metadataConfig = Object.assign(MikroLog.metadataConfig, input.metadataConfig || {});
+    MikroLog.event = Object.assign(MikroLog.event, input.event || {});
+    MikroLog.context = Object.assign(MikroLog.context, input.context || {});
   }
 
   /**
@@ -213,65 +198,60 @@ export class MikroLog {
    * @description Create the log envelope.
    */
   private createLog(log: LogInput): LogOutput {
-    try {
-      const {
-        correlationId,
-        user,
-        route,
-        region,
-        runtime,
-        functionName,
-        functionMemorySize,
-        functionVersion,
-        stage,
-        viewerCountry,
-        accountId,
-        requestTimeEpoch,
-        id,
-        timestamp,
-        timestampHuman
-      } = this.produceDynamicMetadata();
+    const {
+      correlationId,
+      user,
+      route,
+      region,
+      runtime,
+      functionName,
+      functionMemorySize,
+      functionVersion,
+      stage,
+      viewerCountry,
+      accountId,
+      requestTimeEpoch,
+      id,
+      timestamp,
+      timestampHuman
+    } = this.produceDynamicMetadata();
 
-      const metadataConfig: any = MikroLog.metadataConfig;
-      const redactedKeys = metadataConfig['redactedKeys']
-        ? metadataConfig['redactedKeys']
-        : undefined;
-      const maskedValues = metadataConfig['maskedValues']
-        ? metadataConfig['maskedValues']
-        : undefined;
-      if (redactedKeys) delete metadataConfig['redactedKeys'];
-      if (maskedValues) delete metadataConfig['maskedValues'];
+    const metadataConfig: any = MikroLog.metadataConfig;
+    const redactedKeys = metadataConfig['redactedKeys']
+      ? metadataConfig['redactedKeys']
+      : undefined;
+    const maskedValues = metadataConfig['maskedValues']
+      ? metadataConfig['maskedValues']
+      : undefined;
+    if (redactedKeys) delete metadataConfig['redactedKeys'];
+    if (maskedValues) delete metadataConfig['maskedValues'];
 
-      const logOutput = {
-        // Static metadata
-        ...metadataConfig,
-        // Dynamic metadata
-        message: log.message,
-        error: log.level === 'ERROR',
-        level: log.level,
-        httpStatusCode: log.httpStatusCode,
-        id,
-        timestamp,
-        timestampHuman,
-        correlationId,
-        user,
-        route,
-        region,
-        runtime,
-        functionName,
-        functionMemorySize,
-        functionVersion,
-        stage,
-        viewerCountry,
-        accountId,
-        requestTimeEpoch
-      };
+    const logOutput = {
+      // Static metadata
+      ...metadataConfig,
+      // Dynamic metadata
+      message: log.message,
+      error: log.level === 'ERROR',
+      level: log.level,
+      httpStatusCode: log.httpStatusCode,
+      id,
+      timestamp,
+      timestampHuman,
+      correlationId,
+      user,
+      route,
+      region,
+      runtime,
+      functionName,
+      functionMemorySize,
+      functionVersion,
+      stage,
+      viewerCountry,
+      accountId,
+      requestTimeEpoch
+    };
 
-      return this.filterOutput(logOutput, redactedKeys, maskedValues);
-    } catch (error) {
-      console.error(error);
-      throw new Error('TODO custom error');
-    }
+    return this.filterOutput(logOutput, redactedKeys, maskedValues);
   }
 
   /**

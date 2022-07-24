@@ -351,13 +351,10 @@ test.serial('It should mask values when given a "maskedValues" list', (t) => {
   MikroLog.reset();
   const message = 'Hello World';
 
-  const asdf: any = JSON.parse(JSON.stringify(metadataConfig));
-  console.log('ZZZZZ', asdf);
-  asdf['maskedValues'] = ['team', 'id'];
+  const _metadataConfig: any = JSON.parse(JSON.stringify(metadataConfig));
+  _metadataConfig['maskedValues'] = ['team', 'id'];
 
-  const logger = MikroLog.start({ metadataConfig: asdf });
-  console.log('LOGGER');
-  logger.config();
+  const logger = MikroLog.start({ metadataConfig: _metadataConfig });
   const response: any = logger.error(message);
 
   const expected: any = {
@@ -409,8 +406,6 @@ test.serial('It should accept a custom metadata configuration', (t) => {
   };
 
   const logger = MikroLog.start({ metadataConfig: customMetadata });
-  console.log('LOGGER');
-  logger.config();
   const response: any = logger.info(message);
 
   const expected: any = {
@@ -485,13 +480,34 @@ test.serial('It should retain falsy but defined values in logs', (t) => {
   t.deepEqual(response, expected);
 });
 
-/**
- * NEGATIVE TESTS
- */
-/*
-test.serial('It should ASDF',  (t) => {
-  const error = await t.throws( () => await slotAggregate.cancel(''));
-   @ts-ignore
-  t.is(error.name, 'MissingInputDataError');
+test.serial('It should be able to merge enrichment even if input is essentially empty', (t) => {
+  MikroLog.reset();
+  const message = 'Hello World';
+
+  const logger = MikroLog.start();
+  MikroLog.enrich({});
+  const response: any = logger.info(message);
+
+  const expected: any = {
+    error: false,
+    httpStatusCode: 200,
+    level: 'INFO',
+    message: 'Hello World'
+  };
+
+  // Ensure exactness of message field
+  t.is(response['message'], message);
+
+  // Check presence of dynamic fields
+  t.true(response['id'] !== null);
+  t.true(response['timestamp'] !== null);
+  t.true(response['timestampHuman'] !== null);
+
+  // Drop dynamic fields for test validation
+  delete response['id'];
+  delete response['timestamp'];
+  delete response['timestampHuman'];
+
+  // @ts-ignore
+  t.deepEqual(response, expected);
 });
-*/
