@@ -1,4 +1,10 @@
+import { APIGatewayEvent, Context } from 'aws-lambda';
 import { StaticMetadataConfigInput, DynamicMetadataOutput } from './Metadata';
+export interface MikroLogInput {
+    metadataConfig?: StaticMetadataConfigInput | Record<string, any>;
+    event?: APIGatewayEvent | any;
+    context?: Context | any;
+}
 export interface LogInput {
     readonly message: Message;
     readonly level: LogLevels;

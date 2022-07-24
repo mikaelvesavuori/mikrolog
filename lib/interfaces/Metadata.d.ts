@@ -33,6 +33,7 @@ export declare type DynamicMetadataOutput = {
     functionMemorySize: string;
     functionVersion: string;
     stage: string;
+    viewerCountry: string;
     accountId: string;
     requestTimeEpoch: string;
 };

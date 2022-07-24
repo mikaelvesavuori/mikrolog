@@ -1,0 +1,14 @@
+import { APIGatewayEvent, Context } from 'aws-lambda';
+export declare function produceStartTime(): string;
+export declare function produceCorrelationId(event: APIGatewayEvent | any, context: Context): any;
+export declare function produceRegion(context: Context): string;
+export declare function produceRuntime(): string;
+export declare function produceFunctionName(context: Context): string;
+export declare function produceFunctionMemorySize(context: Context): string;
+export declare function produceFunctionVersion(context: Context): string;
+export declare function produceRoute(event: APIGatewayEvent | any): any;
+export declare function produceUser(event: APIGatewayEvent): string;
+export declare function produceStage(event: APIGatewayEvent): string;
+export declare function produceViewerCountry(event: APIGatewayEvent): string;
+export declare function produceAccountId(event: APIGatewayEvent | any): any;
+export declare function produceRequestTimeEpoch(event: APIGatewayEvent): string;
