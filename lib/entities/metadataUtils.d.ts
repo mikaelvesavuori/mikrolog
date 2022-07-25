@@ -11,4 +11,4 @@ export declare function produceUser(event: APIGatewayEvent): string;
 export declare function produceStage(event: APIGatewayEvent): string;
 export declare function produceViewerCountry(event: APIGatewayEvent): string;
 export declare function produceAccountId(event: APIGatewayEvent | any): any;
-export declare function produceRequestTimeEpoch(event: APIGatewayEvent): string;
+export declare function produceTimestampRequest(event: APIGatewayEvent): string;

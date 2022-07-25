@@ -1,10 +1,17 @@
 /**
+ * @description Valid lifecycles stages.
+ */
+type LifecycleStage = 'production' | 'qa' | 'test' | 'development' | 'staging' | 'demo';
+
+/**
+ * @description Valid data sensitivity levels.
+ */
+type DataSensitivity = 'public' | 'sensitive' | 'proprietary' | 'secret';
+
+/**
  * @description User-provided static metadata input.
  */
-export type StaticMetadataConfigInput = {
-  //
-  // REQUIRED FIELDS
-  //
+export interface StaticMetadataConfigInput {
   /**
    * @description The version of the logged service.
    */
@@ -37,9 +44,6 @@ export type StaticMetadataConfigInput = {
    * @description Team responsible for emitting this log.
    */
   team: string;
-  //
-  // OPTIONAL FIELDS
-  //
   /**
    * @description Tags for the logged system.
    */
@@ -48,54 +52,16 @@ export type StaticMetadataConfigInput = {
    * @description Data sensitivity classification for the contents of this log.
    */
   dataSensitivity?: DataSensitivity;
-};
-
-/**
- * @description Enriched metadata that is dynamically extended.
- */
-export type Metadata = StaticMetadataConfigInput & {
-  /**
-   * @description Log ID.
-   */
-  id: string;
-  /**
-   * @description Correlation ID for the function call.
-   */
-  correlationId: string;
-  /**
-   * @description Timestamp when the log was produced.
-   */
-  timestamp: string;
-  /**
-   * @description Timestamp of the call.
-   */
-  timestampRequest: string;
-  /**
-   * @description What region is this system running in?
-   * @todo Is this redundant since this is present in `DynamicMetadataOutput` too?
-   */
-  region: string;
   /**
    * @description What legal jurisdiction does this system fall into?
-   * @example `EU`, `US`, `China`
+   * @example `EU`, `US`, `CN`
    */
-  jurisdiction: string;
-};
-
-/**
- * @description Valid lifecycles stages.
- */
-type LifecycleStage = 'production' | 'qa' | 'test' | 'development' | 'staging' | 'demo';
-
-/**
- * @description Valid data sensitivity levels.
- */
-type DataSensitivity = 'public' | 'sensitive' | 'proprietary' | 'secret';
-
+  jurisdiction?: string;
+}
 /**
  * @description Dynamic metadata.
  */
-export type DynamicMetadataOutput = {
+export interface DynamicMetadataOutput {
   /**
    * @description ID of the log.
    */
@@ -108,6 +74,10 @@ export type DynamicMetadataOutput = {
    * @description Timestamp of this message in ISO 8601 format.
    */
   timestampHuman: string;
+  /**
+   * @description Request time in Unix epoch of the incoming request.
+   */
+  timestampRequest: string;
   /**
    * @description Correlation ID for this function call.
    */
@@ -130,7 +100,7 @@ export type DynamicMetadataOutput = {
    */
   runtime: string;
   /**
-   * @description The name of the funciton.
+   * @description The name of the function.
    */
   functionName: string;
   /**
@@ -153,8 +123,4 @@ export type DynamicMetadataOutput = {
    * @description The AWS account ID that the system is running in.
    */
   accountId: string;
-  /**
-   * @description Request time in Unix epoch of the incoming request.
-   */
-  requestTimeEpoch: string;
-};
+}

@@ -51,7 +51,7 @@ const { MikroLog } = require('mikrolog');
 // ES6 format
 import { MikroLog } from 'mikrolog';
 
-const logger = MikroLog.getInstance();
+const logger = MikroLog.start();
 
 // String message
 logger.log('Hello World!');
@@ -65,11 +65,11 @@ logger.log({
 
 ### Configuration
 
-You may also optionally instantiate MikroLog using a custom metadata object:
+You may also optionally instantiate MikroLog using a custom metadata object. You can do this either when starting (setting up) a local logger or enriching it after the fact.
 
 ```typescript
 const metadata = { service: 'MyService' };
-const logger = MikroLog.getInstance({ metadataConfig: metadata });
+const logger = MikroLog.start({ metadataConfig: metadata });
 ```
 
 To use the full set of features, including deriving dynamic metadata from AWS Lambda, you would add the `event` and `context` objects like so:
@@ -79,10 +79,13 @@ To use the full set of features, including deriving dynamic metadata from AWS La
 export async function handler(event: any, context: any) {
   // {...}
   const metadata = { service: 'MyService' };
-  const logger = MikroLog.getInstance({ metadataConfig: metadata, { event, context } });
+  const logger = MikroLog.start();
+  MikroLog.enrich({ metadataConfig: metadata, event, context });
   // {...}
 }
 ```
+
+Note how MikroLog, in this case, was enriched after its initial start.
 
 See more in the [Metadata](#metadata) section.
 
@@ -161,65 +164,23 @@ The dynamic metadata fields are picked up automatically if you pass them in duri
 
 If these values are not available, they will be dropped at the time of log output. In effect, this means you won't have to deal with them (being empty or otherwise) if you use MikroLog in another type of context.
 
-```typescript
-/**
- * @description ID of the log.
- */
-id: string;
-/**
- * @description Timestamp of this message in Unix epoch.
- */
-timestamp: string;
-/**
- * @description Timestamp of this message in ISO 8601 format.
- */
-timestampHuman: string;
-/**
- * @description Correlation ID for this function call.
- */
-correlationId: string;
-/**
- * @description The user in this log context.
- */
-user: string;
-/**
- * @description The route that is responding. In EventBridge, this will be your detail type.
- * @example `/doSomething`
- */
-route: string;
-/**
- * @description The region of the responding function/system.
- */
-region: string;
-/**
- * @description What runtime is used?
- */
-runtime: string;
-/**
- * @description The name of the funciton.
- */
-functionName: string;
-/**
- * @description Memory size of the current function.
- */
-functionMemorySize: string;
-/**
- * @description The version of the function.
- */
-functionVersion: string;
-/**
- * @description What AWS stage are we in?
- */
-stage: string;
-/**
- * @description The AWS account ID that the system is running in.
- */
-accountId: string;
-/**
- * @description Request time in Unix epoch of the incoming request.
- */
-requestTimeEpoch: string;
-```
+| Field                | Type   | Description                                                                    |
+| -------------------- | ------ | ------------------------------------------------------------------------------ |
+| `id`                 | string | ID of the log.                                                                 |
+| `timestamp`          | string | Timestamp of this message in Unix epoch.                                       |
+| `timestampHuman`     | string | Timestamp of this message in ISO 8601 format.                                  |
+| `correlationId`      | string | Correlation ID for this function call.                                         |
+| `user`               | string | The user in this log context.                                                  |
+| `route`              | string | The route that is responding. In EventBridge, this will be your `detail-type`. |
+| `region`             | string | The region of the responding function/system.                                  |
+| `runtime`            | string | What runtime is used?                                                          |
+| `functionName`       | string | The name of the function.                                                      |
+| `functionMemorySize` | string | Memory size of the current function.                                           |
+| `functionVersion`    | string | The version of the function.                                                   |
+| `stage`              | string | What AWS stage are we in?                                                      |
+| `viewerCountry`      | string | Which country did AWS CloudFront infer the user to be in?                      |
+| `accountId`          | string | The AWS account ID that the system is running in.                              |
+| `timestampRequest`   | string | Request time in Unix epoch of the incoming request.                            |
 
 ## Redacting keys or masking values
 
@@ -248,7 +209,8 @@ const log = logger.log('Checking...');
  * The log will be similar to:
 {
   message: 'Checking...',
-  secretValue: 'MASKED'
+  secretValue: 'MASKED',
+  { ...any other values }
 }
 */
 ```

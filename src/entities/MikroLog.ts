@@ -1,11 +1,9 @@
-import { APIGatewayEvent, Context } from 'aws-lambda';
 import { randomUUID } from 'crypto';
 
 import { MikroLogInput, LogInput, LogOutput, Message } from '../interfaces/MikroLog';
 import { StaticMetadataConfigInput, DynamicMetadataOutput } from '../interfaces/Metadata';
 
 import {
-  produceStartTime,
   produceRegion,
   produceRuntime,
   produceFunctionName,
@@ -17,7 +15,7 @@ import {
   produceStage,
   produceViewerCountry,
   produceAccountId,
-  produceRequestTimeEpoch
+  produceTimestampRequest
 } from './metadataUtils';
 
 /**
@@ -45,10 +43,14 @@ logger.log({
 export class MikroLog {
   private static instance: MikroLog;
   private static metadataConfig: StaticMetadataConfigInput | Record<string, any> = {};
-  // @ts-ignore
-  private static event: APIGatewayEvent = {};
-  // @ts-ignore
-  private static context: Context = {};
+  private static event: any = {};
+  private static context: any = {};
+
+  private constructor() {
+    MikroLog.metadataConfig = {};
+    MikroLog.event = {};
+    MikroLog.context = {};
+  }
 
   /**
    * @description This instantiates MikroLog. In order to be able
@@ -73,7 +75,6 @@ export class MikroLog {
 
   /**
    * @description Enrich MikroLog with metadata, AWS Lambda event and/or context.
-   * @todo Replace or merge intersections of input with existing data?
    */
   public static enrich(input: MikroLogInput) {
     MikroLog.metadataConfig = Object.assign(MikroLog.metadataConfig, input.metadataConfig || {});
@@ -86,20 +87,14 @@ export class MikroLog {
    * reset the instance to its empty default state.
    */
   public static reset() {
-    MikroLog.metadataConfig = {};
-    MikroLog.event = {} as any;
-    MikroLog.context = {} as any;
+    MikroLog.instance = new MikroLog();
   }
 
   /**
    * @description Retrieve all stored data from process environment.
-   * @todo Perhaps store this stringified as one large blob instead?
-   * @todo For security reasons perhaps a check needs to be done on
-   * IP/country/viewer match before restoring?
    */
   private loadEnrichedEnvironment() {
     return {
-      startTime: produceStartTime(),
       region: produceRegion(MikroLog.context),
       runtime: produceRuntime(),
       functionName: produceFunctionName(MikroLog.context),
@@ -111,7 +106,7 @@ export class MikroLog {
       stage: produceStage(MikroLog.event),
       viewerCountry: produceViewerCountry(MikroLog.event),
       accountId: produceAccountId(MikroLog.event),
-      requestTimeEpoch: produceRequestTimeEpoch(MikroLog.event)
+      timestampRequest: produceTimestampRequest(MikroLog.event)
     };
   }
 
@@ -198,57 +193,25 @@ export class MikroLog {
    * @description Create the log envelope.
    */
   private createLog(log: LogInput): LogOutput {
-    const {
-      correlationId,
-      user,
-      route,
-      region,
-      runtime,
-      functionName,
-      functionMemorySize,
-      functionVersion,
-      stage,
-      viewerCountry,
-      accountId,
-      requestTimeEpoch,
-      id,
-      timestamp,
-      timestampHuman
-    } = this.produceDynamicMetadata();
+    const staticMetadata: any = MikroLog.metadataConfig;
+    const redactedKeys = staticMetadata['redactedKeys']
+      ? staticMetadata['redactedKeys']
+      : undefined;
+    const maskedValues = staticMetadata['maskedValues']
+      ? staticMetadata['maskedValues']
+      : undefined;
+    if (redactedKeys) delete staticMetadata['redactedKeys'];
+    if (maskedValues) delete staticMetadata['maskedValues'];
 
-    const metadataConfig: any = MikroLog.metadataConfig;
-    const redactedKeys = metadataConfig['redactedKeys']
-      ? metadataConfig['redactedKeys']
-      : undefined;
-    const maskedValues = metadataConfig['maskedValues']
-      ? metadataConfig['maskedValues']
-      : undefined;
-    if (redactedKeys) delete metadataConfig['redactedKeys'];
-    if (maskedValues) delete metadataConfig['maskedValues'];
+    const dynamicMetadata = this.produceDynamicMetadata();
 
     const logOutput = {
-      // Static metadata
-      ...metadataConfig,
-      // Dynamic metadata
+      ...staticMetadata,
+      ...dynamicMetadata,
       message: log.message,
       error: log.level === 'ERROR',
       level: log.level,
-      httpStatusCode: log.httpStatusCode,
-      id,
-      timestamp,
-      timestampHuman,
-      correlationId,
-      user,
-      route,
-      region,
-      runtime,
-      functionName,
-      functionMemorySize,
-      functionVersion,
-      stage,
-      viewerCountry,
-      accountId,
-      requestTimeEpoch
+      httpStatusCode: log.httpStatusCode
     };
 
     return this.filterOutput(logOutput, redactedKeys, maskedValues);

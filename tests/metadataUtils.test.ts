@@ -5,8 +5,6 @@ import { MikroLog } from '../src';
 import event from '../testdata/event.json';
 import context from '../testdata/context.json';
 
-test.after(() => MikroLog.reset());
-
 /**
  * POSITIVE TESTS
  */
@@ -225,7 +223,7 @@ test.serial('It should set request time (in Unix epoch)', (t) => {
   MikroLog.reset();
   const logger = MikroLog.start();
   MikroLog.enrich({ event, context });
-  const response = logger.log('something').requestTimeEpoch;
+  const response = logger.log('something').timestampRequest;
 
   t.is(response?.length, 13);
 });
@@ -247,7 +245,7 @@ test.serial('It should emit a full log and filter out any empty fields', (t) => 
     message: 'something',
     region: 'eu-north-1',
     id: 'a6b1caa3-8a8d-4dc0-8828-e10f63876f9f',
-    requestTimeEpoch: '1657389598171',
+    timestampRequest: '1657389598171',
     route: '/functionName',
     stage: 'shared',
     timestamp: '1657393943792',
@@ -261,17 +259,14 @@ test.serial('It should emit a full log and filter out any empty fields', (t) => 
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
   t.true(response['timestampHuman'] !== null);
-  t.true(response['startTime'] !== null);
 
   // Drop dynamic fields for test validation
   delete response['id'];
   delete response['timestamp'];
   delete response['timestampHuman'];
-  delete response['startTime'];
   delete expected['id'];
   delete expected['timestamp'];
   delete expected['timestampHuman'];
-  delete expected['startTime'];
 
   t.deepEqual(response, expected);
 });

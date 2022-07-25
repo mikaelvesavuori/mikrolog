@@ -4,11 +4,18 @@ import { MikroLog } from '../src/entities/MikroLog';
 
 import { metadataConfig } from '../testdata/config';
 
-test.after(() => MikroLog.reset());
-
 /**
  * POSITIVE TESTS
  */
+test.serial('Starting MikroLog will set the instance to a new one', (t) => {
+  const logger = MikroLog.start();
+
+  const isInstance = logger instanceof MikroLog;
+  const expected = true;
+
+  t.is(isInstance, expected);
+});
+
 test.serial(
   'It should print out a structured log when given a string message but having no custom static metadata or process environment',
   (t) => {

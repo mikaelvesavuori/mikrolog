@@ -4,9 +4,9 @@ export declare class MikroLog {
     private static metadataConfig;
     private static event;
     private static context;
+    private constructor();
     static start(input?: MikroLogInput): MikroLog;
     static enrich(input: MikroLogInput): void;
-    config(): void;
     static reset(): void;
     private loadEnrichedEnvironment;
     private produceDynamicMetadata;

@@ -1,5 +1,3 @@
-import { APIGatewayEvent, Context } from 'aws-lambda';
-
 import { StaticMetadataConfigInput, DynamicMetadataOutput } from './Metadata';
 
 /**
@@ -13,11 +11,11 @@ export interface MikroLogInput {
   /**
    * AWS Lambda event object. Used to gather dynamic metadata.
    */
-  event?: APIGatewayEvent | any; // TODO
+  event?: any;
   /**
    * AWS Lambda context object. Used to gather dynamic metadata.
    */
-  context?: Context | any; // TODO
+  context?: any;
 }
 
 /**
