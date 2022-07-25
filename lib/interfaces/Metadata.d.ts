@@ -30,4 +30,4 @@ export interface DynamicMetadataOutput {
     viewerCountry: string;
     accountId: string;
 }
-export { };
+export {};
