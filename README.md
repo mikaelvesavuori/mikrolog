@@ -29,11 +29,15 @@ Loggers have become too opinionated, bloated and complicated. MikroLog provides 
 - Outside of AWS itself, logs carry across perfectly to observability solutions like Datadog, New Relic, Honeycomb...
 - Easy to redact or mask sensitive data
 - Uses `process.stdout.write()` rather than `console.log()` so you can safely use it in Lambda
-- Tiny (1.7 KB gzipped)
+- Tiny (~2 KB gzipped)
 - Has zero dependencies
 - Has 100% test coverage
 
 ## Behavior
+
+MikroLog version 2.0 and later is implemented using a singleton pattern, meaning the instance is reused rather than necessitating that you spawn new instances of it everywhere you need it. This makes it easier for you to use, but also means the API is not exactly like it was in version 1.0. In the context of Lambda, where things in the global execution context (like imports and singletons) are reused across calls, you should be aware that the logger context may be reused. Read more in the `Security notes` section further down.
+
+Logs will be sorted alphabetically by key.
 
 MikroLog will throw away any fields that are undefined, null or empty.
 
@@ -133,7 +137,7 @@ logger.debug('My message!');
 
 ### Static metadata
 
-This is the metadata that you may provide at the time of instantiation. These fields will then be used automatically in all subsequent logs.
+_Static metadata_ is the metadata that you may provide at the time of instantiation. These fields will then be used automatically in all subsequent logs.
 
 Under the hood, MikroLog is built and tested around practically the same metadata format as seen in [catalogist](https://github.com/mikaelvesavuori/catalogist) which might look like:
 
@@ -151,7 +155,7 @@ const metadataConfig = {
   dataSensitivity: 'public'
 };
 
-const logger = MikroLog.getInstance({ metadataConfig });
+const logger = MikroLog.start({ metadataConfig });
 ```
 
 _However, you are free to use whatever static metadata you want._
@@ -202,11 +206,11 @@ const metadataConfig = {
   redactedKeys: ['userId'],
   maskedValues: ['secretValue']
 };
-const logger = MikroLog.getInstance({ metadataConfig });
+const logger = MikroLog.start({ metadataConfig });
 const log = logger.log('Checking...');
 
 /**
- * The log will be similar to:
+ * The log will look something like:
 {
   message: 'Checking...',
   secretValue: 'MASKED',
@@ -214,6 +218,24 @@ const log = logger.log('Checking...');
 }
 */
 ```
+
+## Security notes
+
+MikroLog version 1.0 used `process.env` to store values in order to make usage of the logger easier without having to pass around the same logger instance. This could be a security concern (albeit far-fetched) since the environment variables might leak across function calls. From a developer perspective, it was also a workable but not ideal implementation.
+
+MikroLog version 2.0 and later is instead implemented using a singleton pattern, meaning the instance is reused rather than necessitating that you spawn new instances of it everywhere you need it. This makes it easier for you to use, but also means the API is not exactly like it was in version 1.0. In the context of Lambda, where things in the global execution context (like imports and singletons) are reused across calls, you should be aware that the logger context may be reused.
+
+This should not be a significant problem since Lambda is reused in the same _function scope_, which means that for example static metadata that is reused will most likely be the same anyway. This can be validated with a simple experiment:
+
+- Build a basic Lambda function that uses MikroLog and can take in input via POST
+- Call the Lambda with a payload that sets some static field (say `service`) to a custom value
+- Run it a few times
+- Call it again with an empty payload (effectively not using any custom value)
+- It should respond with the previous value for the service, even if you called it this time without any value
+
+For dynamic metadata (which may be more sensitive than static metadata), such metadata is **always** recalculated and will therefore not leak between calls.
+
+At the end of the day you might wonder if this solution is better? I would say overall it is more standardized in its approach as well as (now) documented better. Just keep this in mind when you work with MikroLog or any other logger.
 
 ## License
 

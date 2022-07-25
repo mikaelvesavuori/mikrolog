@@ -85,7 +85,7 @@ export function produceUser(event: any): string {
 
 /**
  * @description Set the current AWS stage.
- * @todo Will be unknown in EventBridge case; use metadata object?
+ * @note Will be unknown in EventBridge case; use metadata object?
  */
 export function produceStage(event: any): string {
   if (event && event['requestContext'] && event['requestContext']['stage'])
@@ -116,7 +116,7 @@ export function produceAccountId(event: any): string {
 
 /**
  * @description Set the request time in Unix epoch format.
- * @todo Will be unknown in called service
+ * @note Will be unknown in called service
  */
 export function produceTimestampRequest(event: any): string {
   if (event && event['requestContext'] && event['requestContext']['requestTimeEpoch'])

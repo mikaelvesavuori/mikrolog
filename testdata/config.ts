@@ -10,5 +10,6 @@ export const metadataConfig: StaticMetadataConfigInput = {
   service: 'UserSignUp',
   team: 'MyDemoTeam',
   tags: [''],
-  dataSensitivity: 'public'
+  dataSensitivity: 'public',
+  jurisdiction: 'EU'
 };

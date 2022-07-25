@@ -95,6 +95,8 @@ export class MikroLog {
    */
   private loadEnrichedEnvironment() {
     return {
+      timestampRequest: produceTimestampRequest(MikroLog.event),
+      accountId: produceAccountId(MikroLog.event),
       region: produceRegion(MikroLog.context),
       runtime: produceRuntime(),
       functionName: produceFunctionName(MikroLog.context),
@@ -104,9 +106,7 @@ export class MikroLog {
       route: produceRoute(MikroLog.event),
       user: produceUser(MikroLog.event),
       stage: produceStage(MikroLog.event),
-      viewerCountry: produceViewerCountry(MikroLog.event),
-      accountId: produceAccountId(MikroLog.event),
-      timestampRequest: produceTimestampRequest(MikroLog.event)
+      viewerCountry: produceViewerCountry(MikroLog.event)
     };
   }
 
@@ -214,11 +214,12 @@ export class MikroLog {
       httpStatusCode: log.httpStatusCode
     };
 
-    return this.filterOutput(logOutput, redactedKeys, maskedValues);
+    const filteredOutput = this.filterOutput(logOutput, redactedKeys, maskedValues);
+    return this.sortOutput(filteredOutput);
   }
 
   /**
-   * @description This filters, redacts and masks the log prior to actual output.
+   * @description This filters, redacts, and masks the log prior to actual output.
    */
   private filterOutput(
     logOutput: LogOutput,
@@ -243,5 +244,18 @@ export class MikroLog {
     });
 
     return filteredOutput;
+  }
+
+  /**
+   * @description Alphabetically sort the fields in the log object.
+   */
+  private sortOutput(input: LogOutput) {
+    const sortedOutput: any = {};
+
+    Object.entries(input)
+      .sort()
+      .forEach(([key, value]) => (sortedOutput[key] = value));
+
+    return sortedOutput;
   }
 }

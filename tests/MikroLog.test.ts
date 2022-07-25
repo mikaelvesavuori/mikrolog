@@ -80,7 +80,8 @@ test.serial('It should print out a structured log when given a string message', 
     level: 'INFO',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
     timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)'
+    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
+    jurisdiction: 'EU'
   };
 
   // Ensure exactness of message field
@@ -129,7 +130,8 @@ test.serial(
       level: 'INFO',
       id: '1256767f-c875-4d82-813d-bc260bd0ba07',
       timestamp: '1656438566041',
-      timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)'
+      timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
+      jurisdiction: 'EU'
     };
 
     // Ensure exactness of message field
@@ -177,7 +179,8 @@ test.serial('It should print out a structured debug log when given a string mess
     level: 'DEBUG',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
     timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)'
+    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
+    jurisdiction: 'EU'
   };
 
   // Ensure exactness of message field
@@ -224,7 +227,8 @@ test.serial('It should print out a structured warning log when given a string me
     level: 'WARN',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
     timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)'
+    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
+    jurisdiction: 'EU'
   };
 
   // Ensure exactness of message field
@@ -271,7 +275,8 @@ test.serial('It should print out a structured error log when given a string mess
     level: 'ERROR',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
     timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)'
+    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
+    jurisdiction: 'EU'
   };
 
   // Ensure exactness of message field
@@ -331,7 +336,8 @@ test.serial('It should redact keys when given a "redactedKeys" list', (t) => {
     level: 'ERROR',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
     timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)'
+    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
+    jurisdiction: 'EU'
   };
 
   // Ensure exactness of message field
@@ -378,7 +384,8 @@ test.serial('It should mask values when given a "maskedValues" list', (t) => {
     system: 'ShowroomActivities',
     tags: [''],
     team: 'MASKED',
-    version: 1
+    version: 1,
+    jurisdiction: 'EU'
   };
 
   // Ensure exactness of message field
