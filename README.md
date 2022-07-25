@@ -235,7 +235,40 @@ This should not be a significant problem since Lambda is reused in the same _fun
 
 For dynamic metadata (which may be more sensitive than static metadata), such metadata is **always** recalculated and will therefore not leak between calls.
 
-At the end of the day you might wonder if this solution is better? I would say overall it is more standardized in its approach as well as (now) documented better. Just keep this in mind when you work with MikroLog or any other logger.
+### Resetting the logger between calls
+
+See below code for an example on how to wrap your implementation to always call `reset()` before closing and returning from the Lambda.
+
+_**There are no promises that this type of reset will be effective!**_
+
+```typescript
+import { MikroLog } from 'mikrolog';
+
+import { metadataConfig } from './config/metadata';
+
+export async function handler(event: any, awsContext: any): Promise<any> {
+  const result = await wrappedHandler(event, awsContext);
+  MikroLog.reset();
+  return result;
+}
+
+async function wrappedHandler(event: any, awsContext: any) {
+  const body = event.body && typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
+  if (body && body.service) metadataConfig.service = body.service;
+
+  const logger = MikroLog.start({ metadataConfig, event, context: awsContext });
+  const message = logger.info('info message');
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify(message)
+  };
+}
+```
+
+---
+
+At the end of the day you might wonder if this solution (v2 vs v1) is better? I would say overall it is more standardized in its approach as well as (now) documented better. Just keep this in mind when you work with MikroLog or any other logger.
 
 ## License
 
