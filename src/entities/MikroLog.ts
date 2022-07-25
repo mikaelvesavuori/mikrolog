@@ -119,8 +119,8 @@ export class MikroLog {
 
     const metadata = {
       id: randomUUID(),
-      timestamp: `${timeNow}`,
-      timestampHuman: new Date(timeNow).toISOString(),
+      timestamp: new Date(timeNow).toISOString(),
+      timestampEpoch: `${timeNow}`,
       ...env
     };
 

@@ -67,13 +67,13 @@ export interface DynamicMetadataOutput {
    */
   id: string;
   /**
-   * @description Timestamp of this message in Unix epoch.
+   * @description Timestamp of this message in ISO 8601 (RFC 3339) format.
    */
   timestamp: string;
   /**
-   * @description Timestamp of this message in ISO 8601 format.
+   * @description Timestamp of this message in Unix epoch.
    */
-  timestampHuman: string;
+  timestampEpoch: string;
   /**
    * @description Request time in Unix epoch of the incoming request.
    */

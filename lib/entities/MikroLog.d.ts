@@ -18,4 +18,5 @@ export declare class MikroLog {
     private writeLog;
     private createLog;
     private filterOutput;
+    private sortOutput;
 }

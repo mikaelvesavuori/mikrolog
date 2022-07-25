@@ -249,7 +249,7 @@ test.serial('It should emit a full log and filter out any empty fields', (t) => 
     route: '/functionName',
     stage: 'shared',
     timestamp: '1657393943792',
-    timestampHuman: '2022-07-09T19:12:23.792Z',
+    timestampEpoch: '2022-07-09T19:12:23.792Z',
     user: 'some user',
     viewerCountry: 'SE'
   };
@@ -258,15 +258,15 @@ test.serial('It should emit a full log and filter out any empty fields', (t) => 
   // Check presence of dynamic fields
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
-  t.true(response['timestampHuman'] !== null);
+  t.true(response['timestampEpoch'] !== null);
 
   // Drop dynamic fields for test validation
   delete response['id'];
   delete response['timestamp'];
-  delete response['timestampHuman'];
+  delete response['timestampEpoch'];
   delete expected['id'];
   delete expected['timestamp'];
-  delete expected['timestampHuman'];
+  delete expected['timestampEpoch'];
 
   t.deepEqual(response, expected);
 });

@@ -170,21 +170,21 @@ If these values are not available, they will be dropped at the time of log outpu
 
 | Field                | Type   | Description                                                                    |
 | -------------------- | ------ | ------------------------------------------------------------------------------ |
-| `id`                 | string | ID of the log.                                                                 |
-| `timestamp`          | string | Timestamp of this message in Unix epoch.                                       |
-| `timestampHuman`     | string | Timestamp of this message in ISO 8601 format.                                  |
-| `correlationId`      | string | Correlation ID for this function call.                                         |
-| `user`               | string | The user in this log context.                                                  |
-| `route`              | string | The route that is responding. In EventBridge, this will be your `detail-type`. |
-| `region`             | string | The region of the responding function/system.                                  |
-| `runtime`            | string | What runtime is used?                                                          |
-| `functionName`       | string | The name of the function.                                                      |
-| `functionMemorySize` | string | Memory size of the current function.                                           |
-| `functionVersion`    | string | The version of the function.                                                   |
-| `stage`              | string | What AWS stage are we in?                                                      |
-| `viewerCountry`      | string | Which country did AWS CloudFront infer the user to be in?                      |
 | `accountId`          | string | The AWS account ID that the system is running in.                              |
+| `correlationId`      | string | Correlation ID for this function call.                                         |
+| `functionMemorySize` | string | Memory size of the current function.                                           |
+| `functionName`       | string | The name of the function.                                                      |
+| `functionVersion`    | string | The version of the function.                                                   |
+| `id`                 | string | ID of the log.                                                                 |
+| `region`             | string | The region of the responding function/system.                                  |
+| `route`              | string | The route that is responding. In EventBridge, this will be your `detail-type`. |
+| `runtime`            | string | What runtime is used?                                                          |
+| `stage`              | string | What AWS stage are we in?                                                      |
+| `timestamp`          | string | Timestamp of this message in ISO 8601 (RFC 3339) format.                       |
+| `timestampEpoch`     | string | Timestamp of this message in Unix epoch.                                       |
 | `timestampRequest`   | string | Request time in Unix epoch of the incoming request.                            |
+| `user`               | string | The user in this log context.                                                  |
+| `viewerCountry`      | string | Which country did AWS CloudFront infer the user to be in?                      |
 
 ## Redacting keys or masking values
 
@@ -230,7 +230,7 @@ This should not be a significant problem since Lambda is reused in the same _fun
 - Build a basic Lambda function that uses MikroLog and can take in input via POST
 - Call the Lambda with a payload that sets some static field (say `service`) to a custom value
 - Run it a few times
-- Call it again with an empty payload (effectively not using any custom value)
+- Call it again with an _empty_ payload (i.e. effectively not using any custom value)
 - It should respond with the previous value for the service, even if you called it this time without any value
 
 For dynamic metadata (which may be more sensitive than static metadata), such metadata is **always** recalculated and will therefore not leak between calls.

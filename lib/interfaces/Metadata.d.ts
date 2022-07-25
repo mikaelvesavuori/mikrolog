@@ -16,7 +16,7 @@ export interface StaticMetadataConfigInput {
 export interface DynamicMetadataOutput {
     id: string;
     timestamp: string;
-    timestampHuman: string;
+    timestampEpoch: string;
     timestampRequest: string;
     correlationId: string;
     user: string;
@@ -30,4 +30,4 @@ export interface DynamicMetadataOutput {
     viewerCountry: string;
     accountId: string;
 }
-export {};
+export { };

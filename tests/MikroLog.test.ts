@@ -31,8 +31,8 @@ test.serial(
       httpStatusCode: 200,
       level: 'INFO',
       id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-      timestamp: '1656438566041',
-      timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)'
+      timestamp: '2022-07-25T08:52:21.121Z',
+      timestampEpoch: '1656438566041'
     };
 
     // Ensure exactness of message field
@@ -41,15 +41,15 @@ test.serial(
     // Check presence of dynamic fields
     t.true(response['id'] !== null);
     t.true(response['timestamp'] !== null);
-    t.true(response['timestampHuman'] !== null);
+    t.true(response['timestampEpoch'] !== null);
 
     // Drop dynamic fields for test validation
     delete response['id'];
     delete response['timestamp'];
-    delete response['timestampHuman'];
+    delete response['timestampEpoch'];
     delete expected['id'];
     delete expected['timestamp'];
-    delete expected['timestampHuman'];
+    delete expected['timestampEpoch'];
 
     // @ts-ignore
     t.deepEqual(response, expected);
@@ -79,8 +79,8 @@ test.serial('It should print out a structured log when given a string message', 
     httpStatusCode: 200,
     level: 'INFO',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-    timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
+    timestamp: '2022-07-25T08:52:21.121Z',
+    timestampEpoch: '1656438566041',
     jurisdiction: 'EU'
   };
 
@@ -90,15 +90,15 @@ test.serial('It should print out a structured log when given a string message', 
   // Check presence of dynamic fields
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
-  t.true(response['timestampHuman'] !== null);
+  t.true(response['timestampEpoch'] !== null);
 
   // Drop dynamic fields for test validation
   delete response['id'];
   delete response['timestamp'];
-  delete response['timestampHuman'];
+  delete response['timestampEpoch'];
   delete expected['id'];
   delete expected['timestamp'];
-  delete expected['timestampHuman'];
+  delete expected['timestampEpoch'];
 
   // @ts-ignore
   t.deepEqual(response, expected);
@@ -129,8 +129,8 @@ test.serial(
       httpStatusCode: 200,
       level: 'INFO',
       id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-      timestamp: '1656438566041',
-      timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
+      timestamp: '2022-07-25T08:52:21.121Z',
+      timestampEpoch: '1656438566041',
       jurisdiction: 'EU'
     };
 
@@ -140,15 +140,15 @@ test.serial(
     // Check presence of dynamic fields
     t.true(response['id'] !== null);
     t.true(response['timestamp'] !== null);
-    t.true(response['timestampHuman'] !== null);
+    t.true(response['timestampEpoch'] !== null);
 
     // Drop dynamic fields for test validation
     delete response['id'];
     delete response['timestamp'];
-    delete response['timestampHuman'];
+    delete response['timestampEpoch'];
     delete expected['id'];
     delete expected['timestamp'];
-    delete expected['timestampHuman'];
+    delete expected['timestampEpoch'];
 
     // @ts-ignore
     t.deepEqual(response, expected);
@@ -178,8 +178,8 @@ test.serial('It should print out a structured debug log when given a string mess
     httpStatusCode: 200,
     level: 'DEBUG',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-    timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
+    timestamp: '2022-07-25T08:52:21.121Z',
+    timestampEpoch: '1656438566041',
     jurisdiction: 'EU'
   };
 
@@ -189,15 +189,15 @@ test.serial('It should print out a structured debug log when given a string mess
   // Check presence of dynamic fields
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
-  t.true(response['timestampHuman'] !== null);
+  t.true(response['timestampEpoch'] !== null);
 
   // Drop dynamic fields for test validation
   delete response['id'];
   delete response['timestamp'];
-  delete response['timestampHuman'];
+  delete response['timestampEpoch'];
   delete expected['id'];
   delete expected['timestamp'];
-  delete expected['timestampHuman'];
+  delete expected['timestampEpoch'];
 
   // @ts-ignore
   t.deepEqual(response, expected);
@@ -226,8 +226,8 @@ test.serial('It should print out a structured warning log when given a string me
     httpStatusCode: 200,
     level: 'WARN',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-    timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
+    timestamp: '2022-07-25T08:52:21.121Z',
+    timestampEpoch: '1656438566041',
     jurisdiction: 'EU'
   };
 
@@ -237,15 +237,15 @@ test.serial('It should print out a structured warning log when given a string me
   // Check presence of dynamic fields
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
-  t.true(response['timestampHuman'] !== null);
+  t.true(response['timestampEpoch'] !== null);
 
   // Drop dynamic fields for test validation
   delete response['id'];
   delete response['timestamp'];
-  delete response['timestampHuman'];
+  delete response['timestampEpoch'];
   delete expected['id'];
   delete expected['timestamp'];
-  delete expected['timestampHuman'];
+  delete expected['timestampEpoch'];
 
   // @ts-ignore
   t.deepEqual(response, expected);
@@ -274,8 +274,8 @@ test.serial('It should print out a structured error log when given a string mess
     httpStatusCode: 400,
     level: 'ERROR',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-    timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
+    timestamp: '2022-07-25T08:52:21.121Z',
+    timestampEpoch: '1656438566041',
     jurisdiction: 'EU'
   };
 
@@ -285,15 +285,15 @@ test.serial('It should print out a structured error log when given a string mess
   // Check presence of dynamic fields
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
-  t.true(response['timestampHuman'] !== null);
+  t.true(response['timestampEpoch'] !== null);
 
   // Drop dynamic fields for test validation
   delete response['id'];
   delete response['timestamp'];
-  delete response['timestampHuman'];
+  delete response['timestampEpoch'];
   delete expected['id'];
   delete expected['timestamp'];
-  delete expected['timestampHuman'];
+  delete expected['timestampEpoch'];
 
   // @ts-ignore
   t.deepEqual(response, expected);
@@ -335,8 +335,8 @@ test.serial('It should redact keys when given a "redactedKeys" list', (t) => {
     httpStatusCode: 400,
     level: 'ERROR',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-    timestamp: '1656438566041',
-    timestampHuman: 'Tue Jun 28 2022 19:49:26 GMT+0200 (Central European Summer Time)',
+    timestamp: '2022-07-25T08:52:21.121Z',
+    timestampEpoch: '1656438566041',
     jurisdiction: 'EU'
   };
 
@@ -346,15 +346,15 @@ test.serial('It should redact keys when given a "redactedKeys" list', (t) => {
   // Check presence of dynamic fields
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
-  t.true(response['timestampHuman'] !== null);
+  t.true(response['timestampEpoch'] !== null);
 
   // Drop dynamic fields for test validation
   delete response['id'];
   delete response['timestamp'];
-  delete response['timestampHuman'];
+  delete response['timestampEpoch'];
   delete expected['id'];
   delete expected['timestamp'];
-  delete expected['timestampHuman'];
+  delete expected['timestampEpoch'];
 
   // @ts-ignore
   t.deepEqual(response, expected);
@@ -394,15 +394,15 @@ test.serial('It should mask values when given a "maskedValues" list', (t) => {
   // Check presence of dynamic fields
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
-  t.true(response['timestampHuman'] !== null);
+  t.true(response['timestampEpoch'] !== null);
 
   // Drop dynamic fields for test validation
   delete response['id'];
   delete response['timestamp'];
-  delete response['timestampHuman'];
+  delete response['timestampEpoch'];
   delete expected['id'];
   delete expected['timestamp'];
-  delete expected['timestampHuman'];
+  delete expected['timestampEpoch'];
 
   // @ts-ignore
   t.deepEqual(response, expected);
@@ -439,15 +439,15 @@ test.serial('It should accept a custom metadata configuration', (t) => {
   // Check presence of dynamic fields
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
-  t.true(response['timestampHuman'] !== null);
+  t.true(response['timestampEpoch'] !== null);
 
   // Drop dynamic fields for test validation
   delete response['id'];
   delete response['timestamp'];
-  delete response['timestampHuman'];
+  delete response['timestampEpoch'];
   delete expected['id'];
   delete expected['timestamp'];
-  delete expected['timestampHuman'];
+  delete expected['timestampEpoch'];
 
   // @ts-ignore
   t.deepEqual(response, expected);
@@ -480,15 +480,15 @@ test.serial('It should retain falsy but defined values in logs', (t) => {
   // Check presence of dynamic fields
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
-  t.true(response['timestampHuman'] !== null);
+  t.true(response['timestampEpoch'] !== null);
 
   // Drop dynamic fields for test validation
   delete response['id'];
   delete response['timestamp'];
-  delete response['timestampHuman'];
+  delete response['timestampEpoch'];
   delete expected['id'];
   delete expected['timestamp'];
-  delete expected['timestampHuman'];
+  delete expected['timestampEpoch'];
 
   // @ts-ignore
   t.deepEqual(response, expected);
@@ -515,12 +515,12 @@ test.serial('It should be able to merge enrichment even if input is essentially 
   // Check presence of dynamic fields
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
-  t.true(response['timestampHuman'] !== null);
+  t.true(response['timestampEpoch'] !== null);
 
   // Drop dynamic fields for test validation
   delete response['id'];
   delete response['timestamp'];
-  delete response['timestampHuman'];
+  delete response['timestampEpoch'];
 
   // @ts-ignore
   t.deepEqual(response, expected);
