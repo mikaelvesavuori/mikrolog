@@ -30,4 +30,5 @@ export interface DynamicMetadataOutput {
     viewerCountry: string;
     accountId: string;
 }
+export declare type FullMetadata = StaticMetadataConfigInput & DynamicMetadataOutput;
 export {};
