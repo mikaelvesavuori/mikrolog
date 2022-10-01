@@ -124,3 +124,8 @@ export interface DynamicMetadataOutput {
    */
   accountId: string;
 }
+
+/**
+ * @description Full metadata set using both dynamic and static sets.
+ */
+export type FullMetadata = StaticMetadataConfigInput & DynamicMetadataOutput;

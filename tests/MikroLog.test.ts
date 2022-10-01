@@ -17,7 +17,7 @@ test.serial('Starting MikroLog will set the instance to a new one', (t) => {
 });
 
 test.serial(
-  'It should print out a structured log when given a string message but having no custom static metadata or process environment',
+  'It should return (print out) a structured log when given a string message but having no custom static metadata or process environment',
   (t) => {
     MikroLog.reset();
     const message = 'Hello World';
@@ -56,7 +56,7 @@ test.serial(
   }
 );
 
-test.serial('It should print out a structured log when given a string message', (t) => {
+test.serial('It should return (print out) a structured log when given a string message', (t) => {
   MikroLog.reset();
   const message = 'Hello World';
 
@@ -105,7 +105,7 @@ test.serial('It should print out a structured log when given a string message', 
 });
 
 test.serial(
-  'It should print out a structured informational log when given a string message',
+  'It should return (print out) a structured informational log when given a string message',
   (t) => {
     MikroLog.reset();
     const message = 'Hello World';
@@ -155,149 +155,216 @@ test.serial(
   }
 );
 
-test.serial('It should print out a structured debug log when given a string message', (t) => {
-  MikroLog.reset();
-  const message = 'Hello World';
+test.serial(
+  'It should return (print out) a structured debug log when given a string message',
+  (t) => {
+    MikroLog.reset();
+    const message = 'Hello World';
 
-  const logger = MikroLog.start({ metadataConfig });
-  const response: any = logger.debug(message);
+    const logger = MikroLog.start({ metadataConfig });
+    const response: any = logger.debug(message);
 
-  const expected: any = {
-    version: 1,
-    lifecycleStage: 'production',
-    owner: 'MyCompany',
-    hostPlatform: 'aws',
-    domain: 'CustomerAcquisition',
-    system: 'ShowroomActivities',
-    service: 'UserSignUp',
-    team: 'MyDemoTeam',
-    tags: [''],
-    dataSensitivity: 'public',
-    message: 'Hello World',
-    error: false,
-    httpStatusCode: 200,
-    level: 'DEBUG',
-    id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-    timestamp: '2022-07-25T08:52:21.121Z',
-    timestampEpoch: '1656438566041',
-    jurisdiction: 'EU'
-  };
+    const expected: any = {
+      version: 1,
+      lifecycleStage: 'production',
+      owner: 'MyCompany',
+      hostPlatform: 'aws',
+      domain: 'CustomerAcquisition',
+      system: 'ShowroomActivities',
+      service: 'UserSignUp',
+      team: 'MyDemoTeam',
+      tags: [''],
+      dataSensitivity: 'public',
+      message: 'Hello World',
+      error: false,
+      httpStatusCode: 200,
+      level: 'DEBUG',
+      id: '1256767f-c875-4d82-813d-bc260bd0ba07',
+      timestamp: '2022-07-25T08:52:21.121Z',
+      timestampEpoch: '1656438566041',
+      jurisdiction: 'EU'
+    };
 
-  // Ensure exactness of message field
-  t.is(response['message'], message);
+    // Ensure exactness of message field
+    t.is(response['message'], message);
 
-  // Check presence of dynamic fields
-  t.true(response['id'] !== null);
-  t.true(response['timestamp'] !== null);
-  t.true(response['timestampEpoch'] !== null);
+    // Check presence of dynamic fields
+    t.true(response['id'] !== null);
+    t.true(response['timestamp'] !== null);
+    t.true(response['timestampEpoch'] !== null);
 
-  // Drop dynamic fields for test validation
-  delete response['id'];
-  delete response['timestamp'];
-  delete response['timestampEpoch'];
-  delete expected['id'];
-  delete expected['timestamp'];
-  delete expected['timestampEpoch'];
+    // Drop dynamic fields for test validation
+    delete response['id'];
+    delete response['timestamp'];
+    delete response['timestampEpoch'];
+    delete expected['id'];
+    delete expected['timestamp'];
+    delete expected['timestampEpoch'];
 
+    // @ts-ignore
+    t.deepEqual(response, expected);
+  }
+);
+
+test.serial(
+  'It should return (print out) a structured warning log when given a string message',
+  (t) => {
+    MikroLog.reset();
+    const message = 'Hello World';
+
+    const logger = MikroLog.start({ metadataConfig });
+    const response: any = logger.warn(message);
+
+    const expected: any = {
+      version: 1,
+      lifecycleStage: 'production',
+      owner: 'MyCompany',
+      hostPlatform: 'aws',
+      domain: 'CustomerAcquisition',
+      system: 'ShowroomActivities',
+      service: 'UserSignUp',
+      team: 'MyDemoTeam',
+      tags: [''],
+      dataSensitivity: 'public',
+      message: 'Hello World',
+      error: false,
+      httpStatusCode: 200,
+      level: 'WARN',
+      id: '1256767f-c875-4d82-813d-bc260bd0ba07',
+      timestamp: '2022-07-25T08:52:21.121Z',
+      timestampEpoch: '1656438566041',
+      jurisdiction: 'EU'
+    };
+
+    // Ensure exactness of message field
+    t.is(response['message'], message);
+
+    // Check presence of dynamic fields
+    t.true(response['id'] !== null);
+    t.true(response['timestamp'] !== null);
+    t.true(response['timestampEpoch'] !== null);
+
+    // Drop dynamic fields for test validation
+    delete response['id'];
+    delete response['timestamp'];
+    delete response['timestampEpoch'];
+    delete expected['id'];
+    delete expected['timestamp'];
+    delete expected['timestampEpoch'];
+
+    // @ts-ignore
+    t.deepEqual(response, expected);
+  }
+);
+
+test.serial(
+  'It should return (print out) a structured error log when given a string message',
+  (t) => {
+    MikroLog.reset();
+    const message = 'Hello World';
+
+    const logger = MikroLog.start({ metadataConfig });
+    const response: any = logger.error(message);
+
+    const expected: any = {
+      version: 1,
+      lifecycleStage: 'production',
+      owner: 'MyCompany',
+      hostPlatform: 'aws',
+      domain: 'CustomerAcquisition',
+      system: 'ShowroomActivities',
+      service: 'UserSignUp',
+      team: 'MyDemoTeam',
+      tags: [''],
+      dataSensitivity: 'public',
+      message: 'Hello World',
+      error: true,
+      httpStatusCode: 400,
+      level: 'ERROR',
+      id: '1256767f-c875-4d82-813d-bc260bd0ba07',
+      timestamp: '2022-07-25T08:52:21.121Z',
+      timestampEpoch: '1656438566041',
+      jurisdiction: 'EU'
+    };
+
+    // Ensure exactness of message field
+    t.is(response['message'], message);
+
+    // Check presence of dynamic fields
+    t.true(response['id'] !== null);
+    t.true(response['timestamp'] !== null);
+    t.true(response['timestampEpoch'] !== null);
+
+    // Drop dynamic fields for test validation
+    delete response['id'];
+    delete response['timestamp'];
+    delete response['timestampEpoch'];
+    delete expected['id'];
+    delete expected['timestamp'];
+    delete expected['timestampEpoch'];
+
+    // @ts-ignore
+    t.deepEqual(response, expected);
+  }
+);
+
+test.serial('It should set the debug sampling rate through an environment variable', (t) => {
+  const expected = 0.5;
+  process.env.MIKROLOG_SAMPLE_RATE = `${expected}`;
+
+  MikroLog.reset(); // Needed as `initDebugSampleLevel()` is only run at init-time
+  const logger = MikroLog.start();
   // @ts-ignore
-  t.deepEqual(response, expected);
+  const result = logger.setDebugSamplingRate();
+  t.is(result, expected);
+
+  // Reset
+  logger.setDebugSamplingRate(100);
+  process.env.MIKROLOG_SAMPLE_RATE = undefined;
 });
 
-test.serial('It should print out a structured warning log when given a string message', (t) => {
-  MikroLog.reset();
-  const message = 'Hello World';
-
-  const logger = MikroLog.start({ metadataConfig });
-  const response: any = logger.warn(message);
-
-  const expected: any = {
-    version: 1,
-    lifecycleStage: 'production',
-    owner: 'MyCompany',
-    hostPlatform: 'aws',
-    domain: 'CustomerAcquisition',
-    system: 'ShowroomActivities',
-    service: 'UserSignUp',
-    team: 'MyDemoTeam',
-    tags: [''],
-    dataSensitivity: 'public',
-    message: 'Hello World',
-    error: false,
-    httpStatusCode: 200,
-    level: 'WARN',
-    id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-    timestamp: '2022-07-25T08:52:21.121Z',
-    timestampEpoch: '1656438566041',
-    jurisdiction: 'EU'
-  };
-
-  // Ensure exactness of message field
-  t.is(response['message'], message);
-
-  // Check presence of dynamic fields
-  t.true(response['id'] !== null);
-  t.true(response['timestamp'] !== null);
-  t.true(response['timestampEpoch'] !== null);
-
-  // Drop dynamic fields for test validation
-  delete response['id'];
-  delete response['timestamp'];
-  delete response['timestampEpoch'];
-  delete expected['id'];
-  delete expected['timestamp'];
-  delete expected['timestampEpoch'];
-
+test.serial('It should return the current DEBUG sampling rate when given a string value', (t) => {
+  const logger = MikroLog.start();
+  const expected = 100;
   // @ts-ignore
-  t.deepEqual(response, expected);
+  const newSamplingRate = logger.setDebugSamplingRate('10273124');
+  t.is(newSamplingRate, expected);
 });
 
-test.serial('It should print out a structured error log when given a string message', (t) => {
-  MikroLog.reset();
-  const message = 'Hello World';
-
-  const logger = MikroLog.start({ metadataConfig });
-  const response: any = logger.error(message);
-
-  const expected: any = {
-    version: 1,
-    lifecycleStage: 'production',
-    owner: 'MyCompany',
-    hostPlatform: 'aws',
-    domain: 'CustomerAcquisition',
-    system: 'ShowroomActivities',
-    service: 'UserSignUp',
-    team: 'MyDemoTeam',
-    tags: [''],
-    dataSensitivity: 'public',
-    message: 'Hello World',
-    error: true,
-    httpStatusCode: 400,
-    level: 'ERROR',
-    id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-    timestamp: '2022-07-25T08:52:21.121Z',
-    timestampEpoch: '1656438566041',
-    jurisdiction: 'EU'
-  };
-
-  // Ensure exactness of message field
-  t.is(response['message'], message);
-
-  // Check presence of dynamic fields
-  t.true(response['id'] !== null);
-  t.true(response['timestamp'] !== null);
-  t.true(response['timestampEpoch'] !== null);
-
-  // Drop dynamic fields for test validation
-  delete response['id'];
-  delete response['timestamp'];
-  delete response['timestampEpoch'];
-  delete expected['id'];
-  delete expected['timestamp'];
-  delete expected['timestampEpoch'];
-
+test.serial('It should return the current DEBUG sampling rate when given an object value', (t) => {
+  const logger = MikroLog.start();
+  const expected = 100;
   // @ts-ignore
-  t.deepEqual(response, expected);
+  const newSamplingRate = logger.setDebugSamplingRate({ asdf: 123 });
+  t.is(newSamplingRate, expected);
 });
+
+test.serial(
+  'It should set a new DEBUG sampling rate when given a number between 0 and 100',
+  (t) => {
+    const logger = MikroLog.start();
+    const expected = 5;
+    const newSamplingRate = logger.setDebugSamplingRate(expected);
+    t.is(newSamplingRate, expected);
+  }
+);
+
+test.serial('It should set the DEBUG sampling rate to 0 when given a number lower than 0', (t) => {
+  const logger = MikroLog.start();
+  const expected = 0;
+  const newSamplingRate = logger.setDebugSamplingRate(-4);
+  t.is(newSamplingRate, expected);
+});
+
+test.serial(
+  'It should set the DEBUG sampling rate to 100 when given a number higher than than 100',
+  (t) => {
+    const logger = MikroLog.start();
+    const expected = 100;
+    const newSamplingRate = logger.setDebugSamplingRate(10273124);
+    t.is(newSamplingRate, expected);
+  }
+);
 
 /**
  * NEGATIVE TESTS

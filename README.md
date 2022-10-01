@@ -93,6 +93,28 @@ Note how MikroLog, in this case, was enriched after its initial start.
 
 See more in the [Metadata](#metadata) section.
 
+### Setting the `DEBUG` sampling rate
+
+You can set the sampling rate either manually or using an environment variable.
+
+The sample rate uses the `0-100` scale. The default value is `100`, meaning you get all `DEBUG` logs if you don't set this to something else.
+
+You may use integers or floating point numbers.
+
+#### Setting it with an environment variable
+
+Set `MIKROLOG_SAMPLE_RATE` to a numeric or numerically-convertible value and it will be set when initializing MikroLog.
+
+#### Setting it manually
+
+You can also call MikroLog manually like so:
+
+```typescript
+const logger = MikroLog.start();
+logger.setDebugSamplingRate(0.5); // 0.5% of all DEBUG logs will now be sampled.
+logger.setDebugSamplingRate(25); // 25% of all DEBUG logs will now be sampled.
+```
+
 ### Logging
 
 #### Informational logs

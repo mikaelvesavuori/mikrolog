@@ -1,8 +1,5 @@
 import { randomUUID } from 'crypto';
 
-import { MikroLogInput, LogInput, LogOutput, Message } from '../interfaces/MikroLog';
-import { StaticMetadataConfigInput, DynamicMetadataOutput } from '../interfaces/Metadata';
-
 import {
   produceRegion,
   produceRuntime,
@@ -16,7 +13,10 @@ import {
   produceViewerCountry,
   produceAccountId,
   produceTimestampRequest
-} from './metadataUtils';
+} from '../infrastructure/metadataUtils';
+
+import { MikroLogInput, LogInput, LogOutput, Message } from '../interfaces/MikroLog';
+import { StaticMetadataConfigInput, DynamicMetadataOutput } from '../interfaces/Metadata';
 
 /**
  * @description MikroLog is a Lambda-oriented lightweight JSON logger.
@@ -45,15 +45,17 @@ export class MikroLog {
   private static metadataConfig: StaticMetadataConfigInput | Record<string, any> = {};
   private static event: any = {};
   private static context: any = {};
+  private static debugSamplingLevel: number;
 
   private constructor() {
     MikroLog.metadataConfig = {};
     MikroLog.event = {};
     MikroLog.context = {};
+    MikroLog.debugSamplingLevel = this.initDebugSampleLevel();
   }
 
   /**
-   * @description This instantiates MikroLog. In order to be able
+   * @description This instantiates `MikroLog`. In order to be able
    * to "remember" event and context we use a singleton pattern to
    * reuse the same logical instance.
    *
@@ -74,6 +76,14 @@ export class MikroLog {
   }
 
   /**
+   * @description An emergency mechanism if you absolutely need to
+   * reset the instance to its empty default state.
+   */
+  public static reset() {
+    MikroLog.instance = new MikroLog();
+  }
+
+  /**
    * @description Enrich MikroLog with metadata, AWS Lambda event and/or context.
    */
   public static enrich(input: MikroLogInput) {
@@ -83,11 +93,83 @@ export class MikroLog {
   }
 
   /**
-   * @description An emergency mechanism if you absolutely need to
-   * reset the instance to its empty default state.
+   * @description Set sampling rate of `DEBUG` logs.
    */
-  public static reset() {
-    MikroLog.instance = new MikroLog();
+  public setDebugSamplingRate(samplingPercent: number): number {
+    if (typeof samplingPercent !== 'number') return MikroLog.debugSamplingLevel;
+
+    if (samplingPercent < 0) samplingPercent = 0;
+    if (samplingPercent > 100) samplingPercent = 100;
+
+    MikroLog.debugSamplingLevel = samplingPercent;
+    return samplingPercent;
+  }
+
+  /**
+   * @description Output a `DEBUG` log. Message may be string or object.
+   * This will respect whatever sampling rate is currently set.
+   * @example logger.debug('My message!');
+   */
+  public debug(message: Message): LogOutput {
+    const createdLog = this.createLog({ message, level: 'DEBUG', httpStatusCode: 200 });
+    if (this.shouldSampleLog()) this.writeLog(createdLog);
+    return createdLog;
+  }
+
+  /**
+   * @description Alias for `Logger.log()`. Message may be string or object.
+   * @example logger.info('My message!');
+   */
+  public info(message: Message): LogOutput {
+    return this.log(message);
+  }
+
+  /**
+   * @description Output an informational-level log. Message may be string or object.
+   * @example logger.log('My message!');
+   */
+  public log(message: Message): LogOutput {
+    const createdLog = this.createLog({ message, level: 'INFO', httpStatusCode: 200 });
+    this.writeLog(createdLog);
+    return createdLog;
+  }
+
+  /**
+   * @description Output a warning-level log. Message may be string or object.
+   * @example logger.warn('My message!');
+   */
+  public warn(message: Message): LogOutput {
+    const createdLog = this.createLog({ message, level: 'WARN', httpStatusCode: 200 });
+    this.writeLog(createdLog);
+    return createdLog;
+  }
+
+  /**
+   * @description Output an error-level log. Message may be string or object.
+   * @example logger.error('My message!');
+   */
+  public error(message: Message): LogOutput {
+    const createdLog = this.createLog({ message, level: 'ERROR', httpStatusCode: 400 });
+    this.writeLog(createdLog);
+    return createdLog;
+  }
+
+  //
+  // PRIVATE METHODS BELOW
+  //
+
+  /**
+   * @description Initialize the debug sample rate.
+   * Only accepts numbers or strings that can convert to numbers.
+   * The default is to use all `DEBUG` logs (i.e. `100` percent).
+   */
+  private initDebugSampleLevel(): number {
+    const envValue = process.env.MIKROLOG_SAMPLE_RATE;
+    if (envValue) {
+      const isNumeric = !Number.isNaN(envValue) && !Number.isNaN(parseFloat(envValue));
+      if (isNumeric) return parseFloat(envValue);
+    }
+    return 100;
   }
 
   /**
@@ -135,55 +217,18 @@ export class MikroLog {
   }
 
   /**
-   * @description Output a debug log. Message may be string or object.
-   * @example logger.debug('My message!');
+   * @description Utility to check if a log should be sampled (written) based
+   * on the currently set `debugSamplingLevel`. This uses a 0-100 scale.
+   *
+   * If the random number is lower than (or equal to) the sampling level,
+   * then we may sample the log.
    */
-  public debug(message: Message): LogOutput {
-    const createdLog = this.createLog({ message, level: 'DEBUG', httpStatusCode: 200 });
-    this.writeLog(createdLog);
-    return createdLog;
+  private shouldSampleLog(): boolean {
+    return Math.random() * 100 <= MikroLog.debugSamplingLevel;
   }
 
   /**
-   * @description Alias for `Logger.log()`. Message may be string or object.
-   * @example logger.info('My message!');
-   */
-  public info(message: Message): LogOutput {
-    return this.log(message);
-  }
-
-  /**
-   * @description Output an informational-level log. Message may be string or object.
-   * @example logger.log('My message!');
-   */
-  public log(message: Message): LogOutput {
-    const createdLog = this.createLog({ message, level: 'INFO', httpStatusCode: 200 });
-    this.writeLog(createdLog);
-    return createdLog;
-  }
-
-  /**
-   * @description Output a warning-level log. Message may be string or object.
-   * @example logger.warn('My message!');
-   */
-  public warn(message: Message): LogOutput {
-    const createdLog = this.createLog({ message, level: 'WARN', httpStatusCode: 200 });
-    this.writeLog(createdLog);
-    return createdLog;
-  }
-
-  /**
-   * @description Output an error-level log. Message may be string or object.
-   * @example logger.error('My message!');
-   */
-  public error(message: Message): LogOutput {
-    const createdLog = this.createLog({ message, level: 'ERROR', httpStatusCode: 400 });
-    this.writeLog(createdLog);
-    return createdLog;
-  }
-
-  /**
-   * @description Call STDOUT to write the log.
+   * @description Call `STDOUT` to write the log.
    */
   private writeLog(createdLog: LogOutput) {
     process.stdout.write(JSON.stringify(createdLog) + '\n');
