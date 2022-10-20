@@ -5,9 +5,14 @@
 
 /**
  * @description Set correlation ID.
+ *
+ * Check first if this is:
+ * 1) via event;
+ * 2) via header (API);
+ * 3) set new one from AWS request ID;
+ * else set it as empty.
  */
 export function produceCorrelationId(event: any, context: any): string {
-  // Check first if this is 1) via event, 2) via header (API), or 3) set new one from AWS request ID, else set as empty
   if (
     event &&
     event['detail'] &&

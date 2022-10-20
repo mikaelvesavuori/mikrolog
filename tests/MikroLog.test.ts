@@ -366,16 +366,33 @@ test.serial(
   }
 );
 
-/**
- * NEGATIVE TESTS
- */
-/*
-test.serial('It should ASDF',  (t) => {
-  const error = await t.throws( () => await slotAggregate.cancel(''));
-   @ts-ignore
-  t.is(error.name, 'MissingInputDataError');
+test.serial('It should set a custom HTTP status code for informational logs', (t) => {
+  const logger = MikroLog.start();
+  const expected = 201;
+  const message = logger.info('Ny message!', 201);
+  t.is(message['httpStatusCode'], expected);
 });
-*/
+
+test.serial('It should set a custom HTTP status code for debug logs', (t) => {
+  const logger = MikroLog.start();
+  const expected = 201;
+  const message = logger.debug('Ny message!', 201);
+  t.is(message['httpStatusCode'], expected);
+});
+
+test.serial('It should set a custom HTTP status code for warning logs', (t) => {
+  const logger = MikroLog.start();
+  const expected = 201;
+  const message = logger.warn('Ny message!', 201);
+  t.is(message['httpStatusCode'], expected);
+});
+
+test.serial('It should set a custom HTTP status code for error logs', (t) => {
+  const logger = MikroLog.start();
+  const expected = 201;
+  const message = logger.error('Ny message!', 201);
+  t.is(message['httpStatusCode'], expected);
+});
 
 test.serial('It should redact keys when given a "redactedKeys" list', (t) => {
   MikroLog.reset();

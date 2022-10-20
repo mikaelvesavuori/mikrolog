@@ -97,7 +97,7 @@ See more in the [Metadata](#metadata) section.
 
 You can set the sampling rate either manually or using an environment variable.
 
-The sample rate uses the `0-100` scale. The default value is `100`, meaning you get all `DEBUG` logs if you don't set this to something else.
+The sample rate uses the `0-100` scale. The default value is `100`, meaning you get _all_ `DEBUG` logs if you don't set this to something else.
 
 You may use integers or floating point numbers.
 
@@ -154,6 +154,18 @@ Output a debug log:
 ```typescript
 logger.debug('My message!');
 ```
+
+#### Setting a custom HTTP status code
+
+By default you get status `200` for all logs except errors, which have status `400`.
+
+If you wish to set a custom HTTP status code you can do like in the following example:
+
+```typescript
+logger.info('My message was created!', 201);
+```
+
+The second parameter can be passed in for all log types.
 
 ## Metadata
 

@@ -15,7 +15,13 @@ import {
   produceTimestampRequest
 } from '../infrastructure/metadataUtils';
 
-import { MikroLogInput, LogInput, LogOutput, Message } from '../interfaces/MikroLog';
+import {
+  MikroLogInput,
+  LogInput,
+  LogOutput,
+  Message,
+  HttpStatusCode
+} from '../interfaces/MikroLog';
 import { StaticMetadataConfigInput, DynamicMetadataOutput } from '../interfaces/Metadata';
 
 /**
@@ -110,8 +116,12 @@ export class MikroLog {
    * This will respect whatever sampling rate is currently set.
    * @example logger.debug('My message!');
    */
-  public debug(message: Message): LogOutput {
-    const createdLog = this.createLog({ message, level: 'DEBUG', httpStatusCode: 200 });
+  public debug(message: Message, httpStatusCode?: HttpStatusCode): LogOutput {
+    const createdLog = this.createLog({
+      message,
+      level: 'DEBUG',
+      httpStatusCode: httpStatusCode || 200
+    });
     if (this.shouldSampleLog()) this.writeLog(createdLog);
     return createdLog;
   }
@@ -120,16 +130,20 @@ export class MikroLog {
    * @description Alias for `Logger.log()`. Message may be string or object.
    * @example logger.info('My message!');
    */
-  public info(message: Message): LogOutput {
-    return this.log(message);
+  public info(message: Message, httpStatusCode?: HttpStatusCode): LogOutput {
+    return this.log(message, httpStatusCode);
   }
 
   /**
    * @description Output an informational-level log. Message may be string or object.
    * @example logger.log('My message!');
    */
-  public log(message: Message): LogOutput {
-    const createdLog = this.createLog({ message, level: 'INFO', httpStatusCode: 200 });
+  public log(message: Message, httpStatusCode?: HttpStatusCode): LogOutput {
+    const createdLog = this.createLog({
+      message,
+      level: 'INFO',
+      httpStatusCode: httpStatusCode || 200
+    });
     this.writeLog(createdLog);
     return createdLog;
   }
@@ -138,8 +152,12 @@ export class MikroLog {
    * @description Output a warning-level log. Message may be string or object.
    * @example logger.warn('My message!');
    */
-  public warn(message: Message): LogOutput {
-    const createdLog = this.createLog({ message, level: 'WARN', httpStatusCode: 200 });
+  public warn(message: Message, httpStatusCode?: HttpStatusCode): LogOutput {
+    const createdLog = this.createLog({
+      message,
+      level: 'WARN',
+      httpStatusCode: httpStatusCode || 200
+    });
     this.writeLog(createdLog);
     return createdLog;
   }
@@ -148,15 +166,15 @@ export class MikroLog {
    * @description Output an error-level log. Message may be string or object.
    * @example logger.error('My message!');
    */
-  public error(message: Message): LogOutput {
-    const createdLog = this.createLog({ message, level: 'ERROR', httpStatusCode: 400 });
+  public error(message: Message, httpStatusCode?: HttpStatusCode): LogOutput {
+    const createdLog = this.createLog({
+      message,
+      level: 'ERROR',
+      httpStatusCode: httpStatusCode || 400
+    });
     this.writeLog(createdLog);
     return createdLog;
   }
-
-  //
-  // PRIVATE METHODS BELOW
-  //
 
   /**
    * @description Initialize the debug sample rate.
