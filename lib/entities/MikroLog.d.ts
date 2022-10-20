@@ -1,4 +1,4 @@
-import { MikroLogInput, LogOutput, Message } from '../interfaces/MikroLog';
+import { MikroLogInput, LogOutput, Message, HttpStatusCode } from '../interfaces/MikroLog';
 export declare class MikroLog {
     private static instance;
     private static metadataConfig;
@@ -10,11 +10,11 @@ export declare class MikroLog {
     static reset(): void;
     static enrich(input: MikroLogInput): void;
     setDebugSamplingRate(samplingPercent: number): number;
-    debug(message: Message): LogOutput;
-    info(message: Message): LogOutput;
-    log(message: Message): LogOutput;
-    warn(message: Message): LogOutput;
-    error(message: Message): LogOutput;
+    debug(message: Message, httpStatusCode?: HttpStatusCode): LogOutput;
+    info(message: Message, httpStatusCode?: HttpStatusCode): LogOutput;
+    log(message: Message, httpStatusCode?: HttpStatusCode): LogOutput;
+    warn(message: Message, httpStatusCode?: HttpStatusCode): LogOutput;
+    error(message: Message, httpStatusCode?: HttpStatusCode): LogOutput;
     private initDebugSampleLevel;
     private loadEnrichedEnvironment;
     private produceDynamicMetadata;
