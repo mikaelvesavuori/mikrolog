@@ -5,11 +5,13 @@ export declare class MikroLog {
     private static event;
     private static context;
     private static debugSamplingLevel;
+    private static isDebugLogSampled;
     private constructor();
     static start(input?: MikroLogInput): MikroLog;
     static reset(): void;
     static enrich(input: MikroLogInput): void;
     setDebugSamplingRate(samplingPercent: number): number;
+    isDebugLogSampled(): boolean;
     debug(message: Message, httpStatusCode?: HttpStatusCode): LogOutput;
     info(message: Message, httpStatusCode?: HttpStatusCode): LogOutput;
     log(message: Message, httpStatusCode?: HttpStatusCode): LogOutput;
