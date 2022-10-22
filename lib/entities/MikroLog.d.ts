@@ -4,12 +4,14 @@ export declare class MikroLog {
     private static metadataConfig;
     private static event;
     private static context;
+    private static correlationId;
     private static debugSamplingLevel;
     private static isDebugLogSampled;
     private constructor();
     static start(input?: MikroLogInput): MikroLog;
     static reset(): void;
     static enrich(input: MikroLogInput): void;
+    setCorrelationId(correlationId: string): void;
     setDebugSamplingRate(samplingPercent: number): number;
     isDebugLogSampled(): boolean;
     debug(message: Message, httpStatusCode?: HttpStatusCode): LogOutput;

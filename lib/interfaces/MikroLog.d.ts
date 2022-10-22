@@ -3,6 +3,7 @@ export interface MikroLogInput {
     metadataConfig?: StaticMetadataConfigInput | Record<string, any>;
     event?: any;
     context?: any;
+    correlationId?: string;
 }
 export interface LogInput {
     readonly message: Message;
