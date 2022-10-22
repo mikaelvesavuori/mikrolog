@@ -67,54 +67,6 @@ logger.log({
 });
 ```
 
-### Configuration
-
-You may also optionally instantiate MikroLog using a custom metadata object. You can do this either when starting (setting up) a local logger or enriching it after the fact.
-
-```typescript
-const metadata = { service: 'MyService' };
-const logger = MikroLog.start({ metadataConfig: metadata });
-```
-
-To use the full set of features, including deriving dynamic metadata from AWS Lambda, you would add the `event` and `context` objects like so:
-
-```typescript
-// Your Lambda handler doing whatever it does
-export async function handler(event: any, context: any) {
-  // {...}
-  const metadata = { service: 'MyService' };
-  const logger = MikroLog.start();
-  MikroLog.enrich({ metadataConfig: metadata, event, context });
-  // {...}
-}
-```
-
-Note how MikroLog, in this case, was enriched after its initial start.
-
-See more in the [Metadata](#metadata) section.
-
-### Setting the `DEBUG` sampling rate
-
-You can set the sampling rate either manually or using an environment variable.
-
-The sample rate uses the `0-100` scale. The default value is `100`, meaning you get _all_ `DEBUG` logs if you don't set this to something else.
-
-You may use integers or floating point numbers.
-
-#### Setting it with an environment variable
-
-Set `MIKROLOG_SAMPLE_RATE` to a numeric or numerically-convertible value and it will be set when initializing MikroLog.
-
-#### Setting it manually
-
-You can also call MikroLog manually like so:
-
-```typescript
-const logger = MikroLog.start();
-logger.setDebugSamplingRate(0.5); // 0.5% of all DEBUG logs will now be sampled.
-logger.setDebugSamplingRate(25); // 25% of all DEBUG logs will now be sampled.
-```
-
 ### Logging
 
 #### Informational logs
@@ -166,6 +118,104 @@ logger.info('My message was created!', 201);
 ```
 
 The second parameter can be passed in for all log types.
+
+### Configuration
+
+You may also optionally instantiate MikroLog using a custom metadata object. You can do this either when starting (setting up) a local logger or enriching it after the fact.
+
+```typescript
+const metadata = { service: 'MyService' };
+const logger = MikroLog.start({ metadataConfig: metadata });
+```
+
+To use the full set of features, including deriving dynamic metadata from AWS Lambda, you would add the `event` and `context` objects like so:
+
+```typescript
+// Your Lambda handler doing whatever it does
+export async function handler(event: any, context: any) {
+  // {...}
+  const metadata = { service: 'MyService' };
+  const logger = MikroLog.start();
+  MikroLog.enrich({ metadataConfig: metadata, event, context });
+  // {...}
+}
+```
+
+Note how MikroLog, in this case, was enriched after its initial start.
+
+See more in the [Metadata](#metadata) section.
+
+### Setting the `DEBUG` sampling rate
+
+You can set the sampling rate either manually or using an environment variable.
+
+A "sampled" log means it is a log that gets written. An "unsampled" log is therefore one that is not written.
+
+The sample rate uses the `0-100` scale. The default value is `100`, meaning you get _all_ `DEBUG` logs if you don't set this to something else.
+
+You may use integers or floating point numbers.
+
+#### Setting it with an environment variable
+
+Set `MIKROLOG_SAMPLE_RATE` to a numeric or numerically-convertible value and it will be set when initializing MikroLog.
+
+#### Setting it manually
+
+You can also call MikroLog manually like so:
+
+```typescript
+const logger = MikroLog.start();
+logger.setDebugSamplingRate(0.5); // 0.5% of all DEBUG logs will now be sampled.
+logger.setDebugSamplingRate(25); // 25% of all DEBUG logs will now be sampled.
+```
+
+#### Checking if last `DEBUG` log was sampled
+
+You can check if the last `DEBUG` log was sampled.
+
+The true value of this will only exist _after_ having used the `debug()` method, as it gets recalculated every time that the method is run.
+
+```typescript
+logger.isDebugLogSampled();
+```
+
+If you want to "persist" the decision you can handle this manually after the first `DEBUG` log call:
+
+```typescript
+// If we get 'TRUE' here we can crank the sampling rate all the way up, else turn it off completely
+logger.isDebugLogSampled(); ? logger.setDebugSamplingRate(100) : logger.setDebugSamplingRate(0);
+```
+
+#### Passing debug logging decision to other services
+
+This is useful if you want to do more complex, cross-boundary debug logging on a call chain, as written about by [Yan Cui (The Burning Monk)](https://theburningmonk.com/2018/04/you-need-to-sample-debug-logs-in-production/).
+
+For example you could make a solution like the below, passing the sampling decision in a header to a downstream service:
+
+```typescript
+const logger = MikroLog.start();
+logger.setDebugSamplingRate(100); // Make sure you absolutely get all debug logs; remember that the default is that all DEBUG logs are preserved
+
+logger.debug('This is some issue!');
+
+await fetch('https://www.some-site.xyz', {
+  headers: {
+    'X-Log-Sampled': logger.isDebugLogSampled()
+  }
+});
+```
+
+Then, on their end they could simply do:
+
+```typescript
+const { headers } = incomingPayload; // Do whatever you need here
+const logger = MikroLog.start();
+
+// If we get 'TRUE' here we can crank the sampling rate all the way up, else turn it off completely
+headers['X-Log-Sampled'] ? logger.setDebugSamplingRate(100) : logger.setDebugSamplingRate(0);
+
+// Rest of code...
+```
 
 ## Metadata
 

@@ -52,12 +52,14 @@ export class MikroLog {
   private static event: any = {};
   private static context: any = {};
   private static debugSamplingLevel: number;
+  private static isDebugLogSampled: boolean;
 
   private constructor() {
     MikroLog.metadataConfig = {};
     MikroLog.event = {};
     MikroLog.context = {};
     MikroLog.debugSamplingLevel = this.initDebugSampleLevel();
+    MikroLog.isDebugLogSampled = true;
   }
 
   /**
@@ -109,6 +111,14 @@ export class MikroLog {
 
     MikroLog.debugSamplingLevel = samplingPercent;
     return samplingPercent;
+  }
+
+  /**
+   * @description Check if MikroLog has sampled the last log.
+   * Will only return true value _after_ having output an actual `DEBUG` log.
+   */
+  public isDebugLogSampled() {
+    return MikroLog.isDebugLogSampled;
   }
 
   /**
@@ -242,7 +252,9 @@ export class MikroLog {
    * then we may sample the log.
    */
   private shouldSampleLog(): boolean {
-    return Math.random() * 100 <= MikroLog.debugSamplingLevel;
+    const logWillBeSampled = Math.random() * 100 <= MikroLog.debugSamplingLevel;
+    MikroLog.isDebugLogSampled = logWillBeSampled;
+    return logWillBeSampled;
   }
 
   /**

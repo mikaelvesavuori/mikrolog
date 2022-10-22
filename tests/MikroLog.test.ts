@@ -366,6 +366,22 @@ test.serial(
   }
 );
 
+test.serial('It should have all logs being sampled at init time', (t) => {
+  const logger = MikroLog.start();
+  const expected = true;
+  const sampling = logger.isDebugLogSampled();
+  t.is(sampling, expected);
+});
+
+test.serial('It should not sample logs when setting the sampling rate to 0', (t) => {
+  const logger = MikroLog.start();
+  const expected = false;
+  logger.setDebugSamplingRate(0);
+  logger.debug('');
+  const sampling = logger.isDebugLogSampled();
+  t.is(sampling, expected);
+});
+
 test.serial('It should set a custom HTTP status code for informational logs', (t) => {
   const logger = MikroLog.start();
   const expected = 201;
