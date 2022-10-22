@@ -51,6 +51,7 @@ export class MikroLog {
   private static metadataConfig: StaticMetadataConfigInput | Record<string, any> = {};
   private static event: any = {};
   private static context: any = {};
+  private static correlationId: string;
   private static debugSamplingLevel: number;
   private static isDebugLogSampled: boolean;
 
@@ -58,6 +59,7 @@ export class MikroLog {
     MikroLog.metadataConfig = {};
     MikroLog.event = {};
     MikroLog.context = {};
+    MikroLog.correlationId = '';
     MikroLog.debugSamplingLevel = this.initDebugSampleLevel();
     MikroLog.isDebugLogSampled = true;
   }
@@ -79,6 +81,7 @@ export class MikroLog {
       MikroLog.metadataConfig = input.metadataConfig || {};
       MikroLog.event = input.event || {};
       MikroLog.context = input.context || {};
+      MikroLog.correlationId = input.correlationId || '';
     }
     return MikroLog.instance;
   }
@@ -98,6 +101,15 @@ export class MikroLog {
     MikroLog.metadataConfig = Object.assign(MikroLog.metadataConfig, input.metadataConfig || {});
     MikroLog.event = Object.assign(MikroLog.event, input.event || {});
     MikroLog.context = Object.assign(MikroLog.context, input.context || {});
+  }
+
+  /**
+   * @description Set correlation ID manually, for example for use in cross-boundary calls.
+   *
+   * This value will be propagated to all future logs.
+   */
+  public setCorrelationId(correlationId: string): void {
+    MikroLog.correlationId = correlationId;
   }
 
   /**
@@ -212,7 +224,8 @@ export class MikroLog {
       functionName: produceFunctionName(MikroLog.context),
       functionMemorySize: produceFunctionMemorySize(MikroLog.context),
       functionVersion: produceFunctionVersion(MikroLog.context),
-      correlationId: produceCorrelationId(MikroLog.event, MikroLog.context),
+      correlationId:
+        MikroLog.correlationId || produceCorrelationId(MikroLog.event, MikroLog.context),
       route: produceRoute(MikroLog.event),
       user: produceUser(MikroLog.event),
       stage: produceStage(MikroLog.event),

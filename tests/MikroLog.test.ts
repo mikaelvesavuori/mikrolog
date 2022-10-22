@@ -308,6 +308,35 @@ test.serial(
   }
 );
 
+test.serial('It should be configurable with a correlation ID at init time', (t) => {
+  const expected = 'abc123';
+  const logger = MikroLog.start({ correlationId: expected });
+  const log = logger.log('');
+  const result = log.correlationId;
+  t.is(result, expected);
+});
+
+test.serial('It should be configurable with a correlation ID', (t) => {
+  const expected = 'abc123';
+  const logger = MikroLog.start();
+  logger.setCorrelationId(expected);
+  const log = logger.log('');
+  const result = log.correlationId;
+  t.is(result, expected);
+});
+
+test.serial('It should retain the correlation ID across multiple logs', (t) => {
+  const expected = 'abc123';
+  const logger = MikroLog.start();
+  logger.setCorrelationId(expected);
+  logger.log('');
+  logger.log('');
+  logger.log('');
+  const log = logger.log('');
+  const result = log.correlationId;
+  t.is(result, expected);
+});
+
 test.serial('It should set the debug sampling rate through an environment variable', (t) => {
   const expected = 0.5;
   process.env.MIKROLOG_SAMPLE_RATE = `${expected}`;

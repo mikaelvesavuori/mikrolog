@@ -16,6 +16,10 @@ export interface MikroLogInput {
    * AWS Lambda context object. Used to gather dynamic metadata.
    */
   context?: any;
+  /**
+   * Manually set correlation ID.
+   */
+  correlationId?: string;
 }
 
 /**

@@ -141,9 +141,24 @@ export async function handler(event: any, context: any) {
 }
 ```
 
-Note how MikroLog, in this case, was enriched after its initial start.
+Further, you can also set the correlation ID manually as part of the `enrich()` call:
+
+```typescript
+MikroLog.enrich({ correlationId: 'abc123' });
+```
+
+Note how MikroLog, in this case, was enriched _after_ its initial start.
 
 See more in the [Metadata](#metadata) section.
+
+### Setting the correlation ID manually after initialization
+
+Setting the correlation ID manually makes sense for example during cross-boundary calls where you want to propagate this value:
+
+```typescript
+const logger = MikroLog.start();
+logger.setCorrelationId('abc123');
+```
 
 ### Setting the `DEBUG` sampling rate
 
