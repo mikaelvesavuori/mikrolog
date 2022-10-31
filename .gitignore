@@ -1,6 +1,7 @@
 .dccache
 .env
 .webpack/
+lib/
 build/
 coverage/
 node_modules/
