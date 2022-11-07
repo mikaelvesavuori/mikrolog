@@ -7,7 +7,7 @@ import {
   produceFunctionMemorySize,
   produceFunctionVersion,
   produceCorrelationId,
-  produceRoute,
+  produceResource,
   produceUser,
   produceStage,
   produceViewerCountry,
@@ -226,7 +226,7 @@ export class MikroLog {
       functionVersion: produceFunctionVersion(MikroLog.context),
       correlationId:
         MikroLog.correlationId || produceCorrelationId(MikroLog.event, MikroLog.context),
-      route: produceRoute(MikroLog.event),
+      resource: produceResource(MikroLog.event),
       user: produceUser(MikroLog.event),
       stage: produceStage(MikroLog.event),
       viewerCountry: produceViewerCountry(MikroLog.event)

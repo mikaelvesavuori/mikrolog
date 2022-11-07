@@ -66,9 +66,9 @@ export function produceFunctionVersion(context: any): string {
 }
 
 /**
- * @description Set the route (Lambda) or `detail-type` (EventBridge).
+ * @description Set the resource from `path` (Lambda) or `detail-type` (EventBridge).
  */
-export function produceRoute(event: any): string {
+export function produceResource(event: any): string {
   if (event && event['detail-type']) return event['detail-type'];
   else if (event && event['path']) return event['path'];
   return '';

@@ -132,17 +132,17 @@ test.serial('It should set function version', (t) => {
   process.env.AWS_LAMBDA_FUNCTION_VERSION = '';
 });
 
-test.serial('It should set route (or detail type) if given event path', (t) => {
+test.serial('It should set resource (or detail type) if given event path', (t) => {
   MikroLog.reset();
   const logger = MikroLog.start();
   MikroLog.enrich({ event, context });
   const expected = '/functionName';
-  const response = logger.log('something').route;
+  const response = logger.log('something').resource;
 
   t.is(response, expected);
 });
 
-test.serial('It should set route (or detail type) if given event detail-type', (t) => {
+test.serial('It should set resource (or detail type) if given event detail-type', (t) => {
   MikroLog.reset();
   const logger = MikroLog.start();
   const _event: any = JSON.parse(JSON.stringify(event));
@@ -150,7 +150,7 @@ test.serial('It should set route (or detail type) if given event detail-type', (
   _event['detail-type'] = 'SomeDetail';
   MikroLog.enrich({ event: _event, context });
   const expected = 'SomeDetail';
-  const response = logger.log('something').route;
+  const response = logger.log('something').resource;
 
   t.is(response, expected);
 });
@@ -246,7 +246,7 @@ test.serial('It should emit a full log and filter out any empty fields', (t) => 
     region: 'eu-north-1',
     id: 'a6b1caa3-8a8d-4dc0-8828-e10f63876f9f',
     timestampRequest: '1657389598171',
-    route: '/functionName',
+    resource: '/functionName',
     stage: 'shared',
     timestamp: '1657393943792',
     timestampEpoch: '2022-07-09T19:12:23.792Z',

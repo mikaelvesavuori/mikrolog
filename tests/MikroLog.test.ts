@@ -65,7 +65,6 @@ test.serial('It should return (print out) a structured log when given a string m
 
   const expected: any = {
     version: 1,
-    lifecycleStage: 'production',
     owner: 'MyCompany',
     hostPlatform: 'aws',
     domain: 'CustomerAcquisition',
@@ -115,7 +114,6 @@ test.serial(
 
     const expected: any = {
       version: 1,
-      lifecycleStage: 'production',
       owner: 'MyCompany',
       hostPlatform: 'aws',
       domain: 'CustomerAcquisition',
@@ -166,7 +164,6 @@ test.serial(
 
     const expected: any = {
       version: 1,
-      lifecycleStage: 'production',
       owner: 'MyCompany',
       hostPlatform: 'aws',
       domain: 'CustomerAcquisition',
@@ -217,7 +214,6 @@ test.serial(
 
     const expected: any = {
       version: 1,
-      lifecycleStage: 'production',
       owner: 'MyCompany',
       hostPlatform: 'aws',
       domain: 'CustomerAcquisition',
@@ -268,7 +264,6 @@ test.serial(
 
     const expected: any = {
       version: 1,
-      lifecycleStage: 'production',
       owner: 'MyCompany',
       hostPlatform: 'aws',
       domain: 'CustomerAcquisition',
@@ -451,7 +446,6 @@ test.serial('It should redact keys when given a "redactedKeys" list', (t) => {
 
   const expected: any = {
     version: 1,
-    lifecycleStage: 'production',
     owner: 'MyCompany',
     hostPlatform: 'aws',
     domain: 'CustomerAcquisition',
@@ -506,7 +500,6 @@ test.serial('It should mask values when given a "maskedValues" list', (t) => {
     hostPlatform: 'aws',
     httpStatusCode: 400,
     level: 'ERROR',
-    lifecycleStage: 'production',
     message: 'Hello World',
     owner: 'MyCompany',
     service: 'UserSignUp',

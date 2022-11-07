@@ -1,7 +1,7 @@
 {
   "name": "mikrolog",
   "description": "The JSON logger you always wanted for Lambda.",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "author": "Mikael Vesavuori",
   "license": "MIT",
   "main": "./lib/index.js",

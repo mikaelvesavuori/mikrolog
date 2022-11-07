@@ -243,7 +243,6 @@ Under the hood, MikroLog is built and tested around practically the same metadat
 ```typescript
 const metadataConfig = {
   version: 1,
-  lifecycleStage: 'production',
   owner: 'MyCompany',
   hostPlatform: 'aws',
   domain: 'CustomerAcquisition',
@@ -267,23 +266,23 @@ The dynamic metadata fields are picked up automatically if you pass them in duri
 
 If these values are not available, they will be dropped at the time of log output. In effect, this means you won't have to deal with them (being empty or otherwise) if you use MikroLog in another type of context.
 
-| Field                | Type   | Description                                                                    |
-| -------------------- | ------ | ------------------------------------------------------------------------------ |
-| `accountId`          | string | The AWS account ID that the system is running in.                              |
-| `correlationId`      | string | Correlation ID for this function call.                                         |
-| `functionMemorySize` | string | Memory size of the current function.                                           |
-| `functionName`       | string | The name of the function.                                                      |
-| `functionVersion`    | string | The version of the function.                                                   |
-| `id`                 | string | ID of the log.                                                                 |
-| `region`             | string | The region of the responding function/system.                                  |
-| `route`              | string | The route that is responding. In EventBridge, this will be your `detail-type`. |
-| `runtime`            | string | What runtime is used?                                                          |
-| `stage`              | string | What AWS stage are we in?                                                      |
-| `timestamp`          | string | Timestamp of this message in ISO 8601 (RFC 3339) format.                       |
-| `timestampEpoch`     | string | Timestamp of this message in Unix epoch.                                       |
-| `timestampRequest`   | string | Request time in Unix epoch of the incoming request.                            |
-| `user`               | string | The user in this log context.                                                  |
-| `viewerCountry`      | string | Which country did AWS CloudFront infer the user to be in?                      |
+| Field                | Type   | Description                                               |
+| -------------------- | ------ | --------------------------------------------------------- |
+| `accountId`          | string | The AWS account ID that the system is running in.         |
+| `correlationId`      | string | Correlation ID for this function call.                    |
+| `functionMemorySize` | string | Memory size of the current function.                      |
+| `functionName`       | string | The name of the function.                                 |
+| `functionVersion`    | string | The version of the function.                              |
+| `id`                 | string | ID of the log.                                            |
+| `region`             | string | The region of the responding function/system.             |
+| `resource`           | string | The resource (channel, URL path...) that is responding.   |
+| `runtime`            | string | What runtime is used?                                     |
+| `stage`              | string | What AWS stage are we in?                                 |
+| `timestamp`          | string | Timestamp of this message in ISO 8601 (RFC 3339) format.  |
+| `timestampEpoch`     | string | Timestamp of this message in Unix epoch.                  |
+| `timestampRequest`   | string | Request time in Unix epoch of the incoming request.       |
+| `user`               | string | The user in this log context.                             |
+| `viewerCountry`      | string | Which country did AWS CloudFront infer the user to be in? |
 
 ## Redacting keys or masking values
 

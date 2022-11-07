@@ -1,14 +1,4 @@
 /**
- * @description Valid lifecycles stages.
- */
-type LifecycleStage = 'production' | 'qa' | 'test' | 'development' | 'staging' | 'demo';
-
-/**
- * @description Valid data sensitivity levels.
- */
-type DataSensitivity = 'public' | 'sensitive' | 'proprietary' | 'secret';
-
-/**
  * @description User-provided static metadata input.
  */
 export interface StaticMetadataConfigInput {
@@ -16,10 +6,6 @@ export interface StaticMetadataConfigInput {
    * @description The version of the logged service.
    */
   version: number;
-  /**
-   * @description Which lifecycle stage the logged service pertains to.
-   */
-  lifecycleStage: LifecycleStage;
   /**
    * @description The organization that owns this system.
    */
@@ -50,8 +36,9 @@ export interface StaticMetadataConfigInput {
   tags?: string[];
   /**
    * @description Data sensitivity classification for the contents of this log.
+   * @example `public`, `proprietary`, `confidential`, `secret`
    */
-  dataSensitivity?: DataSensitivity;
+  dataSensitivity?: string;
   /**
    * @description What legal jurisdiction does this system fall into?
    * @example `EU`, `US`, `CN`
@@ -67,6 +54,10 @@ export interface DynamicMetadataOutput {
    */
   id: string;
   /**
+   * @description Correlation ID for this function call.
+   */
+  correlationId: string;
+  /**
    * @description Timestamp of this message in ISO 8601 (RFC 3339) format.
    */
   timestamp: string;
@@ -79,18 +70,14 @@ export interface DynamicMetadataOutput {
    */
   timestampRequest: string;
   /**
-   * @description Correlation ID for this function call.
-   */
-  correlationId: string;
-  /**
    * @description The user in this log context.
    */
   user: string;
   /**
-   * @description The route that is responding. In EventBridge, this will be your detail type.
+   * @description The resource (channel, URL path...) that is responding.
    * @example `/doSomething`
    */
-  route: string;
+  resource: string;
   /**
    * @description The region of the responding function/system.
    */
