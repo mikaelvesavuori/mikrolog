@@ -230,7 +230,6 @@ export class MikroLog {
    */
   private loadEnrichedEnvironment() {
     return {
-      isColdStart: this.isColdStart(),
       timestampRequest: produceTimestampRequest(MikroLog.event),
       accountId: produceAccountId(MikroLog.event),
       region: produceRegion(MikroLog.context),
@@ -313,7 +312,8 @@ export class MikroLog {
       message: log.message,
       error: log.level === 'ERROR',
       level: log.level,
-      httpStatusCode: log.httpStatusCode
+      httpStatusCode: log.httpStatusCode,
+      isColdStart: this.isColdStart()
     };
 
     const filteredOutput = this.filterOutput(logOutput, redactedKeys, maskedValues);
