@@ -54,6 +54,7 @@ export class MikroLog {
   private static correlationId: string;
   private static debugSamplingLevel: number;
   private static isDebugLogSampled: boolean;
+  private coldStart = true;
 
   private constructor() {
     MikroLog.metadataConfig = {};
@@ -101,6 +102,18 @@ export class MikroLog {
     MikroLog.metadataConfig = Object.assign(MikroLog.metadataConfig, input.metadataConfig || {});
     MikroLog.event = Object.assign(MikroLog.event, input.event || {});
     MikroLog.context = Object.assign(MikroLog.context, input.context || {});
+  }
+
+  /**
+   * @description Is this a Lambda cold start?
+   */
+  public isColdStart(): boolean {
+    if (this.coldStart) {
+      this.coldStart = false;
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -217,6 +230,7 @@ export class MikroLog {
    */
   private loadEnrichedEnvironment() {
     return {
+      isColdStart: this.isColdStart(),
       timestampRequest: produceTimestampRequest(MikroLog.event),
       accountId: produceAccountId(MikroLog.event),
       region: produceRegion(MikroLog.context),

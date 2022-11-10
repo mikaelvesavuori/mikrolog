@@ -29,6 +29,7 @@ test.serial(
       message: 'Hello World',
       error: false,
       httpStatusCode: 200,
+      isColdStart: true,
       level: 'INFO',
       id: '1256767f-c875-4d82-813d-bc260bd0ba07',
       timestamp: '2022-07-25T08:52:21.121Z',
@@ -76,6 +77,7 @@ test.serial('It should return (print out) a structured log when given a string m
     message: 'Hello World',
     error: false,
     httpStatusCode: 200,
+    isColdStart: true,
     level: 'INFO',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
     timestamp: '2022-07-25T08:52:21.121Z',
@@ -125,6 +127,7 @@ test.serial(
       message: 'Hello World',
       error: false,
       httpStatusCode: 200,
+      isColdStart: true,
       level: 'INFO',
       id: '1256767f-c875-4d82-813d-bc260bd0ba07',
       timestamp: '2022-07-25T08:52:21.121Z',
@@ -175,6 +178,7 @@ test.serial(
       message: 'Hello World',
       error: false,
       httpStatusCode: 200,
+      isColdStart: true,
       level: 'DEBUG',
       id: '1256767f-c875-4d82-813d-bc260bd0ba07',
       timestamp: '2022-07-25T08:52:21.121Z',
@@ -225,6 +229,7 @@ test.serial(
       message: 'Hello World',
       error: false,
       httpStatusCode: 200,
+      isColdStart: true,
       level: 'WARN',
       id: '1256767f-c875-4d82-813d-bc260bd0ba07',
       timestamp: '2022-07-25T08:52:21.121Z',
@@ -275,6 +280,7 @@ test.serial(
       message: 'Hello World',
       error: true,
       httpStatusCode: 400,
+      isColdStart: true,
       level: 'ERROR',
       id: '1256767f-c875-4d82-813d-bc260bd0ba07',
       timestamp: '2022-07-25T08:52:21.121Z',
@@ -456,6 +462,7 @@ test.serial('It should redact keys when given a "redactedKeys" list', (t) => {
     message: 'Hello World',
     error: true,
     httpStatusCode: 400,
+    isColdStart: true,
     level: 'ERROR',
     id: '1256767f-c875-4d82-813d-bc260bd0ba07',
     timestamp: '2022-07-25T08:52:21.121Z',
@@ -499,6 +506,7 @@ test.serial('It should mask values when given a "maskedValues" list', (t) => {
     error: true,
     hostPlatform: 'aws',
     httpStatusCode: 400,
+    isColdStart: true,
     level: 'ERROR',
     message: 'Hello World',
     owner: 'MyCompany',
@@ -551,6 +559,7 @@ test.serial('It should accept a custom metadata configuration', (t) => {
     },
     error: false,
     httpStatusCode: 200,
+    isColdStart: true,
     level: 'INFO',
     message: 'Hello World'
   };
@@ -590,6 +599,7 @@ test.serial('It should retain falsy but defined values in logs', (t) => {
   const expected: any = {
     error: false,
     httpStatusCode: 200,
+    isColdStart: true,
     falsyTest1: false,
     falsyTest2: 0,
     level: 'INFO',
@@ -627,6 +637,7 @@ test.serial('It should be able to merge enrichment even if input is essentially 
   const expected: any = {
     error: false,
     httpStatusCode: 200,
+    isColdStart: true,
     level: 'INFO',
     message: 'Hello World'
   };

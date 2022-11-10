@@ -241,6 +241,7 @@ test.serial('It should emit a full log and filter out any empty fields', (t) => 
     functionName: 'somestack-FunctionName',
     functionVersion: '$LATEST',
     httpStatusCode: 200,
+    isColdStart: true,
     level: 'INFO',
     message: 'something',
     region: 'eu-north-1',
