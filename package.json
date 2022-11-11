@@ -42,7 +42,7 @@
     "docs:typedoc": "npx typedoc --entryPoints src --entryPointStrategy expand --exclude '**/*+(test).ts' --externalPattern 'node_modules/**/*' --excludeExternals --out docs/"
   },
   "dependencies": {
-    "aws-metadata-utils": "0"
+    "aws-metadata-utils": "1"
   },
   "devDependencies": {
     "@ava/typescript": "3",
