@@ -1,19 +1,6 @@
 import { randomUUID } from 'crypto';
 
-import {
-  produceRegion,
-  produceRuntime,
-  produceFunctionName,
-  produceFunctionMemorySize,
-  produceFunctionVersion,
-  produceCorrelationId,
-  produceResource,
-  produceUser,
-  produceStage,
-  produceViewerCountry,
-  produceAccountId,
-  produceTimestampRequest
-} from '../infrastructure/metadataUtils';
+import { getMetadata } from 'aws-metadata-utils';
 
 import {
   MikroLogInput,
@@ -226,40 +213,39 @@ export class MikroLog {
   }
 
   /**
-   * @description Retrieve all stored data from process environment.
-   */
-  private loadEnrichedEnvironment() {
-    return {
-      timestampRequest: produceTimestampRequest(MikroLog.event),
-      accountId: produceAccountId(MikroLog.event),
-      region: produceRegion(MikroLog.context),
-      runtime: produceRuntime(),
-      functionName: produceFunctionName(MikroLog.context),
-      functionMemorySize: produceFunctionMemorySize(MikroLog.context),
-      functionVersion: produceFunctionVersion(MikroLog.context),
-      correlationId:
-        MikroLog.correlationId || produceCorrelationId(MikroLog.event, MikroLog.context),
-      resource: produceResource(MikroLog.event),
-      user: produceUser(MikroLog.event),
-      stage: produceStage(MikroLog.event),
-      viewerCountry: produceViewerCountry(MikroLog.event)
-    };
-  }
-
-  /**
-   * @description Get dynamic user metadata from process environment.
+   * @description Get dynamic metadata.
    */
   private produceDynamicMetadata(): DynamicMetadataOutput {
+    const dynamicMetadata = this.getDynamicMetadata();
+
     const timeNow = Date.now();
-    const env = this.loadEnrichedEnvironment();
 
     const metadata = {
       id: randomUUID(),
       timestamp: new Date(timeNow).toISOString(),
       timestampEpoch: `${timeNow}`,
-      ...env
+      ...dynamicMetadata
     };
 
+    return this.filterMetadata(metadata);
+  }
+
+  /**
+   * @description Use `aws-metadata-utils` to get dynamic metadata.
+   * Restore manually-set `correlationId` if we have one.
+   */
+  private getDynamicMetadata() {
+    const metadata = getMetadata(MikroLog.event, MikroLog.context);
+    return {
+      ...metadata,
+      correlationId: MikroLog.correlationId || metadata.correlationId
+    };
+  }
+
+  /**
+   * @description Filter metadata from empties.
+   */
+  private filterMetadata(metadata: Record<string, any>) {
     const filteredMetadata: any = {};
 
     Object.entries(metadata).forEach((entry: any) => {

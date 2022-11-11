@@ -30,7 +30,7 @@ Loggers have become too opinionated, bloated and complicated. MikroLog provides 
 - Easy to redact or mask sensitive data
 - Uses `process.stdout.write()` rather than `console.log()` so you can safely use it in Lambda
 - Tiny (~2 KB gzipped)
-- Has zero dependencies
+- Has only one dependency, `aws-metadata-utils` (for picking out metadata)
 - Has 100% test coverage
 
 ## Behavior
@@ -261,6 +261,8 @@ _However, you are free to use whatever static metadata you want._
 Ideally you store this static metadata configuration in its own file and have unique ones for each service.
 
 ### Dynamic metadata
+
+_MikroLog uses [`aws-metadata-utils`](https://github.com/mikaelvesavuori/aws-metadata-utils) to pick out metadata._
 
 The dynamic metadata fields are picked up automatically if you pass them in during instantiation. Most of those metadata fields will relate to unique value types available in AWS Lambda.
 

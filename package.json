@@ -1,7 +1,7 @@
 {
   "name": "mikrolog",
   "description": "The JSON logger you always wanted for Lambda.",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "author": "Mikael Vesavuori",
   "license": "MIT",
   "main": "./lib/index.js",
@@ -40,6 +40,9 @@
     "docs": "npm run docs:clean && npm run docs:typedoc",
     "docs:clean": "rm -rf docs",
     "docs:typedoc": "npx typedoc --entryPoints src --entryPointStrategy expand --exclude '**/*+(test).ts' --externalPattern 'node_modules/**/*' --excludeExternals --out docs/"
+  },
+  "dependencies": {
+    "aws-metadata-utils": "0"
   },
   "devDependencies": {
     "@ava/typescript": "3",
