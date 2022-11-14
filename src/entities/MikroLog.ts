@@ -65,12 +65,10 @@ export class MikroLog {
    */
   public static start(input?: MikroLogInput): MikroLog {
     if (!MikroLog.instance) MikroLog.instance = new MikroLog();
-    if (input) {
-      MikroLog.metadataConfig = input.metadataConfig || {};
-      MikroLog.event = input.event || {};
-      MikroLog.context = input.context || {};
-      MikroLog.correlationId = input.correlationId || '';
-    }
+    MikroLog.metadataConfig = input?.metadataConfig || {};
+    MikroLog.event = input?.event || {};
+    MikroLog.context = input?.context || {};
+    MikroLog.correlationId = input?.correlationId || '';
     return MikroLog.instance;
   }
 
