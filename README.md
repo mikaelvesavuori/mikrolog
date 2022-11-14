@@ -30,7 +30,7 @@ Loggers have become too opinionated, bloated and complicated. MikroLog provides 
 - Easy to redact or mask sensitive data
 - Uses `process.stdout.write()` rather than `console.log()` so you can safely use it in Lambda
 - Tiny (~2 KB gzipped)
-- Has only one dependency, `aws-metadata-utils` (for picking out metadata)
+- Has only one dependency, [`aws-metadata-utils`](https://github.com/mikaelvesavuori/aws-metadata-utils) (for picking out metadata)
 - Has 100% test coverage
 
 ## Behavior
