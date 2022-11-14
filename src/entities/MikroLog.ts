@@ -41,6 +41,7 @@ export class MikroLog {
   private static correlationId: string;
   private static debugSamplingLevel: number;
   private static isDebugLogSampled: boolean;
+  private coldStart = true;
 
   private constructor() {
     MikroLog.metadataConfig = {};
@@ -49,8 +50,6 @@ export class MikroLog {
     MikroLog.correlationId = '';
     MikroLog.debugSamplingLevel = this.initDebugSampleLevel();
     MikroLog.isDebugLogSampled = true;
-
-    process.env.IS_COLD_START = 'true';
   }
 
   /**
@@ -94,12 +93,13 @@ export class MikroLog {
 
   /**
    * @description Is this a Lambda cold start?
-   *
-   * Setting the value in the process environment makes it possible
-   * to persist the value to subsequent calls, also by other libraries.
    */
   public isColdStart(): boolean {
-    if (process.env.IS_COLD_START === 'true') return true;
+    if (this.coldStart) {
+      this.coldStart = false;
+      return true;
+    }
+
     return false;
   }
 

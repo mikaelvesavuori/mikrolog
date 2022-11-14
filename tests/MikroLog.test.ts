@@ -589,36 +589,3 @@ test.serial('It should be able to merge enrichment even if input is essentially 
   // @ts-ignore
   t.deepEqual(response, expected);
 });
-
-test.serial(
-  'It should retain the cold start status between multiple calls in the same process',
-  (t) => {
-    MikroLog.reset();
-
-    const logger = MikroLog.start({ metadataConfig });
-    const response1: any = logger.log('');
-    const response2: any = logger.log('');
-
-    const expected = response1.isColdStart === true && response2.isColdStart === true;
-
-    // @ts-ignore
-    t.is(expected, true);
-  }
-);
-
-test.serial(
-  'It should not reuse the cold start status between calls when "IS_COLD_START" is not set',
-  (t) => {
-    MikroLog.reset();
-
-    const logger = MikroLog.start({ metadataConfig });
-    const response1: any = logger.log('');
-    process.env.IS_COLD_START = 'false';
-    const response2: any = logger.log('');
-
-    const expected = response1.isColdStart === true && response2.isColdStart === false;
-
-    // @ts-ignore
-    t.is(expected, true);
-  }
-);
