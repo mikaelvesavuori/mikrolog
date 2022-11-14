@@ -4,6 +4,27 @@ import { MikroLog } from '../src/entities/MikroLog';
 
 import { metadataConfig } from '../testdata/config';
 
+const fullLog = {
+  version: 1,
+  owner: 'MyCompany',
+  hostPlatform: 'aws',
+  domain: 'CustomerAcquisition',
+  system: 'ShowroomActivities',
+  service: 'UserSignUp',
+  team: 'MyDemoTeam',
+  tags: [''],
+  dataSensitivity: 'public',
+  message: 'Hello World',
+  error: false,
+  httpStatusCode: 200,
+  isColdStart: true,
+  level: 'INFO',
+  id: '1256767f-c875-4d82-813d-bc260bd0ba07',
+  timestamp: '2022-07-25T08:52:21.121Z',
+  timestampEpoch: '1656438566041',
+  jurisdiction: 'EU'
+};
+
 /**
  * POSITIVE TESTS
  */
@@ -64,26 +85,7 @@ test.serial('It should return (print out) a structured log when given a string m
   const logger = MikroLog.start({ metadataConfig });
   const response: any = logger.log(message);
 
-  const expected: any = {
-    version: 1,
-    owner: 'MyCompany',
-    hostPlatform: 'aws',
-    domain: 'CustomerAcquisition',
-    system: 'ShowroomActivities',
-    service: 'UserSignUp',
-    team: 'MyDemoTeam',
-    tags: [''],
-    dataSensitivity: 'public',
-    message: 'Hello World',
-    error: false,
-    httpStatusCode: 200,
-    isColdStart: true,
-    level: 'INFO',
-    id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-    timestamp: '2022-07-25T08:52:21.121Z',
-    timestampEpoch: '1656438566041',
-    jurisdiction: 'EU'
-  };
+  const expected: any = JSON.parse(JSON.stringify(fullLog));
 
   // Ensure exactness of message field
   t.is(response['message'], message);
@@ -114,26 +116,7 @@ test.serial(
     const logger = MikroLog.start({ metadataConfig });
     const response: any = logger.info(message);
 
-    const expected: any = {
-      version: 1,
-      owner: 'MyCompany',
-      hostPlatform: 'aws',
-      domain: 'CustomerAcquisition',
-      system: 'ShowroomActivities',
-      service: 'UserSignUp',
-      team: 'MyDemoTeam',
-      tags: [''],
-      dataSensitivity: 'public',
-      message: 'Hello World',
-      error: false,
-      httpStatusCode: 200,
-      isColdStart: true,
-      level: 'INFO',
-      id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-      timestamp: '2022-07-25T08:52:21.121Z',
-      timestampEpoch: '1656438566041',
-      jurisdiction: 'EU'
-    };
+    const expected: any = JSON.parse(JSON.stringify(fullLog));
 
     // Ensure exactness of message field
     t.is(response['message'], message);
@@ -165,26 +148,8 @@ test.serial(
     const logger = MikroLog.start({ metadataConfig });
     const response: any = logger.debug(message);
 
-    const expected: any = {
-      version: 1,
-      owner: 'MyCompany',
-      hostPlatform: 'aws',
-      domain: 'CustomerAcquisition',
-      system: 'ShowroomActivities',
-      service: 'UserSignUp',
-      team: 'MyDemoTeam',
-      tags: [''],
-      dataSensitivity: 'public',
-      message: 'Hello World',
-      error: false,
-      httpStatusCode: 200,
-      isColdStart: true,
-      level: 'DEBUG',
-      id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-      timestamp: '2022-07-25T08:52:21.121Z',
-      timestampEpoch: '1656438566041',
-      jurisdiction: 'EU'
-    };
+    const expected: any = JSON.parse(JSON.stringify(fullLog));
+    expected['level'] = 'DEBUG';
 
     // Ensure exactness of message field
     t.is(response['message'], message);
@@ -216,26 +181,8 @@ test.serial(
     const logger = MikroLog.start({ metadataConfig });
     const response: any = logger.warn(message);
 
-    const expected: any = {
-      version: 1,
-      owner: 'MyCompany',
-      hostPlatform: 'aws',
-      domain: 'CustomerAcquisition',
-      system: 'ShowroomActivities',
-      service: 'UserSignUp',
-      team: 'MyDemoTeam',
-      tags: [''],
-      dataSensitivity: 'public',
-      message: 'Hello World',
-      error: false,
-      httpStatusCode: 200,
-      isColdStart: true,
-      level: 'WARN',
-      id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-      timestamp: '2022-07-25T08:52:21.121Z',
-      timestampEpoch: '1656438566041',
-      jurisdiction: 'EU'
-    };
+    const expected: any = JSON.parse(JSON.stringify(fullLog));
+    expected['level'] = 'WARN';
 
     // Ensure exactness of message field
     t.is(response['message'], message);
@@ -267,26 +214,10 @@ test.serial(
     const logger = MikroLog.start({ metadataConfig });
     const response: any = logger.error(message);
 
-    const expected: any = {
-      version: 1,
-      owner: 'MyCompany',
-      hostPlatform: 'aws',
-      domain: 'CustomerAcquisition',
-      system: 'ShowroomActivities',
-      service: 'UserSignUp',
-      team: 'MyDemoTeam',
-      tags: [''],
-      dataSensitivity: 'public',
-      message: 'Hello World',
-      error: true,
-      httpStatusCode: 400,
-      isColdStart: true,
-      level: 'ERROR',
-      id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-      timestamp: '2022-07-25T08:52:21.121Z',
-      timestampEpoch: '1656438566041',
-      jurisdiction: 'EU'
-    };
+    const expected: any = JSON.parse(JSON.stringify(fullLog));
+    expected['level'] = 'ERROR';
+    expected['error'] = true;
+    expected['httpStatusCode'] = 400;
 
     // Ensure exactness of message field
     t.is(response['message'], message);
@@ -658,3 +589,36 @@ test.serial('It should be able to merge enrichment even if input is essentially 
   // @ts-ignore
   t.deepEqual(response, expected);
 });
+
+test.serial(
+  'It should retain the cold start status between multiple calls in the same process',
+  (t) => {
+    MikroLog.reset();
+
+    const logger = MikroLog.start({ metadataConfig });
+    const response1: any = logger.log('');
+    const response2: any = logger.log('');
+
+    const expected = response1.isColdStart === true && response2.isColdStart === true;
+
+    // @ts-ignore
+    t.is(expected, true);
+  }
+);
+
+test.serial(
+  'It should not reuse the cold start status between calls when "IS_COLD_START" is not set',
+  (t) => {
+    MikroLog.reset();
+
+    const logger = MikroLog.start({ metadataConfig });
+    const response1: any = logger.log('');
+    process.env.IS_COLD_START = 'false';
+    const response2: any = logger.log('');
+
+    const expected = response1.isColdStart === true && response2.isColdStart === false;
+
+    // @ts-ignore
+    t.is(expected, true);
+  }
+);
