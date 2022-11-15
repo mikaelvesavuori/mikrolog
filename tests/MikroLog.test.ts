@@ -73,7 +73,6 @@ test.serial(
     delete expected['timestamp'];
     delete expected['timestampEpoch'];
 
-    // @ts-ignore
     t.deepEqual(response, expected);
   }
 );
@@ -103,7 +102,6 @@ test.serial('It should return (print out) a structured log when given a string m
   delete expected['timestamp'];
   delete expected['timestampEpoch'];
 
-  // @ts-ignore
   t.deepEqual(response, expected);
 });
 
@@ -134,7 +132,6 @@ test.serial(
     delete expected['timestamp'];
     delete expected['timestampEpoch'];
 
-    // @ts-ignore
     t.deepEqual(response, expected);
   }
 );
@@ -167,7 +164,6 @@ test.serial(
     delete expected['timestamp'];
     delete expected['timestampEpoch'];
 
-    // @ts-ignore
     t.deepEqual(response, expected);
   }
 );
@@ -200,7 +196,6 @@ test.serial(
     delete expected['timestamp'];
     delete expected['timestampEpoch'];
 
-    // @ts-ignore
     t.deepEqual(response, expected);
   }
 );
@@ -235,7 +230,6 @@ test.serial(
     delete expected['timestamp'];
     delete expected['timestampEpoch'];
 
-    // @ts-ignore
     t.deepEqual(response, expected);
   }
 );
@@ -417,7 +411,6 @@ test.serial('It should redact keys when given a "redactedKeys" list', (t) => {
   delete expected['timestamp'];
   delete expected['timestampEpoch'];
 
-  // @ts-ignore
   t.deepEqual(response, expected);
 });
 
@@ -465,7 +458,6 @@ test.serial('It should mask values when given a "maskedValues" list', (t) => {
   delete expected['timestamp'];
   delete expected['timestampEpoch'];
 
-  // @ts-ignore
   t.deepEqual(response, expected);
 });
 
@@ -511,7 +503,6 @@ test.serial('It should accept a custom metadata configuration', (t) => {
   delete expected['timestamp'];
   delete expected['timestampEpoch'];
 
-  // @ts-ignore
   t.deepEqual(response, expected);
 });
 
@@ -553,7 +544,6 @@ test.serial('It should retain falsy but defined values in logs', (t) => {
   delete expected['timestamp'];
   delete expected['timestampEpoch'];
 
-  // @ts-ignore
   t.deepEqual(response, expected);
 });
 
@@ -586,6 +576,5 @@ test.serial('It should be able to merge enrichment even if input is essentially 
   delete response['timestamp'];
   delete response['timestampEpoch'];
 
-  // @ts-ignore
   t.deepEqual(response, expected);
 });

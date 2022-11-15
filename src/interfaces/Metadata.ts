@@ -45,6 +45,7 @@ export interface StaticMetadataConfigInput {
    */
   jurisdiction?: string;
 }
+
 /**
  * @description Dynamic metadata.
  */
