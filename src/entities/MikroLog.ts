@@ -291,8 +291,8 @@ export class MikroLog {
     const dynamicMetadata = this.produceDynamicMetadata();
 
     const logOutput = {
-      ...staticMetadata,
       ...dynamicMetadata,
+      ...staticMetadata,
       message: log.message,
       error: log.level === 'ERROR',
       level: log.level,
