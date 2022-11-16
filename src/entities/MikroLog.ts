@@ -41,7 +41,7 @@ export class MikroLog {
   private static correlationId: string;
   private static debugSamplingLevel: number;
   private static isDebugLogSampled: boolean;
-  private coldStart = true;
+  private static isColdStart = true;
 
   private constructor() {
     MikroLog.metadataConfig = {};
@@ -60,6 +60,8 @@ export class MikroLog {
    * If the `start` method receives any input, that input will
    * overwrite any existing metadata, event, and context.
    *
+   * It will also, consequently, wipe the Lambda cold start state.
+   *
    * If you want to "add" to these, you should instead call
    * `enrich()` and pass in your additional data there.
    */
@@ -68,8 +70,21 @@ export class MikroLog {
     MikroLog.metadataConfig = input?.metadataConfig || {};
     MikroLog.event = input?.event || {};
     MikroLog.context = input?.context || {};
+    MikroLog.context.isColdStart = MikroLog.getColdStart();
     MikroLog.correlationId = input?.correlationId || '';
     return MikroLog.instance;
+  }
+
+  /**
+   * @description Is this a Lambda cold start?
+   */
+  private static getColdStart(): boolean {
+    if (MikroLog.isColdStart) {
+      MikroLog.isColdStart = false;
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -87,18 +102,6 @@ export class MikroLog {
     MikroLog.metadataConfig = Object.assign(MikroLog.metadataConfig, input.metadataConfig || {});
     MikroLog.event = Object.assign(MikroLog.event, input.event || {});
     MikroLog.context = Object.assign(MikroLog.context, input.context || {});
-  }
-
-  /**
-   * @description Is this a Lambda cold start?
-   */
-  public isColdStart(): boolean {
-    if (this.coldStart) {
-      this.coldStart = false;
-      return true;
-    }
-
-    return false;
   }
 
   /**
@@ -234,6 +237,7 @@ export class MikroLog {
    */
   private getDynamicMetadata() {
     const metadata = getMetadata(MikroLog.event, MikroLog.context);
+
     return {
       ...metadata,
       correlationId: MikroLog.correlationId || metadata.correlationId
@@ -248,7 +252,7 @@ export class MikroLog {
 
     Object.entries(metadata).forEach((entry: any) => {
       const [key, value] = entry;
-      if (value) filteredMetadata[key] = value;
+      if (value || value === false || value === 0) filteredMetadata[key] = value;
     });
 
     return filteredMetadata;
@@ -297,7 +301,7 @@ export class MikroLog {
       error: log.level === 'ERROR',
       level: log.level,
       httpStatusCode: log.httpStatusCode,
-      isColdStart: this.isColdStart()
+      isColdStart: MikroLog.context.isColdStart
     };
 
     const filteredOutput = this.filterOutput(logOutput, redactedKeys, maskedValues);

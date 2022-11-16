@@ -3,36 +3,25 @@ import test from 'ava';
 import { MikroLog } from '../src/entities/MikroLog';
 
 import { metadataConfig } from '../testdata/config';
+import fullLog from '../testdata/fullLog.json';
 
-const fullLog = {
-  version: 1,
-  owner: 'MyCompany',
-  hostPlatform: 'aws',
-  domain: 'CustomerAcquisition',
-  system: 'ShowroomActivities',
-  service: 'UserSignUp',
-  team: 'MyDemoTeam',
-  tags: [''],
-  dataSensitivity: 'public',
-  message: 'Hello World',
-  error: false,
-  httpStatusCode: 200,
-  isColdStart: true,
-  level: 'INFO',
-  id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-  timestamp: '2022-07-25T08:52:21.121Z',
-  timestampEpoch: '1656438566041',
-  jurisdiction: 'EU'
-};
+function cleanObject(object: Record<string, any>) {
+  delete object['id'];
+  delete object['timestamp'];
+  delete object['timestampEpoch'];
+  delete object['isColdStart'];
+
+  return object;
+}
 
 /**
  * POSITIVE TESTS
  */
 test.serial('Starting MikroLog will set the instance to a new one', (t) => {
+  const expected = true;
   const logger = MikroLog.start();
 
   const isInstance = logger instanceof MikroLog;
-  const expected = true;
 
   t.is(isInstance, expected);
 });
@@ -64,16 +53,13 @@ test.serial(
     t.true(response['id'] !== null);
     t.true(response['timestamp'] !== null);
     t.true(response['timestampEpoch'] !== null);
+    t.true(response['isColdStart'] !== null);
 
     // Drop dynamic fields for test validation
-    delete response['id'];
-    delete response['timestamp'];
-    delete response['timestampEpoch'];
-    delete expected['id'];
-    delete expected['timestamp'];
-    delete expected['timestampEpoch'];
+    const cleanedResponse = cleanObject(response);
+    const cleanedExpected = cleanObject(expected);
 
-    t.deepEqual(response, expected);
+    t.deepEqual(cleanedResponse, cleanedExpected);
   }
 );
 
@@ -93,16 +79,13 @@ test.serial('It should return (print out) a structured log when given a string m
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
   t.true(response['timestampEpoch'] !== null);
+  t.true(response['isColdStart'] !== null);
 
   // Drop dynamic fields for test validation
-  delete response['id'];
-  delete response['timestamp'];
-  delete response['timestampEpoch'];
-  delete expected['id'];
-  delete expected['timestamp'];
-  delete expected['timestampEpoch'];
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
 
-  t.deepEqual(response, expected);
+  t.deepEqual(cleanedResponse, cleanedExpected);
 });
 
 test.serial(
@@ -123,16 +106,13 @@ test.serial(
     t.true(response['id'] !== null);
     t.true(response['timestamp'] !== null);
     t.true(response['timestampEpoch'] !== null);
+    t.true(response['isColdStart'] !== null);
 
     // Drop dynamic fields for test validation
-    delete response['id'];
-    delete response['timestamp'];
-    delete response['timestampEpoch'];
-    delete expected['id'];
-    delete expected['timestamp'];
-    delete expected['timestampEpoch'];
+    const cleanedResponse = cleanObject(response);
+    const cleanedExpected = cleanObject(expected);
 
-    t.deepEqual(response, expected);
+    t.deepEqual(cleanedResponse, cleanedExpected);
   }
 );
 
@@ -155,16 +135,13 @@ test.serial(
     t.true(response['id'] !== null);
     t.true(response['timestamp'] !== null);
     t.true(response['timestampEpoch'] !== null);
+    t.true(response['isColdStart'] !== null);
 
     // Drop dynamic fields for test validation
-    delete response['id'];
-    delete response['timestamp'];
-    delete response['timestampEpoch'];
-    delete expected['id'];
-    delete expected['timestamp'];
-    delete expected['timestampEpoch'];
+    const cleanedResponse = cleanObject(response);
+    const cleanedExpected = cleanObject(expected);
 
-    t.deepEqual(response, expected);
+    t.deepEqual(cleanedResponse, cleanedExpected);
   }
 );
 
@@ -187,16 +164,13 @@ test.serial(
     t.true(response['id'] !== null);
     t.true(response['timestamp'] !== null);
     t.true(response['timestampEpoch'] !== null);
+    t.true(response['isColdStart'] !== null);
 
     // Drop dynamic fields for test validation
-    delete response['id'];
-    delete response['timestamp'];
-    delete response['timestampEpoch'];
-    delete expected['id'];
-    delete expected['timestamp'];
-    delete expected['timestampEpoch'];
+    const cleanedResponse = cleanObject(response);
+    const cleanedExpected = cleanObject(expected);
 
-    t.deepEqual(response, expected);
+    t.deepEqual(cleanedResponse, cleanedExpected);
   }
 );
 
@@ -221,16 +195,13 @@ test.serial(
     t.true(response['id'] !== null);
     t.true(response['timestamp'] !== null);
     t.true(response['timestampEpoch'] !== null);
+    t.true(response['isColdStart'] !== null);
 
     // Drop dynamic fields for test validation
-    delete response['id'];
-    delete response['timestamp'];
-    delete response['timestampEpoch'];
-    delete expected['id'];
-    delete expected['timestamp'];
-    delete expected['timestampEpoch'];
+    const cleanedResponse = cleanObject(response);
+    const cleanedExpected = cleanObject(expected);
 
-    t.deepEqual(response, expected);
+    t.deepEqual(cleanedResponse, cleanedExpected);
   }
 );
 
@@ -402,16 +373,13 @@ test.serial('It should redact keys when given a "redactedKeys" list', (t) => {
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
   t.true(response['timestampEpoch'] !== null);
+  t.true(response['isColdStart'] !== null);
 
   // Drop dynamic fields for test validation
-  delete response['id'];
-  delete response['timestamp'];
-  delete response['timestampEpoch'];
-  delete expected['id'];
-  delete expected['timestamp'];
-  delete expected['timestampEpoch'];
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
 
-  t.deepEqual(response, expected);
+  t.deepEqual(cleanedResponse, cleanedExpected);
 });
 
 test.serial('It should mask values when given a "maskedValues" list', (t) => {
@@ -449,16 +417,13 @@ test.serial('It should mask values when given a "maskedValues" list', (t) => {
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
   t.true(response['timestampEpoch'] !== null);
+  t.true(response['isColdStart'] !== null);
 
   // Drop dynamic fields for test validation
-  delete response['id'];
-  delete response['timestamp'];
-  delete response['timestampEpoch'];
-  delete expected['id'];
-  delete expected['timestamp'];
-  delete expected['timestampEpoch'];
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
 
-  t.deepEqual(response, expected);
+  t.deepEqual(cleanedResponse, cleanedExpected);
 });
 
 test.serial('It should accept a custom metadata configuration', (t) => {
@@ -494,16 +459,13 @@ test.serial('It should accept a custom metadata configuration', (t) => {
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
   t.true(response['timestampEpoch'] !== null);
+  t.true(response['isColdStart'] !== null);
 
   // Drop dynamic fields for test validation
-  delete response['id'];
-  delete response['timestamp'];
-  delete response['timestampEpoch'];
-  delete expected['id'];
-  delete expected['timestamp'];
-  delete expected['timestampEpoch'];
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
 
-  t.deepEqual(response, expected);
+  t.deepEqual(cleanedResponse, cleanedExpected);
 });
 
 test.serial('It should retain falsy but defined values in logs', (t) => {
@@ -535,16 +497,13 @@ test.serial('It should retain falsy but defined values in logs', (t) => {
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
   t.true(response['timestampEpoch'] !== null);
+  t.true(response['isColdStart'] !== null);
 
   // Drop dynamic fields for test validation
-  delete response['id'];
-  delete response['timestamp'];
-  delete response['timestampEpoch'];
-  delete expected['id'];
-  delete expected['timestamp'];
-  delete expected['timestampEpoch'];
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
 
-  t.deepEqual(response, expected);
+  t.deepEqual(cleanedResponse, cleanedExpected);
 });
 
 test.serial('It should be able to merge enrichment even if input is essentially empty', (t) => {
@@ -570,11 +529,11 @@ test.serial('It should be able to merge enrichment even if input is essentially 
   t.true(response['id'] !== null);
   t.true(response['timestamp'] !== null);
   t.true(response['timestampEpoch'] !== null);
+  t.true(response['isColdStart'] !== null);
 
   // Drop dynamic fields for test validation
-  delete response['id'];
-  delete response['timestamp'];
-  delete response['timestampEpoch'];
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
 
-  t.deepEqual(response, expected);
+  t.deepEqual(cleanedResponse, cleanedExpected);
 });

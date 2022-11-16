@@ -111,6 +111,10 @@ export interface DynamicMetadataOutput {
    * @description The AWS account ID that the system is running in.
    */
   accountId: string;
+  /**
+   * @description Is this a Lambda cold start?
+   */
+  isColdStart: boolean;
 }
 
 /**

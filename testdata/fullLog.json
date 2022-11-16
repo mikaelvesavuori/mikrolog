@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "owner": "MyCompany",
+  "hostPlatform": "aws",
+  "domain": "CustomerAcquisition",
+  "system": "ShowroomActivities",
+  "service": "UserSignUp",
+  "team": "MyDemoTeam",
+  "tags": [""],
+  "dataSensitivity": "public",
+  "message": "Hello World",
+  "error": false,
+  "httpStatusCode": 200,
+  "isColdStart": true,
+  "level": "INFO",
+  "id": "1256767f-c875-4d82-813d-bc260bd0ba07",
+  "timestamp": "2022-07-25T08:52:21.121Z",
+  "timestampEpoch": "1656438566041",
+  "jurisdiction": "EU"
+}
