@@ -67,11 +67,11 @@ export class MikroLog {
    */
   public static start(input?: MikroLogInput): MikroLog {
     if (!MikroLog.instance) MikroLog.instance = new MikroLog();
-    MikroLog.metadataConfig = input?.metadataConfig || {};
-    MikroLog.event = input?.event || {};
-    MikroLog.context = input?.context || {};
+    MikroLog.metadataConfig = input?.metadataConfig || this.metadataConfig || {};
+    MikroLog.event = input?.event || this.event || {};
+    MikroLog.context = input?.context || this.context || {};
     MikroLog.context.isColdStart = MikroLog.getColdStart();
-    MikroLog.correlationId = input?.correlationId || '';
+    MikroLog.correlationId = input?.correlationId || this.correlationId || '';
     return MikroLog.instance;
   }
 
