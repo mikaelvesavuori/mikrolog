@@ -537,3 +537,36 @@ test.serial('It should be able to merge enrichment even if input is essentially 
 
   t.deepEqual(cleanedResponse, cleanedExpected);
 });
+
+test.serial('It should be able to enrich with correlation ID', (t) => {
+  MikroLog.reset();
+  const message = 'Hello World';
+
+  const logger = MikroLog.start();
+  MikroLog.enrich({ correlationId: 'abc123' });
+  const response: any = logger.info(message);
+
+  const expected: any = {
+    correlationId: 'abc123',
+    error: false,
+    httpStatusCode: 200,
+    isColdStart: true,
+    level: 'INFO',
+    message: 'Hello World'
+  };
+
+  // Ensure exactness of message field
+  t.is(response['message'], message);
+
+  // Check presence of dynamic fields
+  t.true(response['id'] !== null);
+  t.true(response['timestamp'] !== null);
+  t.true(response['timestampEpoch'] !== null);
+  t.true(response['isColdStart'] !== null);
+
+  // Drop dynamic fields for test validation
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
+
+  t.deepEqual(cleanedResponse, cleanedExpected);
+});

@@ -102,6 +102,7 @@ export class MikroLog {
     MikroLog.metadataConfig = Object.assign(MikroLog.metadataConfig, input.metadataConfig || {});
     MikroLog.event = Object.assign(MikroLog.event, input.event || {});
     MikroLog.context = Object.assign(MikroLog.context, input.context || {});
+    MikroLog.correlationId = input?.correlationId || this.correlationId || '';
   }
 
   /**
