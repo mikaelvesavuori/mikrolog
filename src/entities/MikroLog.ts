@@ -108,7 +108,19 @@ export class MikroLog {
   }
 
   /**
-   * @description TODO
+   * @description If you want a one-time root-level enrichment, you can do:
+   *
+   * ```
+   * const logger = MikroLog.start();
+   * logger.enrichNext({ someId: '123456789abcdefghi' });
+   * logger.info('Ping!'); // Enrichment is present on log
+   * logger.info('Ping!'); // Enrichment is longer present
+   * ```
+   *
+   * You can also use nested objects:
+   * ```
+   * logger.enrichNext({ myObject: { myValue: 'Something here', otherValue: 'Something else' } });
+   * ```
    */
   public enrichNext(input: Record<string, any>) {
     this.nextLogEnrichment = input;
