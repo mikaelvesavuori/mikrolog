@@ -234,6 +234,28 @@ headers['X-Log-Sampled'] ? logger.setDebugSamplingRate(100) : logger.setDebugSam
 
 ## Metadata
 
+### One-time root-level enrichment
+
+If you want a one-time root-level enrichment, you can do:
+
+```typescript
+const logger = MikroLog.start();
+logger.enrichNext({ someId: '123456789abcdefghi' });
+logger.info('Ping!'); // Enrichment is present on log
+logger.info('Ping!'); // Enrichment is longer present
+```
+
+This works just as well on nested object:
+
+```typescript
+const logger = MikroLog.start();
+logger.enrichNext({ myObject: { myValue: 'Something here', otherValue: 'Something else' } });
+logger.info('Ping!'); // Enrichment is present on log
+logger.info('Ping!'); // Enrichment is longer present
+```
+
+Note that only object input is allowed for this method.
+
 ### Static metadata
 
 _Static metadata_ is the metadata that you may provide at the time of instantiation. These fields will then be used automatically in all subsequent logs.

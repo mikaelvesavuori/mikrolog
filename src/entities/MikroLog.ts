@@ -42,6 +42,7 @@ export class MikroLog {
   private static debugSamplingLevel: number;
   private static isDebugLogSampled: boolean;
   private static isColdStart = true;
+  private nextLogEnrichment: Record<string, any>;
 
   private constructor() {
     MikroLog.metadataConfig = {};
@@ -50,6 +51,7 @@ export class MikroLog {
     MikroLog.correlationId = '';
     MikroLog.debugSamplingLevel = this.initDebugSampleLevel();
     MikroLog.isDebugLogSampled = true;
+    this.nextLogEnrichment = {};
   }
 
   /**
@@ -103,6 +105,13 @@ export class MikroLog {
     MikroLog.event = Object.assign(MikroLog.event, input.event || {});
     MikroLog.context = Object.assign(MikroLog.context, input.context || {});
     MikroLog.correlationId = input?.correlationId || this.correlationId || '';
+  }
+
+  /**
+   * @description TODO
+   */
+  public enrichNext(input: Record<string, any>) {
+    this.nextLogEnrichment = input;
   }
 
   /**
@@ -295,15 +304,24 @@ export class MikroLog {
 
     const dynamicMetadata = this.produceDynamicMetadata();
 
-    const logOutput = {
-      ...dynamicMetadata,
-      ...staticMetadata,
-      message: log.message,
-      error: log.level === 'ERROR',
-      level: log.level,
-      httpStatusCode: log.httpStatusCode,
-      isColdStart: MikroLog.context.isColdStart
-    };
+    const logOutput = (() => {
+      const output = {
+        ...dynamicMetadata,
+        ...staticMetadata,
+        message: log.message,
+        error: log.level === 'ERROR',
+        level: log.level,
+        httpStatusCode: log.httpStatusCode,
+        isColdStart: MikroLog.context.isColdStart
+      };
+
+      if (this.nextLogEnrichment && JSON.stringify(this.nextLogEnrichment) !== '{}')
+        return Object.assign(output, this.nextLogEnrichment);
+
+      return output;
+    })();
+
+    this.nextLogEnrichment = {};
 
     const filteredOutput = this.filterOutput(logOutput, redactedKeys, maskedValues);
     return this.sortOutput(filteredOutput);

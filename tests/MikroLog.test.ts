@@ -570,3 +570,37 @@ test.serial('It should be able to enrich with correlation ID', (t) => {
 
   t.deepEqual(cleanedResponse, cleanedExpected);
 });
+
+test.serial(
+  'It should enrich a single-level log with a one-time root item and ensure it is not present in later calls',
+  (t) => {
+    MikroLog.reset();
+    const message = 'Hello World';
+
+    const logger = MikroLog.start();
+    logger.enrichNext({ myValue: 'abc123' });
+
+    const responseFirst: Record<string, any> = logger.info(message);
+    const responseSecond: Record<string, any> = logger.info(message);
+
+    t.is(responseFirst.hasOwnProperty('myValue'), true);
+    t.is(responseSecond.hasOwnProperty('myValue'), false);
+  }
+);
+
+test.serial(
+  'It should enrich a multi-level log with a one-time root item and ensure it is not present in later calls',
+  (t) => {
+    MikroLog.reset();
+    const message = 'Hello World';
+
+    const logger = MikroLog.start();
+    logger.enrichNext({ dd: { trace_id: 'abc123' } });
+
+    const responseFirst: Record<string, any> = logger.info(message);
+    const responseSecond: Record<string, any> = logger.info(message);
+
+    t.is(responseFirst['dd']['trace_id'], 'abc123');
+    t.is(responseSecond.hasOwnProperty('dd'), false);
+  }
+);
