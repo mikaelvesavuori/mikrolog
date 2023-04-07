@@ -114,7 +114,7 @@ export class MikroLog {
    * const logger = MikroLog.start();
    * logger.enrichNext({ someId: '123456789abcdefghi' });
    * logger.info('Ping!'); // Enrichment is present on log
-   * logger.info('Ping!'); // Enrichment is longer present
+   * logger.info('Ping!'); // Enrichment is no longer present
    * ```
    *
    * You can also use nested objects:

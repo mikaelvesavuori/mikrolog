@@ -242,7 +242,7 @@ If you want a one-time root-level enrichment, you can do:
 const logger = MikroLog.start();
 logger.enrichNext({ someId: '123456789abcdefghi' });
 logger.info('Ping!'); // Enrichment is present on log
-logger.info('Ping!'); // Enrichment is longer present
+logger.info('Ping!'); // Enrichment is no longer present
 ```
 
 This works just as well on nested object:
@@ -251,7 +251,7 @@ This works just as well on nested object:
 const logger = MikroLog.start();
 logger.enrichNext({ myObject: { myValue: 'Something here', otherValue: 'Something else' } });
 logger.info('Ping!'); // Enrichment is present on log
-logger.info('Ping!'); // Enrichment is longer present
+logger.info('Ping!'); // Enrichment is no longer present
 ```
 
 Note that only object input is allowed for this method.
