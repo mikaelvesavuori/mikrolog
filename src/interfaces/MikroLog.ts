@@ -1,4 +1,4 @@
-import { StaticMetadataConfigInput, DynamicMetadataOutput } from './Metadata';
+import { StaticMetadataConfigInput, DynamicMetadataOutput } from './Metadata.js';
 
 /**
  * @description Input when instantiating a new MikroLog instance.

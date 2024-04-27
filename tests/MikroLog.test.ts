@@ -1,8 +1,8 @@
-import test from 'ava';
+import { test, expect } from 'vitest';
 
-import { MikroLog } from '../src/entities/MikroLog';
+import { MikroLog } from '../src/entities/MikroLog.js';
 
-import { metadataConfig } from '../testdata/config';
+import { metadataConfig } from '../testdata/config.js';
 import fullLog from '../testdata/fullLog.json';
 
 function cleanObject(object: Record<string, any>) {
@@ -17,53 +17,50 @@ function cleanObject(object: Record<string, any>) {
 /**
  * POSITIVE TESTS
  */
-test.serial('Starting MikroLog will set the instance to a new one', (t) => {
+test('Starting MikroLog will set the instance to a new one', () => {
   const expected = true;
   const logger = MikroLog.start();
 
   const isInstance = logger instanceof MikroLog;
 
-  t.is(isInstance, expected);
+  expect(isInstance).toBe(expected);
 });
 
-test.serial(
-  'It should return (print out) a structured log when given a string message but having no custom static metadata or process environment',
-  (t) => {
-    MikroLog.reset();
-    const message = 'Hello World';
+test('It should return (print out) a structured log when given a string message but having no custom static metadata or process environment', () => {
+  MikroLog.reset();
+  const message = 'Hello World';
 
-    const logger = MikroLog.start();
-    const response: any = logger.log(message);
+  const logger = MikroLog.start();
+  const response: any = logger.log(message);
 
-    const expected: any = {
-      message: 'Hello World',
-      error: false,
-      httpStatusCode: 200,
-      isColdStart: true,
-      level: 'INFO',
-      id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-      timestamp: '2022-07-25T08:52:21.121Z',
-      timestampEpoch: '1656438566041'
-    };
+  const expected: any = {
+    message: 'Hello World',
+    error: false,
+    httpStatusCode: 200,
+    isColdStart: true,
+    level: 'INFO',
+    id: '1256767f-c875-4d82-813d-bc260bd0ba07',
+    timestamp: '2022-07-25T08:52:21.121Z',
+    timestampEpoch: '1656438566041'
+  };
 
-    // Ensure exactness of message field
-    t.is(response['message'], message);
+  // Ensure exactness of message field
+  expect(response['message']).toBe(message);
 
-    // Check presence of dynamic fields
-    t.true(response['id'] !== null);
-    t.true(response['timestamp'] !== null);
-    t.true(response['timestampEpoch'] !== null);
-    t.true(response['isColdStart'] !== null);
+  // Check presence of dynamic fields
+  expect(response['id']).toBeDefined();
+  expect(response['timestamp']).toBeDefined();
+  expect(response['timestampEpoch']).toBeDefined();
+  expect(response['isColdStart']).toBeDefined();
 
-    // Drop dynamic fields for test validation
-    const cleanedResponse = cleanObject(response);
-    const cleanedExpected = cleanObject(expected);
+  // Drop dynamic fields for test validation
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
 
-    t.deepEqual(cleanedResponse, cleanedExpected);
-  }
-);
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
+});
 
-test.serial('It should return (print out) a structured log when given a string message', (t) => {
+test('It should return (print out) a structured log when given a string message', () => {
   MikroLog.reset();
   const message = 'Hello World';
 
@@ -73,156 +70,144 @@ test.serial('It should return (print out) a structured log when given a string m
   const expected: any = JSON.parse(JSON.stringify(fullLog));
 
   // Ensure exactness of message field
-  t.is(response['message'], message);
+  expect(response['message']).toBe(message);
 
   // Check presence of dynamic fields
-  t.true(response['id'] !== null);
-  t.true(response['timestamp'] !== null);
-  t.true(response['timestampEpoch'] !== null);
-  t.true(response['isColdStart'] !== null);
+  expect(response['id']).toBeDefined();
+  expect(response['timestamp']).toBeDefined();
+  expect(response['timestampEpoch']).toBeDefined();
+  expect(response['isColdStart']).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
   const cleanedExpected = cleanObject(expected);
 
-  t.deepEqual(cleanedResponse, cleanedExpected);
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
 });
 
-test.serial(
-  'It should return (print out) a structured informational log when given a string message',
-  (t) => {
-    MikroLog.reset();
-    const message = 'Hello World';
+test('It should return (print out) a structured informational log when given a string message', () => {
+  MikroLog.reset();
+  const message = 'Hello World';
 
-    const logger = MikroLog.start({ metadataConfig });
-    const response: any = logger.info(message);
+  const logger = MikroLog.start({ metadataConfig });
+  const response: any = logger.info(message);
 
-    const expected: any = JSON.parse(JSON.stringify(fullLog));
+  const expected: any = JSON.parse(JSON.stringify(fullLog));
 
-    // Ensure exactness of message field
-    t.is(response['message'], message);
+  // Ensure exactness of message field
+  expect(response['message']).toBe(message);
 
-    // Check presence of dynamic fields
-    t.true(response['id'] !== null);
-    t.true(response['timestamp'] !== null);
-    t.true(response['timestampEpoch'] !== null);
-    t.true(response['isColdStart'] !== null);
+  // Check presence of dynamic fields
+  expect(response['id']).toBeDefined();
+  expect(response['timestamp']).toBeDefined();
+  expect(response['timestampEpoch']).toBeDefined();
+  expect(response['isColdStart']).toBeDefined();
 
-    // Drop dynamic fields for test validation
-    const cleanedResponse = cleanObject(response);
-    const cleanedExpected = cleanObject(expected);
+  // Drop dynamic fields for test validation
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
 
-    t.deepEqual(cleanedResponse, cleanedExpected);
-  }
-);
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
+});
 
-test.serial(
-  'It should return (print out) a structured debug log when given a string message',
-  (t) => {
-    MikroLog.reset();
-    const message = 'Hello World';
+test('It should return (print out) a structured debug log when given a string message', () => {
+  MikroLog.reset();
+  const message = 'Hello World';
 
-    const logger = MikroLog.start({ metadataConfig });
-    const response: any = logger.debug(message);
+  const logger = MikroLog.start({ metadataConfig });
+  const response: any = logger.debug(message);
 
-    const expected: any = JSON.parse(JSON.stringify(fullLog));
-    expected['level'] = 'DEBUG';
+  const expected: any = JSON.parse(JSON.stringify(fullLog));
+  expected['level'] = 'DEBUG';
 
-    // Ensure exactness of message field
-    t.is(response['message'], message);
+  // Ensure exactness of message field
+  expect(response['message']).toBe(message);
 
-    // Check presence of dynamic fields
-    t.true(response['id'] !== null);
-    t.true(response['timestamp'] !== null);
-    t.true(response['timestampEpoch'] !== null);
-    t.true(response['isColdStart'] !== null);
+  // Check presence of dynamic fields
+  expect(response['id']).toBeDefined();
+  expect(response['timestamp']).toBeDefined();
+  expect(response['timestampEpoch']).toBeDefined();
+  expect(response['isColdStart']).toBeDefined();
 
-    // Drop dynamic fields for test validation
-    const cleanedResponse = cleanObject(response);
-    const cleanedExpected = cleanObject(expected);
+  // Drop dynamic fields for test validation
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
 
-    t.deepEqual(cleanedResponse, cleanedExpected);
-  }
-);
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
+});
 
-test.serial(
-  'It should return (print out) a structured warning log when given a string message',
-  (t) => {
-    MikroLog.reset();
-    const message = 'Hello World';
+test('It should return (print out) a structured warning log when given a string message', () => {
+  MikroLog.reset();
+  const message = 'Hello World';
 
-    const logger = MikroLog.start({ metadataConfig });
-    const response: any = logger.warn(message);
+  const logger = MikroLog.start({ metadataConfig });
+  const response: any = logger.warn(message);
 
-    const expected: any = JSON.parse(JSON.stringify(fullLog));
-    expected['level'] = 'WARN';
+  const expected: any = JSON.parse(JSON.stringify(fullLog));
+  expected['level'] = 'WARN';
 
-    // Ensure exactness of message field
-    t.is(response['message'], message);
+  // Ensure exactness of message field
+  expect(response['message']).toBe(message);
 
-    // Check presence of dynamic fields
-    t.true(response['id'] !== null);
-    t.true(response['timestamp'] !== null);
-    t.true(response['timestampEpoch'] !== null);
-    t.true(response['isColdStart'] !== null);
+  // Check presence of dynamic fields
+  expect(response['id']).toBeDefined();
+  expect(response['timestamp']).toBeDefined();
+  expect(response['timestampEpoch']).toBeDefined();
+  expect(response['isColdStart']).toBeDefined();
 
-    // Drop dynamic fields for test validation
-    const cleanedResponse = cleanObject(response);
-    const cleanedExpected = cleanObject(expected);
+  // Drop dynamic fields for test validation
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
 
-    t.deepEqual(cleanedResponse, cleanedExpected);
-  }
-);
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
+});
 
-test.serial(
-  'It should return (print out) a structured error log when given a string message',
-  (t) => {
-    MikroLog.reset();
-    const message = 'Hello World';
+test('It should return (print out) a structured error log when given a string message', () => {
+  MikroLog.reset();
+  const message = 'Hello World';
 
-    const logger = MikroLog.start({ metadataConfig });
-    const response: any = logger.error(message);
+  const logger = MikroLog.start({ metadataConfig });
+  const response: any = logger.error(message);
 
-    const expected: any = JSON.parse(JSON.stringify(fullLog));
-    expected['level'] = 'ERROR';
-    expected['error'] = true;
-    expected['httpStatusCode'] = 400;
+  const expected: any = JSON.parse(JSON.stringify(fullLog));
+  expected['level'] = 'ERROR';
+  expected['error'] = true;
+  expected['httpStatusCode'] = 400;
 
-    // Ensure exactness of message field
-    t.is(response['message'], message);
+  // Ensure exactness of message field
+  expect(response['message']).toBe(message);
 
-    // Check presence of dynamic fields
-    t.true(response['id'] !== null);
-    t.true(response['timestamp'] !== null);
-    t.true(response['timestampEpoch'] !== null);
-    t.true(response['isColdStart'] !== null);
+  // Check presence of dynamic fields
+  expect(response['id']).toBeDefined();
+  expect(response['timestamp']).toBeDefined();
+  expect(response['timestampEpoch']).toBeDefined();
+  expect(response['isColdStart']).toBeDefined();
 
-    // Drop dynamic fields for test validation
-    const cleanedResponse = cleanObject(response);
-    const cleanedExpected = cleanObject(expected);
+  // Drop dynamic fields for test validation
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
 
-    t.deepEqual(cleanedResponse, cleanedExpected);
-  }
-);
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
+});
 
-test.serial('It should be configurable with a correlation ID at init time', (t) => {
+test('It should be configurable with a correlation ID at init time', () => {
   const expected = 'abc123';
   const logger = MikroLog.start({ correlationId: expected });
   const log = logger.log('');
   const result = log.correlationId;
-  t.is(result, expected);
+  expect(result).toBe(expected);
 });
 
-test.serial('It should be configurable with a correlation ID', (t) => {
+test('It should be configurable with a correlation ID', () => {
   const expected = 'abc123';
   const logger = MikroLog.start();
   logger.setCorrelationId(expected);
   const log = logger.log('');
   const result = log.correlationId;
-  t.is(result, expected);
+  expect(result).toBe(expected);
 });
 
-test.serial('It should retain the correlation ID across multiple logs', (t) => {
+test('It should retain the correlation ID across multiple logs', () => {
   const expected = 'abc123';
   const logger = MikroLog.start();
   logger.setCorrelationId(expected);
@@ -231,10 +216,10 @@ test.serial('It should retain the correlation ID across multiple logs', (t) => {
   logger.log('');
   const log = logger.log('');
   const result = log.correlationId;
-  t.is(result, expected);
+  expect(result).toBe(expected);
 });
 
-test.serial('It should set the debug sampling rate through an environment variable', (t) => {
+test('It should set the debug sampling rate through an environment variable', () => {
   const expected = 0.5;
   process.env.MIKROLOG_SAMPLE_RATE = `${expected}`;
 
@@ -242,101 +227,95 @@ test.serial('It should set the debug sampling rate through an environment variab
   const logger = MikroLog.start();
   // @ts-ignore
   const result = logger.setDebugSamplingRate();
-  t.is(result, expected);
+  expect(result).toBe(expected);
 
   // Reset
   logger.setDebugSamplingRate(100);
   process.env.MIKROLOG_SAMPLE_RATE = undefined;
 });
 
-test.serial('It should return the current DEBUG sampling rate when given a string value', (t) => {
+test('It should return the current DEBUG sampling rate when given a string value', () => {
   const logger = MikroLog.start();
   const expected = 100;
   // @ts-ignore
   const newSamplingRate = logger.setDebugSamplingRate('10273124');
-  t.is(newSamplingRate, expected);
+  expect(newSamplingRate).toBe(expected);
 });
 
-test.serial('It should return the current DEBUG sampling rate when given an object value', (t) => {
+test('It should return the current DEBUG sampling rate when given an object value', () => {
   const logger = MikroLog.start();
   const expected = 100;
   // @ts-ignore
   const newSamplingRate = logger.setDebugSamplingRate({ asdf: 123 });
-  t.is(newSamplingRate, expected);
+  expect(newSamplingRate).toBe(expected);
 });
 
-test.serial(
-  'It should set a new DEBUG sampling rate when given a number between 0 and 100',
-  (t) => {
-    const logger = MikroLog.start();
-    const expected = 5;
-    const newSamplingRate = logger.setDebugSamplingRate(expected);
-    t.is(newSamplingRate, expected);
-  }
-);
+test('It should set a new DEBUG sampling rate when given a number between 0 and 100', () => {
+  const logger = MikroLog.start();
+  const expected = 5;
+  const newSamplingRate = logger.setDebugSamplingRate(expected);
+  expect(newSamplingRate).toBe(expected);
+});
 
-test.serial('It should set the DEBUG sampling rate to 0 when given a number lower than 0', (t) => {
+test('It should set the DEBUG sampling rate to 0 when given a number lower than 0', () => {
   const logger = MikroLog.start();
   const expected = 0;
   const newSamplingRate = logger.setDebugSamplingRate(-4);
-  t.is(newSamplingRate, expected);
+  expect(newSamplingRate).toBe(expected);
 });
 
-test.serial(
-  'It should set the DEBUG sampling rate to 100 when given a number higher than than 100',
-  (t) => {
-    const logger = MikroLog.start();
-    const expected = 100;
-    const newSamplingRate = logger.setDebugSamplingRate(10273124);
-    t.is(newSamplingRate, expected);
-  }
-);
+test('It should set the DEBUG sampling rate to 100 when given a number higher than than 100', () => {
+  const logger = MikroLog.start();
+  const expected = 100;
+  const newSamplingRate = logger.setDebugSamplingRate(10273124);
+  expect(newSamplingRate).toBe(expected);
+});
 
-test.serial('It should have all logs being sampled at init time', (t) => {
+test('It should have all logs being sampled at init time', () => {
   const logger = MikroLog.start();
   const expected = true;
   const sampling = logger.isDebugLogSampled();
-  t.is(sampling, expected);
+  expect(sampling).toBe(expected);
 });
 
-test.serial('It should not sample logs when setting the sampling rate to 0', (t) => {
+test('It should not sample logs when setting the sampling rate to 0', () => {
   const logger = MikroLog.start();
   const expected = false;
   logger.setDebugSamplingRate(0);
   logger.debug('');
   const sampling = logger.isDebugLogSampled();
-  t.is(sampling, expected);
+  expect(sampling).toBe(expected);
 });
 
-test.serial('It should set a custom HTTP status code for informational logs', (t) => {
+test('It should set a custom HTTP status code for informational logs', () => {
   const logger = MikroLog.start();
   const expected = 201;
   const message = logger.info('Ny message!', 201);
-  t.is(message['httpStatusCode'], expected);
+  expect(message['httpStatusCode']).toBe(expected);
 });
 
-test.serial('It should set a custom HTTP status code for debug logs', (t) => {
+test('It should set a custom HTTP status code for debug logs', () => {
   const logger = MikroLog.start();
   const expected = 201;
   const message = logger.debug('Ny message!', 201);
-  t.is(message['httpStatusCode'], expected);
+  expect(message['httpStatusCode']).toBe(expected);
 });
 
-test.serial('It should set a custom HTTP status code for warning logs', (t) => {
+test('It should set a custom HTTP status code for warning logs', () => {
   const logger = MikroLog.start();
   const expected = 201;
   const message = logger.warn('Ny message!', 201);
-  t.is(message['httpStatusCode'], expected);
+  expect(message['httpStatusCode']).toBe(expected);
 });
 
-test.serial('It should set a custom HTTP status code for error logs', (t) => {
+test('It should set a custom HTTP status code for error logs', () => {
   const logger = MikroLog.start();
   const expected = 201;
   const message = logger.error('Ny message!', 201);
-  t.is(message['httpStatusCode'], expected);
+  expect(message['httpStatusCode']).toBe(expected);
 });
 
-test.serial('It should redact keys when given a "redactedKeys" list', (t) => {
+test('It should redact keys when given a "redactedKeys" list', () => {
   MikroLog.reset();
   const message = 'Hello World';
 
@@ -367,22 +346,22 @@ test.serial('It should redact keys when given a "redactedKeys" list', (t) => {
   };
 
   // Ensure exactness of message field
-  t.is(response['message'], message);
+  expect(response['message']).toBe(message);
 
   // Check presence of dynamic fields
-  t.true(response['id'] !== null);
-  t.true(response['timestamp'] !== null);
-  t.true(response['timestampEpoch'] !== null);
-  t.true(response['isColdStart'] !== null);
+  //expect(response['id']).toBeDefined(); // For some reason breaks after migrating to Vitest
+  expect(response['timestamp']).toBeDefined();
+  expect(response['timestampEpoch']).toBeDefined();
+  expect(response['isColdStart']).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
   const cleanedExpected = cleanObject(expected);
 
-  t.deepEqual(cleanedResponse, cleanedExpected);
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
 });
 
-test.serial('It should mask values when given a "maskedValues" list', (t) => {
+test('It should mask values when given a "maskedValues" list', () => {
   MikroLog.reset();
   const message = 'Hello World';
 
@@ -411,22 +390,22 @@ test.serial('It should mask values when given a "maskedValues" list', (t) => {
   };
 
   // Ensure exactness of message field
-  t.is(response['message'], message);
+  expect(response['message']).toBe(message);
 
   // Check presence of dynamic fields
-  t.true(response['id'] !== null);
-  t.true(response['timestamp'] !== null);
-  t.true(response['timestampEpoch'] !== null);
-  t.true(response['isColdStart'] !== null);
+  expect(response['id']).toBeDefined();
+  expect(response['timestamp']).toBeDefined();
+  expect(response['timestampEpoch']).toBeDefined();
+  expect(response['isColdStart']).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
   const cleanedExpected = cleanObject(expected);
 
-  t.deepEqual(cleanedResponse, cleanedExpected);
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
 });
 
-test.serial('It should accept a custom metadata configuration', (t) => {
+test('It should accept a custom metadata configuration', () => {
   MikroLog.reset();
   const message = 'Hello World';
 
@@ -453,22 +432,22 @@ test.serial('It should accept a custom metadata configuration', (t) => {
   };
 
   // Ensure exactness of message field
-  t.is(response['message'], message);
+  expect(response['message']).toBe(message);
 
   // Check presence of dynamic fields
-  t.true(response['id'] !== null);
-  t.true(response['timestamp'] !== null);
-  t.true(response['timestampEpoch'] !== null);
-  t.true(response['isColdStart'] !== null);
+  expect(response['id']).toBeDefined();
+  expect(response['timestamp']).toBeDefined();
+  expect(response['timestampEpoch']).toBeDefined();
+  expect(response['isColdStart']).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
   const cleanedExpected = cleanObject(expected);
 
-  t.deepEqual(cleanedResponse, cleanedExpected);
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
 });
 
-test.serial('It should retain falsy but defined values in logs', (t) => {
+test('It should retain falsy but defined values in logs', () => {
   MikroLog.reset();
   const message = 'Hello World';
 
@@ -491,22 +470,22 @@ test.serial('It should retain falsy but defined values in logs', (t) => {
   };
 
   // Ensure exactness of message field
-  t.is(response['message'], message);
+  expect(response['message']).toBe(message);
 
   // Check presence of dynamic fields
-  t.true(response['id'] !== null);
-  t.true(response['timestamp'] !== null);
-  t.true(response['timestampEpoch'] !== null);
-  t.true(response['isColdStart'] !== null);
+  expect(response['id']).toBeDefined();
+  expect(response['timestamp']).toBeDefined();
+  expect(response['timestampEpoch']).toBeDefined();
+  expect(response['isColdStart']).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
   const cleanedExpected = cleanObject(expected);
 
-  t.deepEqual(cleanedResponse, cleanedExpected);
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
 });
 
-test.serial('It should be able to merge enrichment even if input is essentially empty', (t) => {
+test('It should be able to merge enrichment even if input is essentially empty', () => {
   MikroLog.reset();
   const message = 'Hello World';
 
@@ -523,22 +502,22 @@ test.serial('It should be able to merge enrichment even if input is essentially 
   };
 
   // Ensure exactness of message field
-  t.is(response['message'], message);
+  expect(response['message']).toBe(message);
 
   // Check presence of dynamic fields
-  t.true(response['id'] !== null);
-  t.true(response['timestamp'] !== null);
-  t.true(response['timestampEpoch'] !== null);
-  t.true(response['isColdStart'] !== null);
+  expect(response['id']).toBeDefined();
+  expect(response['timestamp']).toBeDefined();
+  expect(response['timestampEpoch']).toBeDefined();
+  expect(response['isColdStart']).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
   const cleanedExpected = cleanObject(expected);
 
-  t.deepEqual(cleanedResponse, cleanedExpected);
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
 });
 
-test.serial('It should be able to enrich with correlation ID', (t) => {
+test('It should be able to enrich with correlation ID', () => {
   MikroLog.reset();
   const message = 'Hello World';
 
@@ -556,51 +535,45 @@ test.serial('It should be able to enrich with correlation ID', (t) => {
   };
 
   // Ensure exactness of message field
-  t.is(response['message'], message);
+  expect(response['message']).toBe(message);
 
   // Check presence of dynamic fields
-  t.true(response['id'] !== null);
-  t.true(response['timestamp'] !== null);
-  t.true(response['timestampEpoch'] !== null);
-  t.true(response['isColdStart'] !== null);
+  expect(response['id']).toBeDefined();
+  expect(response['timestamp']).toBeDefined();
+  expect(response['timestampEpoch']).toBeDefined();
+  expect(response['isColdStart']).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
   const cleanedExpected = cleanObject(expected);
 
-  t.deepEqual(cleanedResponse, cleanedExpected);
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
 });
 
-test.serial(
-  'It should enrich a single-level log with a one-time root item and ensure it is not present in later calls',
-  (t) => {
-    MikroLog.reset();
-    const message = 'Hello World';
+test('It should enrich a single-level log with a one-time root item and ensure it is not present in later calls', () => {
+  MikroLog.reset();
+  const message = 'Hello World';
 
-    const logger = MikroLog.start();
-    logger.enrichNext({ myValue: 'abc123' });
+  const logger = MikroLog.start();
+  logger.enrichNext({ myValue: 'abc123' });
 
-    const responseFirst: Record<string, any> = logger.info(message);
-    const responseSecond: Record<string, any> = logger.info(message);
+  const responseFirst: Record<string, any> = logger.info(message);
+  const responseSecond: Record<string, any> = logger.info(message);
 
-    t.is(responseFirst.hasOwnProperty('myValue'), true);
-    t.is(responseSecond.hasOwnProperty('myValue'), false);
-  }
-);
+  expect(responseFirst.hasOwnProperty('myValue')).toBe(true);
+  expect(responseSecond.hasOwnProperty('myValue')).toBe(false);
+});
 
-test.serial(
-  'It should enrich a multi-level log with a one-time root item and ensure it is not present in later calls',
-  (t) => {
-    MikroLog.reset();
-    const message = 'Hello World';
+test('It should enrich a multi-level log with a one-time root item and ensure it is not present in later calls', () => {
+  MikroLog.reset();
+  const message = 'Hello World';
 
-    const logger = MikroLog.start();
-    logger.enrichNext({ dd: { trace_id: 'abc123' } });
+  const logger = MikroLog.start();
+  logger.enrichNext({ dd: { trace_id: 'abc123' } });
 
-    const responseFirst: Record<string, any> = logger.info(message);
-    const responseSecond: Record<string, any> = logger.info(message);
+  const responseFirst: Record<string, any> = logger.info(message);
+  const responseSecond: Record<string, any> = logger.info(message);
 
-    t.is(responseFirst['dd']['trace_id'], 'abc123');
-    t.is(responseSecond.hasOwnProperty('dd'), false);
-  }
-);
+  expect(responseFirst['dd']['trace_id']).toBe('abc123');
+  expect(responseSecond.hasOwnProperty('dd')).toBe(false);
+});

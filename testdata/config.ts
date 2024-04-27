@@ -1,4 +1,4 @@
-import { StaticMetadataConfigInput } from '../src/interfaces/Metadata';
+import { StaticMetadataConfigInput } from '../src/interfaces/Metadata.js';
 
 export const metadataConfig: StaticMetadataConfigInput = {
   version: 1,

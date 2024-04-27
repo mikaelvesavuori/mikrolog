@@ -1,10 +1,18 @@
 {
   "name": "mikrolog",
   "description": "The JSON logger you always wanted for Lambda.",
-  "version": "2.1.14",
+  "version": "2.1.15",
   "author": "Mikael Vesavuori",
   "license": "MIT",
-  "main": "./lib/index.js",
+  "type": "module",
+  "main": "lib/index.cjs",
+  "module": "lib/index.js",
+  "exports": {
+    ".": {
+      "require": "./lib/index.cjs",
+      "import": "./lib/index.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mikaelvesavuori/mikrolog.git"
@@ -31,12 +39,13 @@
   ],
   "scripts": {
     "start": "npx ts-node src/index.ts",
-    "test": "npx c8 -reporter=lcov ava",
-    "build": "npm run clean && npx tsc --project tsconfig.build.json",
-    "clean": "rm -rf lib",
+    "test": "npx vitest run --coverage",
+    "test:watch": "npx vitest",
+    "build": "npm run clean && tsup src --format esm,cjs --dts && mv dist lib",
+    "clean": "rm -rf lib && rm -rf dist",
     "package": "npm pack",
     "prepublishOnly": "npm run build",
-    "prepare": "husky install",
+    "prepare": "husky",
     "docs": "npm run docs:clean && npm run docs:typedoc",
     "docs:clean": "rm -rf docs",
     "docs:typedoc": "npx typedoc --entryPoints src --entryPointStrategy expand --exclude '**/*+(test).ts' --externalPattern 'node_modules/**/*' --excludeExternals --out docs/"
@@ -45,33 +54,18 @@
     "aws-metadata-utils": "1"
   },
   "devDependencies": {
-    "@ava/typescript": "3",
-    "@types/node": "18",
-    "@typescript-eslint/eslint-plugin": "5",
-    "@typescript-eslint/parser": "5",
-    "ava": "5",
-    "c8": "7",
+    "@types/node": "20",
+    "@typescript-eslint/eslint-plugin": "7",
+    "@typescript-eslint/parser": "7",
+    "@vitest/coverage-v8": "1",
     "eslint": "8",
-    "eslint-config-prettier": "8",
-    "eslint-plugin-prettier": "4",
-    "husky": "8",
-    "prettier": "2",
-    "ts-node": "10",
-    "typedoc": "^0.23.23",
-    "typescript": "4"
-  },
-  "ava": {
-    "typescript": {
-      "rewritePaths": {
-        "src/": "lib/"
-      },
-      "compile": false
-    },
-    "files": [
-      "tests/**/*.ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ]
+    "eslint-config-prettier": "9",
+    "eslint-plugin-prettier": "5",
+    "husky": "9",
+    "prettier": "3",
+    "tsup": "8",
+    "typescript": "5",
+    "typedoc": "0",
+    "vitest": "1"
   }
 }

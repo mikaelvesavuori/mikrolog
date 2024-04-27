@@ -8,8 +8,8 @@ import {
   LogOutput,
   Message,
   HttpStatusCode
-} from '../interfaces/MikroLog';
-import { StaticMetadataConfigInput, DynamicMetadataOutput } from '../interfaces/Metadata';
+} from '../interfaces/MikroLog.js';
+import { StaticMetadataConfigInput, DynamicMetadataOutput } from '../interfaces/Metadata.js';
 
 /**
  * @description MikroLog is a Lambda-oriented lightweight JSON logger.
