@@ -1,4 +1,7 @@
-import { StaticMetadataConfigInput, DynamicMetadataOutput } from './Metadata.js';
+import type {
+  DynamicMetadataOutput,
+  StaticMetadataConfigInput
+} from './Metadata.js';
 
 /**
  * @description Input when instantiating a new MikroLog instance.
@@ -43,7 +46,9 @@ export interface LogInput {
 /**
  * @description Shape of final log output.
  */
-export interface LogOutput extends StaticMetadataConfigInput, DynamicMetadataOutput {
+export interface LogOutput
+  extends StaticMetadataConfigInput,
+    DynamicMetadataOutput {
   /**
    * @description Log message.
    */

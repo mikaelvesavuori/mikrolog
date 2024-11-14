@@ -1,15 +1,18 @@
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 
 import { getMetadata } from 'aws-metadata-utils';
 
-import {
-  MikroLogInput,
+import type {
+  DynamicMetadataOutput,
+  StaticMetadataConfigInput
+} from '../interfaces/Metadata.js';
+import type {
+  HttpStatusCode,
   LogInput,
   LogOutput,
   Message,
-  HttpStatusCode
+  MikroLogInput
 } from '../interfaces/MikroLog.js';
-import { StaticMetadataConfigInput, DynamicMetadataOutput } from '../interfaces/Metadata.js';
 
 /**
  * @description MikroLog is a Lambda-oriented lightweight JSON logger.
@@ -35,7 +38,9 @@ logger.log({
  */
 export class MikroLog {
   private static instance: MikroLog;
-  private static metadataConfig: StaticMetadataConfigInput | Record<string, any> = {};
+  private static metadataConfig:
+    | StaticMetadataConfigInput
+    | Record<string, any> = {};
   private static event: any = {};
   private static context: any = {};
   private static correlationId: string;
@@ -73,7 +78,11 @@ export class MikroLog {
     MikroLog.event = input?.event || this.event;
     MikroLog.context = input?.context || this.context;
     MikroLog.context.isColdStart = MikroLog.getColdStart();
-    MikroLog.correlationId = input?.correlationId || this.correlationId || '';
+    MikroLog.correlationId =
+      input?.correlationId ||
+      this.correlationId ||
+      process.env.CORRELATION_ID ||
+      '';
     return MikroLog.instance;
   }
 
@@ -101,10 +110,17 @@ export class MikroLog {
    * @description Enrich MikroLog with metadata, AWS Lambda event and/or context.
    */
   public static enrich(input: MikroLogInput) {
-    MikroLog.metadataConfig = Object.assign(MikroLog.metadataConfig, input.metadataConfig || {});
+    MikroLog.metadataConfig = Object.assign(
+      MikroLog.metadataConfig,
+      input.metadataConfig || {}
+    );
     MikroLog.event = Object.assign(MikroLog.event, input.event || {});
     MikroLog.context = Object.assign(MikroLog.context, input.context || {});
-    MikroLog.correlationId = input?.correlationId || this.correlationId || '';
+    MikroLog.correlationId =
+      input?.correlationId ||
+      this.correlationId ||
+      process.env.CORRELATION_ID ||
+      '';
   }
 
   /**
@@ -139,13 +155,14 @@ export class MikroLog {
    * @description Set sampling rate of `DEBUG` logs.
    */
   public setDebugSamplingRate(samplingPercent: number): number {
+    let fixedValue = samplingPercent;
     if (typeof samplingPercent !== 'number') return MikroLog.debugSamplingLevel;
 
-    if (samplingPercent < 0) samplingPercent = 0;
-    if (samplingPercent > 100) samplingPercent = 100;
+    if (samplingPercent < 0) fixedValue = 0;
+    if (samplingPercent > 100) fixedValue = 100;
 
-    MikroLog.debugSamplingLevel = samplingPercent;
-    return samplingPercent;
+    MikroLog.debugSamplingLevel = fixedValue;
+    return fixedValue;
   }
 
   /**
@@ -229,8 +246,9 @@ export class MikroLog {
   private initDebugSampleLevel(): number {
     const envValue = process.env.MIKROLOG_SAMPLE_RATE;
     if (envValue) {
-      const isNumeric = !Number.isNaN(envValue) && !Number.isNaN(parseFloat(envValue));
-      if (isNumeric) return parseFloat(envValue);
+      const isNumeric =
+        !Number.isNaN(envValue) && !Number.isNaN(Number.parseFloat(envValue));
+      if (isNumeric) return Number.parseFloat(envValue);
     }
     return 100;
   }
@@ -274,7 +292,8 @@ export class MikroLog {
 
     Object.entries(metadata).forEach((entry: any) => {
       const [key, value] = entry;
-      if (value || value === false || value === 0) filteredMetadata[key] = value;
+      if (value || value === false || value === 0)
+        filteredMetadata[key] = value;
     });
 
     return filteredMetadata;
@@ -297,7 +316,7 @@ export class MikroLog {
    * @description Call `STDOUT` to write the log.
    */
   private writeLog(createdLog: LogOutput) {
-    process.stdout.write(JSON.stringify(createdLog) + '\n');
+    process.stdout.write(`${JSON.stringify(createdLog)}\n`);
   }
 
   /**
@@ -305,14 +324,14 @@ export class MikroLog {
    */
   private createLog(log: LogInput): LogOutput {
     const staticMetadata: any = MikroLog.metadataConfig;
-    const redactedKeys = staticMetadata['redactedKeys']
-      ? staticMetadata['redactedKeys']
+    const redactedKeys = staticMetadata.redactedKeys
+      ? staticMetadata.redactedKeys
       : undefined;
-    const maskedValues = staticMetadata['maskedValues']
-      ? staticMetadata['maskedValues']
+    const maskedValues = staticMetadata.maskedValues
+      ? staticMetadata.maskedValues
       : undefined;
-    if (redactedKeys) delete staticMetadata['redactedKeys'];
-    if (maskedValues) delete staticMetadata['maskedValues'];
+    if (redactedKeys) delete staticMetadata.redactedKeys;
+    if (maskedValues) delete staticMetadata.maskedValues;
 
     const dynamicMetadata = this.produceDynamicMetadata();
 
@@ -327,7 +346,10 @@ export class MikroLog {
         isColdStart: MikroLog.context.isColdStart
       };
 
-      if (this.nextLogEnrichment && JSON.stringify(this.nextLogEnrichment) !== '{}')
+      if (
+        this.nextLogEnrichment &&
+        JSON.stringify(this.nextLogEnrichment) !== '{}'
+      )
         return Object.assign(output, this.nextLogEnrichment);
 
       return output;
@@ -335,7 +357,11 @@ export class MikroLog {
 
     this.nextLogEnrichment = {};
 
-    const filteredOutput = this.filterOutput(logOutput, redactedKeys, maskedValues);
+    const filteredOutput = this.filterOutput(
+      logOutput,
+      redactedKeys,
+      maskedValues
+    );
     return this.sortOutput(filteredOutput);
   }
 
@@ -351,8 +377,8 @@ export class MikroLog {
     Object.entries(logOutput).forEach((entry: any) => {
       const [key, value] = entry;
 
-      if (redactedKeys && redactedKeys.includes(key)) return;
-      if (maskedValues && maskedValues.includes(key)) {
+      if (redactedKeys?.includes(key)) return;
+      if (maskedValues?.includes(key)) {
         filteredOutput[key] = 'MASKED';
         return;
       }

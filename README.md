@@ -24,7 +24,7 @@ Loggers have become too opinionated, bloated and complicated. MikroLog provides 
 - Familiar syntax using `log()`, `info()`, `debug()`, `warn()` and `error()`
 - Zero config and opinionated enough to still be awesome without any magic tricks
 - Cuts out all the stuff you won't need in cloud/serverless like storing logs or creating file output
-- None of the `pid` and other garbage fields you get from many other solutions
+- None of the `pid` and other garbage fields you get from many other solutions
 - Flexible for most needs by loading your own static metadata that gets used in all logs
 - Outside of AWS itself, logs carry across perfectly to observability solutions like Datadog, New Relic, Honeycomb...
 - Easy to redact or mask sensitive data
@@ -141,7 +141,9 @@ export async function handler(event: any, context: any) {
 }
 ```
 
-Further, you can also set the correlation ID manually as part of the `enrich()` call:
+By default, unless you manually provide a correlation ID, if there is a value stored at `process.env.CORRELATION_ID`, then MikroLog will automatically use it.
+
+You can set the correlation ID _manually_ as part of the `enrich()` call:
 
 ```typescript
 MikroLog.enrich({ correlationId: 'abc123' });

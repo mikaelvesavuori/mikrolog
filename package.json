@@ -1,7 +1,7 @@
 {
   "name": "mikrolog",
   "description": "The JSON logger you always wanted for Lambda.",
-  "version": "2.1.15",
+  "version": "2.1.16",
   "author": "Mikael Vesavuori",
   "license": "MIT",
   "type": "module",
@@ -43,6 +43,7 @@
     "test:watch": "npx vitest",
     "build": "npm run clean && tsup src --format esm,cjs --dts && mv dist lib",
     "clean": "rm -rf lib && rm -rf dist",
+    "lint": "npx @biomejs/biome check --write ./src && npx @biomejs/biome check --write ./tests",
     "package": "npm pack",
     "prepublishOnly": "npm run build",
     "prepare": "husky",
@@ -54,15 +55,11 @@
     "aws-metadata-utils": "1"
   },
   "devDependencies": {
+    "@biomejs/biome": "1",
     "@types/node": "20",
-    "@typescript-eslint/eslint-plugin": "7",
-    "@typescript-eslint/parser": "7",
     "@vitest/coverage-v8": "1",
     "eslint": "8",
-    "eslint-config-prettier": "9",
-    "eslint-plugin-prettier": "5",
     "husky": "9",
-    "prettier": "3",
     "tsup": "8",
     "typescript": "5",
     "typedoc": "0",

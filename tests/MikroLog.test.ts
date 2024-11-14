@@ -1,15 +1,16 @@
-import { test, expect } from 'vitest';
+import { expect, test } from 'vitest';
 
 import { MikroLog } from '../src/entities/MikroLog.js';
 
 import { metadataConfig } from '../testdata/config.js';
+// @ts-ignore
 import fullLog from '../testdata/fullLog.json';
 
 function cleanObject(object: Record<string, any>) {
-  delete object['id'];
-  delete object['timestamp'];
-  delete object['timestampEpoch'];
-  delete object['isColdStart'];
+  delete object.id;
+  delete object.timestamp;
+  delete object.timestampEpoch;
+  delete object.isColdStart;
 
   return object;
 }
@@ -45,13 +46,13 @@ test('It should return (print out) a structured log when given a string message 
   };
 
   // Ensure exactness of message field
-  expect(response['message']).toBe(message);
+  expect(response.message).toBe(message);
 
   // Check presence of dynamic fields
-  expect(response['id']).toBeDefined();
-  expect(response['timestamp']).toBeDefined();
-  expect(response['timestampEpoch']).toBeDefined();
-  expect(response['isColdStart']).toBeDefined();
+  expect(response.id).toBeDefined();
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
@@ -70,13 +71,13 @@ test('It should return (print out) a structured log when given a string message'
   const expected: any = JSON.parse(JSON.stringify(fullLog));
 
   // Ensure exactness of message field
-  expect(response['message']).toBe(message);
+  expect(response.message).toBe(message);
 
   // Check presence of dynamic fields
-  expect(response['id']).toBeDefined();
-  expect(response['timestamp']).toBeDefined();
-  expect(response['timestampEpoch']).toBeDefined();
-  expect(response['isColdStart']).toBeDefined();
+  expect(response.id).toBeDefined();
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
@@ -95,13 +96,13 @@ test('It should return (print out) a structured informational log when given a s
   const expected: any = JSON.parse(JSON.stringify(fullLog));
 
   // Ensure exactness of message field
-  expect(response['message']).toBe(message);
+  expect(response.message).toBe(message);
 
   // Check presence of dynamic fields
-  expect(response['id']).toBeDefined();
-  expect(response['timestamp']).toBeDefined();
-  expect(response['timestampEpoch']).toBeDefined();
-  expect(response['isColdStart']).toBeDefined();
+  expect(response.id).toBeDefined();
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
@@ -118,16 +119,16 @@ test('It should return (print out) a structured debug log when given a string me
   const response: any = logger.debug(message);
 
   const expected: any = JSON.parse(JSON.stringify(fullLog));
-  expected['level'] = 'DEBUG';
+  expected.level = 'DEBUG';
 
   // Ensure exactness of message field
-  expect(response['message']).toBe(message);
+  expect(response.message).toBe(message);
 
   // Check presence of dynamic fields
-  expect(response['id']).toBeDefined();
-  expect(response['timestamp']).toBeDefined();
-  expect(response['timestampEpoch']).toBeDefined();
-  expect(response['isColdStart']).toBeDefined();
+  expect(response.id).toBeDefined();
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
@@ -144,16 +145,16 @@ test('It should return (print out) a structured warning log when given a string 
   const response: any = logger.warn(message);
 
   const expected: any = JSON.parse(JSON.stringify(fullLog));
-  expected['level'] = 'WARN';
+  expected.level = 'WARN';
 
   // Ensure exactness of message field
-  expect(response['message']).toBe(message);
+  expect(response.message).toBe(message);
 
   // Check presence of dynamic fields
-  expect(response['id']).toBeDefined();
-  expect(response['timestamp']).toBeDefined();
-  expect(response['timestampEpoch']).toBeDefined();
-  expect(response['isColdStart']).toBeDefined();
+  expect(response.id).toBeDefined();
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
@@ -170,18 +171,18 @@ test('It should return (print out) a structured error log when given a string me
   const response: any = logger.error(message);
 
   const expected: any = JSON.parse(JSON.stringify(fullLog));
-  expected['level'] = 'ERROR';
-  expected['error'] = true;
-  expected['httpStatusCode'] = 400;
+  expected.level = 'ERROR';
+  expected.error = true;
+  expected.httpStatusCode = 400;
 
   // Ensure exactness of message field
-  expect(response['message']).toBe(message);
+  expect(response.message).toBe(message);
 
   // Check presence of dynamic fields
-  expect(response['id']).toBeDefined();
-  expect(response['timestamp']).toBeDefined();
-  expect(response['timestampEpoch']).toBeDefined();
-  expect(response['isColdStart']).toBeDefined();
+  expect(response.id).toBeDefined();
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
@@ -217,6 +218,28 @@ test('It should retain the correlation ID across multiple logs', () => {
   const log = logger.log('');
   const result = log.correlationId;
   expect(result).toBe(expected);
+});
+
+test('It should pick the correlation ID from the environment', () => {
+  const expected = 'abc123';
+  process.env.CORRELATION_ID = expected;
+  const logger = MikroLog.start();
+  const log = logger.log('');
+  const result = log.correlationId;
+  expect(result).toBe(expected);
+  process.env.CORRELATION_ID = '';
+});
+
+test('It should pick the correlation ID from the environment and keep it across multiple instances', () => {
+  const expected = 'abc123';
+  process.env.CORRELATION_ID = expected;
+  const logger1 = MikroLog.start();
+  const log1 = logger1.log('');
+  process.env.CORRELATION_ID = '';
+  const logger2 = MikroLog.start();
+  const log2 = logger2.log('');
+  expect(log1.correlationId).toBe(expected);
+  expect(log2.correlationId).toBe(expected);
 });
 
 test('It should set the debug sampling rate through an environment variable', () => {
@@ -291,28 +314,28 @@ test('It should set a custom HTTP status code for informational logs', () => {
   const logger = MikroLog.start();
   const expected = 201;
   const message = logger.info('Ny message!', 201);
-  expect(message['httpStatusCode']).toBe(expected);
+  expect(message.httpStatusCode).toBe(expected);
 });
 
 test('It should set a custom HTTP status code for debug logs', () => {
   const logger = MikroLog.start();
   const expected = 201;
   const message = logger.debug('Ny message!', 201);
-  expect(message['httpStatusCode']).toBe(expected);
+  expect(message.httpStatusCode).toBe(expected);
 });
 
 test('It should set a custom HTTP status code for warning logs', () => {
   const logger = MikroLog.start();
   const expected = 201;
   const message = logger.warn('Ny message!', 201);
-  expect(message['httpStatusCode']).toBe(expected);
+  expect(message.httpStatusCode).toBe(expected);
 });
 
 test('It should set a custom HTTP status code for error logs', () => {
   const logger = MikroLog.start();
   const expected = 201;
   const message = logger.error('Ny message!', 201);
-  expect(message['httpStatusCode']).toBe(expected);
+  expect(message.httpStatusCode).toBe(expected);
 });
 
 test('It should redact keys when given a "redactedKeys" list', () => {
@@ -320,7 +343,7 @@ test('It should redact keys when given a "redactedKeys" list', () => {
   const message = 'Hello World';
 
   const _metadataConfig: any = JSON.parse(JSON.stringify(metadataConfig));
-  _metadataConfig['redactedKeys'] = ['team', 'id'];
+  _metadataConfig.redactedKeys = ['team', 'id'];
 
   const logger = MikroLog.start({ metadataConfig: _metadataConfig });
   const response: any = logger.error(message);
@@ -346,13 +369,13 @@ test('It should redact keys when given a "redactedKeys" list', () => {
   };
 
   // Ensure exactness of message field
-  expect(response['message']).toBe(message);
+  expect(response.message).toBe(message);
 
   // Check presence of dynamic fields
-  //expect(response['id']).toBeDefined(); // For some reason breaks after migrating to Vitest
-  expect(response['timestamp']).toBeDefined();
-  expect(response['timestampEpoch']).toBeDefined();
-  expect(response['isColdStart']).toBeDefined();
+  //expect(response.id).toBeDefined(); // For some reason breaks after migrating to Vitest
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
@@ -366,7 +389,7 @@ test('It should mask values when given a "maskedValues" list', () => {
   const message = 'Hello World';
 
   const _metadataConfig: any = JSON.parse(JSON.stringify(metadataConfig));
-  _metadataConfig['maskedValues'] = ['team', 'id'];
+  _metadataConfig.maskedValues = ['team', 'id'];
 
   const logger = MikroLog.start({ metadataConfig: _metadataConfig });
   const response: any = logger.error(message);
@@ -390,13 +413,13 @@ test('It should mask values when given a "maskedValues" list', () => {
   };
 
   // Ensure exactness of message field
-  expect(response['message']).toBe(message);
+  expect(response.message).toBe(message);
 
   // Check presence of dynamic fields
-  expect(response['id']).toBeDefined();
-  expect(response['timestamp']).toBeDefined();
-  expect(response['timestampEpoch']).toBeDefined();
-  expect(response['isColdStart']).toBeDefined();
+  expect(response.id).toBeDefined();
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
@@ -432,13 +455,13 @@ test('It should accept a custom metadata configuration', () => {
   };
 
   // Ensure exactness of message field
-  expect(response['message']).toBe(message);
+  expect(response.message).toBe(message);
 
   // Check presence of dynamic fields
-  expect(response['id']).toBeDefined();
-  expect(response['timestamp']).toBeDefined();
-  expect(response['timestampEpoch']).toBeDefined();
-  expect(response['isColdStart']).toBeDefined();
+  expect(response.id).toBeDefined();
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
@@ -470,13 +493,13 @@ test('It should retain falsy but defined values in logs', () => {
   };
 
   // Ensure exactness of message field
-  expect(response['message']).toBe(message);
+  expect(response.message).toBe(message);
 
   // Check presence of dynamic fields
-  expect(response['id']).toBeDefined();
-  expect(response['timestamp']).toBeDefined();
-  expect(response['timestampEpoch']).toBeDefined();
-  expect(response['isColdStart']).toBeDefined();
+  expect(response.id).toBeDefined();
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
@@ -502,13 +525,13 @@ test('It should be able to merge enrichment even if input is essentially empty',
   };
 
   // Ensure exactness of message field
-  expect(response['message']).toBe(message);
+  expect(response.message).toBe(message);
 
   // Check presence of dynamic fields
-  expect(response['id']).toBeDefined();
-  expect(response['timestamp']).toBeDefined();
-  expect(response['timestampEpoch']).toBeDefined();
-  expect(response['isColdStart']).toBeDefined();
+  expect(response.id).toBeDefined();
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
@@ -535,13 +558,13 @@ test('It should be able to enrich with correlation ID', () => {
   };
 
   // Ensure exactness of message field
-  expect(response['message']).toBe(message);
+  expect(response.message).toBe(message);
 
   // Check presence of dynamic fields
-  expect(response['id']).toBeDefined();
-  expect(response['timestamp']).toBeDefined();
-  expect(response['timestampEpoch']).toBeDefined();
-  expect(response['isColdStart']).toBeDefined();
+  expect(response.id).toBeDefined();
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
 
   // Drop dynamic fields for test validation
   const cleanedResponse = cleanObject(response);
@@ -574,6 +597,6 @@ test('It should enrich a multi-level log with a one-time root item and ensure it
   const responseFirst: Record<string, any> = logger.info(message);
   const responseSecond: Record<string, any> = logger.info(message);
 
-  expect(responseFirst['dd']['trace_id']).toBe('abc123');
+  expect(responseFirst.dd.trace_id).toBe('abc123');
   expect(responseSecond.hasOwnProperty('dd')).toBe(false);
 });
