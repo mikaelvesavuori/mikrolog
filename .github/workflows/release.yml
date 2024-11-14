@@ -6,7 +6,7 @@ on:
       - "v*"
 
 jobs:
-  build-unix:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,8 +39,8 @@ jobs:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
           coverageLocations: ${{ github.workspace }}/coverage/lcov.info:lcov
 
-  publish-npm:
-    needs: ['build-unix']
+  publish:
+    needs: ['build']
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
