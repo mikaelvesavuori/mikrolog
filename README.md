@@ -247,7 +247,7 @@ logger.info('Ping!'); // Enrichment is present on log
 logger.info('Ping!'); // Enrichment is no longer present
 ```
 
-This works just as well on nested object:
+This works just as well on nested objects:
 
 ```typescript
 const logger = MikroLog.start();
@@ -318,7 +318,7 @@ In your static metadata you can add some extra security measures with two differ
 - `redactedKeys`: Any items in this array will be completely removed from log output.
 - `maskedValues`: Any items in this array will have `MASKED` as their value. Their keys will however remain untampered.
 
-These will only be able to redact or mask top-level fields, not nested items.
+You can redact or mask nested values by using dot syntax, for example `user.auth.token`.
 
 **Note**: These "meta" items will not themselves show up in your logs.
 

@@ -32,9 +32,9 @@ test('It should return (print out) a structured log when given a string message 
   const message = 'Hello World';
 
   const logger = MikroLog.start();
-  const response: any = logger.log(message);
+  const response = logger.log(message);
 
-  const expected: any = {
+  const expected = {
     message: 'Hello World',
     error: false,
     httpStatusCode: 200,
@@ -66,9 +66,9 @@ test('It should return (print out) a structured log when given a string message'
   const message = 'Hello World';
 
   const logger = MikroLog.start({ metadataConfig });
-  const response: any = logger.log(message);
+  const response = logger.log(message);
 
-  const expected: any = JSON.parse(JSON.stringify(fullLog));
+  const expected = JSON.parse(JSON.stringify(fullLog));
 
   // Ensure exactness of message field
   expect(response.message).toBe(message);
@@ -91,9 +91,9 @@ test('It should return (print out) a structured informational log when given a s
   const message = 'Hello World';
 
   const logger = MikroLog.start({ metadataConfig });
-  const response: any = logger.info(message);
+  const response = logger.info(message);
 
-  const expected: any = JSON.parse(JSON.stringify(fullLog));
+  const expected = JSON.parse(JSON.stringify(fullLog));
 
   // Ensure exactness of message field
   expect(response.message).toBe(message);
@@ -116,9 +116,9 @@ test('It should return (print out) a structured debug log when given a string me
   const message = 'Hello World';
 
   const logger = MikroLog.start({ metadataConfig });
-  const response: any = logger.debug(message);
+  const response = logger.debug(message);
 
-  const expected: any = JSON.parse(JSON.stringify(fullLog));
+  const expected = JSON.parse(JSON.stringify(fullLog));
   expected.level = 'DEBUG';
 
   // Ensure exactness of message field
@@ -142,9 +142,9 @@ test('It should return (print out) a structured warning log when given a string 
   const message = 'Hello World';
 
   const logger = MikroLog.start({ metadataConfig });
-  const response: any = logger.warn(message);
+  const response = logger.warn(message);
 
-  const expected: any = JSON.parse(JSON.stringify(fullLog));
+  const expected = JSON.parse(JSON.stringify(fullLog));
   expected.level = 'WARN';
 
   // Ensure exactness of message field
@@ -168,9 +168,9 @@ test('It should return (print out) a structured error log when given a string me
   const message = 'Hello World';
 
   const logger = MikroLog.start({ metadataConfig });
-  const response: any = logger.error(message);
+  const response = logger.error(message);
 
-  const expected: any = JSON.parse(JSON.stringify(fullLog));
+  const expected = JSON.parse(JSON.stringify(fullLog));
   expected.level = 'ERROR';
   expected.error = true;
   expected.httpStatusCode = 400;
@@ -342,13 +342,60 @@ test('It should redact keys when given a "redactedKeys" list', () => {
   MikroLog.reset();
   const message = 'Hello World';
 
-  const _metadataConfig: any = JSON.parse(JSON.stringify(metadataConfig));
+  const _metadataConfig = JSON.parse(JSON.stringify(metadataConfig));
   _metadataConfig.redactedKeys = ['team', 'id'];
 
   const logger = MikroLog.start({ metadataConfig: _metadataConfig });
-  const response: any = logger.error(message);
+  const response = logger.error(message);
 
-  const expected: any = {
+  const expected = {
+    version: 1,
+    owner: 'MyCompany',
+    hostPlatform: 'aws',
+    domain: 'CustomerAcquisition',
+    system: 'ShowroomActivities',
+    service: 'UserSignUp',
+    tags: [''],
+    dataSensitivity: 'public',
+    message: 'Hello World',
+    error: true,
+    httpStatusCode: 400,
+    isColdStart: true,
+    level: 'ERROR',
+    id: '1256767f-c875-4d82-813d-bc260bd0ba07',
+    timestamp: '2022-07-25T08:52:21.121Z',
+    timestampEpoch: '1656438566041',
+    jurisdiction: 'EU'
+  };
+
+  // Ensure exactness of message field
+  expect(response.message).toBe(message);
+
+  // Check presence of dynamic fields
+  //expect(response.id).toBeDefined(); // For some reason breaks after migrating to Vitest
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
+
+  // Drop dynamic fields for test validation
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
+
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
+});
+
+test('It should redact nested keys when given a "redactedKeys" list', () => {
+  MikroLog.reset();
+  const message = 'Hello World';
+
+  const _metadataConfig = JSON.parse(JSON.stringify(metadataConfig));
+  _metadataConfig.auth = { token: 'abc123' };
+  _metadataConfig.redactedKeys = ['auth.token'];
+
+  const logger = MikroLog.start({ metadataConfig: _metadataConfig });
+  const response = logger.error(message);
+
+  const expected = {
     version: 1,
     owner: 'MyCompany',
     hostPlatform: 'aws',
@@ -388,13 +435,13 @@ test('It should mask values when given a "maskedValues" list', () => {
   MikroLog.reset();
   const message = 'Hello World';
 
-  const _metadataConfig: any = JSON.parse(JSON.stringify(metadataConfig));
+  const _metadataConfig = JSON.parse(JSON.stringify(metadataConfig));
   _metadataConfig.maskedValues = ['team', 'id'];
 
   const logger = MikroLog.start({ metadataConfig: _metadataConfig });
-  const response: any = logger.error(message);
+  const response = logger.error(message);
 
-  const expected: any = {
+  const expected = {
     dataSensitivity: 'public',
     domain: 'CustomerAcquisition',
     error: true,
@@ -428,6 +475,52 @@ test('It should mask values when given a "maskedValues" list', () => {
   expect(cleanedResponse).toMatchObject(cleanedExpected);
 });
 
+test('It should mask nested values when given a "maskedValues" list', () => {
+  MikroLog.reset();
+  const message = 'Hello World';
+
+  const _metadataConfig = JSON.parse(JSON.stringify(metadataConfig));
+  _metadataConfig.auth = { token: 'abc123' };
+  _metadataConfig.maskedValues = ['auth.token'];
+
+  const logger = MikroLog.start({ metadataConfig: _metadataConfig });
+  const response = logger.error(message);
+
+  const expected = {
+    auth: { token: 'MASKED' },
+    dataSensitivity: 'public',
+    domain: 'CustomerAcquisition',
+    error: true,
+    hostPlatform: 'aws',
+    httpStatusCode: 400,
+    isColdStart: true,
+    level: 'ERROR',
+    message: 'Hello World',
+    owner: 'MyCompany',
+    service: 'UserSignUp',
+    system: 'ShowroomActivities',
+    tags: [''],
+    team: 'MyDemoTeam',
+    version: 1,
+    jurisdiction: 'EU'
+  };
+
+  // Ensure exactness of message field
+  expect(response.message).toBe(message);
+
+  // Check presence of dynamic fields
+  expect(response.id).toBeDefined();
+  expect(response.timestamp).toBeDefined();
+  expect(response.timestampEpoch).toBeDefined();
+  expect(response.isColdStart).toBeDefined();
+
+  // Drop dynamic fields for test validation
+  const cleanedResponse = cleanObject(response);
+  const cleanedExpected = cleanObject(expected);
+
+  expect(cleanedResponse).toMatchObject(cleanedExpected);
+});
+
 test('It should accept a custom metadata configuration', () => {
   MikroLog.reset();
   const message = 'Hello World';
@@ -440,9 +533,9 @@ test('It should accept a custom metadata configuration', () => {
   };
 
   const logger = MikroLog.start({ metadataConfig: customMetadata });
-  const response: any = logger.info(message);
+  const response = logger.info(message);
 
-  const expected: any = {
+  const expected = {
     myCustomFields: {
       something: 123,
       custom: 'Yep it works'
@@ -480,9 +573,9 @@ test('It should retain falsy but defined values in logs', () => {
       falsyTest2: 0
     }
   });
-  const response: any = logger.info(message);
+  const response = logger.info(message);
 
-  const expected: any = {
+  const expected = {
     error: false,
     httpStatusCode: 200,
     isColdStart: true,
@@ -514,9 +607,9 @@ test('It should be able to merge enrichment even if input is essentially empty',
 
   const logger = MikroLog.start();
   MikroLog.enrich({});
-  const response: any = logger.info(message);
+  const response = logger.info(message);
 
-  const expected: any = {
+  const expected = {
     error: false,
     httpStatusCode: 200,
     isColdStart: true,
@@ -546,9 +639,9 @@ test('It should be able to enrich with correlation ID', () => {
 
   const logger = MikroLog.start();
   MikroLog.enrich({ correlationId: 'abc123' });
-  const response: any = logger.info(message);
+  const response = logger.info(message);
 
-  const expected: any = {
+  const expected = {
     correlationId: 'abc123',
     error: false,
     httpStatusCode: 200,

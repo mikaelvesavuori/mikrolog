@@ -374,23 +374,67 @@ export class MikroLog {
     maskedValues?: string[]
   ): any {
     const filteredOutput: any = {};
-    Object.entries(logOutput).forEach((entry: any) => {
-      const [key, value] = entry;
 
-      if (redactedKeys?.includes(key)) return;
-      if (maskedValues?.includes(key)) {
-        filteredOutput[key] = 'MASKED';
+    /**
+     * Recursive helper function to handle nested objects.
+     */
+    const processEntry = (key: string, value: any, path: string[] = []) => {
+      const fullPath = [...path, key].join('.'); // Construct the full path of the key
+
+      // Check for redaction
+      if (redactedKeys?.includes(fullPath)) return;
+
+      // Check for masking
+      if (maskedValues?.includes(fullPath)) {
+        this.setNestedValue(filteredOutput, path, key, 'MASKED');
         return;
       }
 
-      /**
-       * Only add key-value pairs that are not actually undefined, null or empty.
-       * For example, since `error` is an actual boolean we will return it as-is.
-       */
-      if (value || value === 0 || value === false) filteredOutput[key] = value;
-    });
+      // Handle nested objects
+      if (
+        typeof value === 'object' &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
+        Object.entries(value).forEach(([nestedKey, nestedValue]) =>
+          processEntry(nestedKey, nestedValue, [...path, key])
+        );
+      } else {
+        // Only add non-nested keys if not undefined, null, or empty
+        if (value || value === 0 || value === false) {
+          if (path.length) {
+            this.setNestedValue(filteredOutput, path, key, value);
+          } else {
+            filteredOutput[key] = value;
+          }
+        }
+      }
+    };
+
+    Object.entries(logOutput).forEach(([key, value]) =>
+      processEntry(key, value)
+    );
 
     return filteredOutput;
+  }
+
+  /**
+   * Utility function to set a nested value in an object.
+   */
+  setNestedValue(target: any, path: string[], key: string, value: any): void {
+    let current = target;
+
+    // Traverse the path to ensure the hierarchy exists
+    for (let i = 0; i < path.length; i++) {
+      const segment = path[i];
+      if (!current[segment] || typeof current[segment] !== 'object') {
+        current[segment] = {}; // Create the object if it doesn't exist
+      }
+      current = current[segment];
+    }
+
+    // Set the final value
+    current[key] = value;
   }
 
   /**
