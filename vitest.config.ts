@@ -8,6 +8,7 @@ export default defineConfig({
       reporter: ['text', 'lcov'],
       include: ['src/**/*.{js,ts}', '!src/index.ts'],
       exclude: ['**/*.test.{js,ts}', '**/node_modules/**']
-    }
+    },
+    include: ['tests/**/*.ts']
   }
 });
