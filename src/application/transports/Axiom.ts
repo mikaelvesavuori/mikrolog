@@ -23,7 +23,7 @@ export class AxiomTransport implements Transport {
   /**
    * @description Flush ("send") logs to Axiom.
    */
-  async flush(logs: LogOutput[]) {
+  public async flush(logs: LogOutput[]) {
     const url = process.env.TRANSPORT_ENDPOINT
       ? /* v8 ignore next */
         process.env.TRANSPORT_ENDPOINT
