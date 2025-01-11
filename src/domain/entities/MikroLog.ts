@@ -15,10 +15,6 @@ import type {
 } from '../../interfaces/MikroLog.js';
 import type { Transport } from '../../interfaces/Transport.js';
 
-import { AxiomTransport } from '../../application/transports/Axiom.js';
-
-import { TransportError } from '../../application/errors/TransportError.js';
-
 /**
  * @description MikroLog is a Lambda-oriented lightweight JSON logger.
  *
@@ -197,12 +193,7 @@ export class MikroLog {
    * logger.setTransport(transport);
    */
   public setTransport(transport: Transport) {
-    if (transport instanceof AxiomTransport) {
-      this.transport = transport;
-      return;
-    }
-
-    throw new TransportError('Unsupported transport provided');
+    this.transport = transport;
   }
 
   /**

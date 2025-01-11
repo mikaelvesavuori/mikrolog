@@ -806,16 +806,6 @@ describe('Transports', () => {
     expect(MikroLog.logBuffer.length).toBe(0);
   });
 
-  test('It should throw a TransportError if using an unsupported transport', async () => {
-    MikroLog.reset();
-
-    const logger = MikroLog.start({ metadataConfig });
-    expect(() =>
-      // @ts-ignore
-      logger.setTransport('does_not_exist', axiomConfig)
-    ).toThrowError(TransportError);
-  });
-
   describe('Axiom transport', () => {
     test('It should use the Axiom transport successfully', async () => {
       MikroLog.reset();
