@@ -56,12 +56,12 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1",
-    "@types/node": "20",
-    "@vitest/coverage-v8": "1",
+    "@types/node": "22",
+    "@vitest/coverage-v8": "2",
     "husky": "9",
     "tsup": "8",
     "typescript": "5",
     "typedoc": "0",
-    "vitest": "1"
+    "vitest": "2"
   }
 }

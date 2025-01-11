@@ -187,6 +187,12 @@ export class MikroLog {
 
   /**
    * @description Set a custom transport.
+   * @example
+   * const transport = new AxiomTransport({
+   *   auth: process.env.AXIOM_API_KEY,
+   *   dataset: 'my_dataset'
+   * });
+   * logger.setTransport(transport);
    */
   public setTransport(transport: Transport) {
     if (transport instanceof AxiomTransport) {
