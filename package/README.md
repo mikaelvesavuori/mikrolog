@@ -27,7 +27,6 @@ Loggers have become too opinionated, bloated and complicated. MikroLog provides 
 - None of the `pid` and other garbage fields you get from many other solutions
 - Flexible for most needs by loading your own static metadata that gets used in all logs
 - Outside of AWS itself, logs carry across perfectly to observability solutions like Datadog, New Relic, Honeycomb...
-- Has transport support
 - Easy to redact or mask sensitive data
 - Uses `process.stdout.write()` rather than `console.log()` so you can safely use it in Lambda
 - Tiny (~2 KB gzipped)
@@ -233,34 +232,6 @@ const logger = MikroLog.start();
 headers['X-Log-Sampled'] ? logger.setDebugSamplingRate(100) : logger.setDebugSamplingRate(0);
 
 // Rest of code...
-```
-
-## Transports
-
-A transport is a configuration that allows MikroLog to flush (i.e. send) logs to another service.
-
-As of version `2.2.0`, MikroLog supports [Axiom](https://axiom.co).
-
-Transport support is based on a "log buffer" that keeps all logs in-memory. They are sent and removed from the buffer when flushed, which is done manually by you.
-
-It's recommended to flush logs only in your clean-up phase, such as at the end of your handler, to avoid adding more latency and volatility than necessary.
-
-### Using the Axiom transport
-
-An example of using the Axiom transport could look like this:
-
-```ts
-const logger = MikroLog.start({ metadataConfig });
-const transport = new AxiomTransport({
-  auth: process.env.AXIOM_API_KEY,
-  dataset: 'my_dataset'
-});
-logger.setTransport(transport);
-
-logger.log('Hello');
-logger.log('World');
-
-await logger.flushLogs(); // Send the logs
 ```
 
 ## Metadata

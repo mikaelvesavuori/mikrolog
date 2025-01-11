@@ -1,1 +1,1 @@
-export * from './entities/MikroLog.js';
+export * from './domain/entities/MikroLog.js';

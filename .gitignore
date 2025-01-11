@@ -7,4 +7,5 @@ build/
 coverage/
 node_modules/
 docs/
+dist/
 *.tgz

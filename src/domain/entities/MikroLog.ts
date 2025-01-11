@@ -5,14 +5,19 @@ import { getMetadata } from 'aws-metadata-utils';
 import type {
   DynamicMetadataOutput,
   StaticMetadataConfigInput
-} from '../interfaces/Metadata.js';
+} from '../../interfaces/Metadata.js';
 import type {
   HttpStatusCode,
   LogInput,
   LogOutput,
   Message,
   MikroLogInput
-} from '../interfaces/MikroLog.js';
+} from '../../interfaces/MikroLog.js';
+import type { Transport } from '../../interfaces/Transport.js';
+
+import { AxiomTransport } from '../../application/transports/Axiom.js';
+
+import { TransportError } from '../../application/errors/TransportError.js';
 
 /**
  * @description MikroLog is a Lambda-oriented lightweight JSON logger.
@@ -38,6 +43,7 @@ logger.log({
  */
 export class MikroLog {
   private static instance: MikroLog;
+
   private static metadataConfig:
     | StaticMetadataConfigInput
     | Record<string, any> = {};
@@ -49,6 +55,9 @@ export class MikroLog {
   private static isColdStart = true;
   private nextLogEnrichment: Record<string, any>;
 
+  private transport: Transport | null;
+  logBuffer: LogOutput[] = [];
+
   private constructor() {
     MikroLog.metadataConfig = {};
     MikroLog.event = {};
@@ -57,6 +66,7 @@ export class MikroLog {
     MikroLog.debugSamplingLevel = this.initDebugSampleLevel();
     MikroLog.isDebugLogSampled = true;
     this.nextLogEnrichment = {};
+    this.transport = null;
   }
 
   /**
@@ -74,6 +84,7 @@ export class MikroLog {
    */
   public static start(input?: MikroLogInput): MikroLog {
     if (!MikroLog.instance) MikroLog.instance = new MikroLog();
+
     MikroLog.metadataConfig = input?.metadataConfig || this.metadataConfig;
     MikroLog.event = input?.event || this.event;
     MikroLog.context = input?.context || this.context;
@@ -83,6 +94,7 @@ export class MikroLog {
       this.correlationId ||
       process.env.CORRELATION_ID ||
       '';
+
     return MikroLog.instance;
   }
 
@@ -171,6 +183,34 @@ export class MikroLog {
    */
   public isDebugLogSampled() {
     return MikroLog.isDebugLogSampled;
+  }
+
+  /**
+   * @description Set a custom transport.
+   */
+  public setTransport(transport: Transport) {
+    if (transport instanceof AxiomTransport) {
+      this.transport = transport;
+      return;
+    }
+
+    throw new TransportError('Unsupported transport provided');
+  }
+
+  /**
+   * @description Flush ("send") logs to the external transport.
+   * Nothing happens if you don't have a transport or logs.
+   *
+   * To avoid doing this all the time and adding latency, simply
+   * run this at the end of your function invocation to send
+   * all buffered logs at once.
+   */
+  public async flushLogs() {
+    if (!this.transport) return;
+    if (this.logBuffer.length === 0) return;
+
+    await this.transport.flush(this.logBuffer);
+    this.logBuffer = [];
   }
 
   /**
@@ -317,6 +357,8 @@ export class MikroLog {
    */
   private writeLog(createdLog: LogOutput) {
     process.stdout.write(`${JSON.stringify(createdLog)}\n`);
+
+    if (this.transport) this.logBuffer.push(createdLog);
   }
 
   /**

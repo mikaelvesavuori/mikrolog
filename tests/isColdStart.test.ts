@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { MikroLog } from '../src/entities/MikroLog.js';
+import { MikroLog } from '../src/domain/entities/MikroLog.js';
 
 /**
  * @note These tests should be separated as the cold start state
