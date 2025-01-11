@@ -373,7 +373,9 @@ export class MikroLog {
    * @description Create the log envelope.
    */
   private createLog(log: LogInput): LogOutput {
-    const staticMetadata: any = MikroLog.metadataConfig;
+    const staticMetadata: any = JSON.parse(
+      JSON.stringify(MikroLog.metadataConfig)
+    );
     const redactedKeys = staticMetadata.redactedKeys
       ? staticMetadata.redactedKeys
       : undefined;

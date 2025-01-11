@@ -97,7 +97,7 @@ describe('Logs output', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
   test('It should return (print out) a structured log when given a string message', () => {
@@ -122,7 +122,7 @@ describe('Logs output', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
   test('It should return (print out) a structured informational log when given a string message', () => {
@@ -147,7 +147,7 @@ describe('Logs output', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
   test('It should return (print out) a structured debug log when given a string message', () => {
@@ -173,7 +173,7 @@ describe('Logs output', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
   test('It should return (print out) a structured warning log when given a string message', () => {
@@ -199,7 +199,7 @@ describe('Logs output', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
   test('It should return (print out) a structured error log when given a string message', () => {
@@ -227,7 +227,7 @@ describe('Logs output', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
   test('It should retain falsy but defined values in logs', () => {
@@ -265,7 +265,7 @@ describe('Logs output', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
   });
 });
 
@@ -466,7 +466,7 @@ describe('Redact data', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
   test('It should redact nested keys when given a "redactedKeys" list', () => {
@@ -497,6 +497,7 @@ describe('Redact data', () => {
       id: '1256767f-c875-4d82-813d-bc260bd0ba07',
       timestamp: '2022-07-25T08:52:21.121Z',
       timestampEpoch: '1656438566041',
+      team: 'MyDemoTeam',
       jurisdiction: 'EU'
     };
 
@@ -513,7 +514,7 @@ describe('Redact data', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
   });
 });
 
@@ -559,7 +560,26 @@ describe('Mask data', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
+  });
+
+  test('It should persist masking settings values across multiple logs', () => {
+    MikroLog.reset();
+    const expected = 'MASKED';
+    const message = 'Hello World';
+
+    const _metadataConfig = JSON.parse(JSON.stringify(metadataConfig));
+    _metadataConfig.auth = { token: 'abc123' };
+    _metadataConfig.maskedValues = ['auth.token'];
+
+    const logger = MikroLog.start({ metadataConfig: _metadataConfig });
+    const response = logger.error(message);
+    const response2 = logger.error(message);
+
+    // @ts-ignore
+    expect(response.auth.token).toBe(expected);
+    // @ts-ignore
+    expect(response2.auth.token).toBe(expected);
   });
 
   test('It should mask nested values when given a "maskedValues" list', () => {
@@ -605,7 +625,7 @@ describe('Mask data', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
   });
 });
 
@@ -649,7 +669,7 @@ describe('Metadata', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
   });
 });
 
@@ -683,7 +703,7 @@ describe('Enrichment', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
   test('It should be able to enrich with correlation ID', () => {
@@ -716,7 +736,7 @@ describe('Enrichment', () => {
     const cleanedResponse = cleanObject(response);
     const cleanedExpected = cleanObject(expected);
 
-    expect(cleanedResponse).toMatchObject(cleanedExpected);
+    expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
   test('It should enrich a single-level log with a one-time root item and ensure it is not present in later calls', () => {
