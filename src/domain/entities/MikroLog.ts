@@ -56,7 +56,7 @@ export class MikroLog {
   private nextLogEnrichment: Record<string, any>;
 
   private transport: Transport | null;
-  logBuffer: LogOutput[] = [];
+  static logBuffer: LogOutput[] = [];
 
   private constructor() {
     MikroLog.metadataConfig = {};
@@ -65,6 +65,7 @@ export class MikroLog {
     MikroLog.correlationId = '';
     MikroLog.debugSamplingLevel = this.initDebugSampleLevel();
     MikroLog.isDebugLogSampled = true;
+    MikroLog.logBuffer = [];
     this.nextLogEnrichment = {};
     this.transport = null;
   }
@@ -174,6 +175,7 @@ export class MikroLog {
     if (samplingPercent > 100) fixedValue = 100;
 
     MikroLog.debugSamplingLevel = fixedValue;
+
     return fixedValue;
   }
 
@@ -212,11 +214,10 @@ export class MikroLog {
    * all buffered logs at once.
    */
   public async flushLogs() {
-    if (!this.transport) return;
-    if (this.logBuffer.length === 0) return;
+    if (this.transport && MikroLog.logBuffer.length > 0)
+      await this.transport.flush(MikroLog.logBuffer);
 
-    await this.transport.flush(this.logBuffer);
-    this.logBuffer = [];
+    MikroLog.logBuffer = [];
   }
 
   /**
@@ -230,7 +231,9 @@ export class MikroLog {
       level: 'DEBUG',
       httpStatusCode: httpStatusCode || 200
     });
+
     if (this.shouldSampleLog()) this.writeLog(createdLog);
+
     return createdLog;
   }
 
@@ -252,7 +255,9 @@ export class MikroLog {
       level: 'INFO',
       httpStatusCode: httpStatusCode || 200
     });
+
     this.writeLog(createdLog);
+
     return createdLog;
   }
 
@@ -266,7 +271,9 @@ export class MikroLog {
       level: 'WARN',
       httpStatusCode: httpStatusCode || 200
     });
+
     this.writeLog(createdLog);
+
     return createdLog;
   }
 
@@ -280,7 +287,9 @@ export class MikroLog {
       level: 'ERROR',
       httpStatusCode: httpStatusCode || 400
     });
+
     this.writeLog(createdLog);
+
     return createdLog;
   }
 
@@ -296,6 +305,7 @@ export class MikroLog {
         !Number.isNaN(envValue) && !Number.isNaN(Number.parseFloat(envValue));
       if (isNumeric) return Number.parseFloat(envValue);
     }
+
     return 100;
   }
 
@@ -355,6 +365,7 @@ export class MikroLog {
   private shouldSampleLog(): boolean {
     const logWillBeSampled = Math.random() * 100 <= MikroLog.debugSamplingLevel;
     MikroLog.isDebugLogSampled = logWillBeSampled;
+
     return logWillBeSampled;
   }
 
@@ -364,7 +375,7 @@ export class MikroLog {
   private writeLog(createdLog: LogOutput) {
     process.stdout.write(`${JSON.stringify(createdLog)}\n`);
 
-    if (this.transport) this.logBuffer.push(createdLog);
+    MikroLog.logBuffer.push(createdLog);
   }
 
   /**
@@ -410,6 +421,7 @@ export class MikroLog {
       redactedKeys,
       maskedValues
     );
+
     return this.sortOutput(filteredOutput);
   }
 

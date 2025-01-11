@@ -49,6 +49,20 @@ describe('Instantiation', () => {
 
     expect(isInstance).toBe(expected);
   });
+
+  test('It should empty the log buffer when resetting', async () => {
+    MikroLog.reset();
+
+    const logger = MikroLog.start();
+    logger.log('Hello World');
+    logger.log('Hello World');
+    logger.log('Hello World');
+
+    expect(MikroLog.logBuffer.length).toBe(3);
+
+    MikroLog.reset();
+    expect(MikroLog.logBuffer.length).toBe(0);
+  });
 });
 
 describe('Logs output', () => {
@@ -745,7 +759,7 @@ describe('Log buffering', () => {
     logger.log('Hello');
     logger.log('World');
 
-    expect(logger.logBuffer.length).toBe(2);
+    expect(MikroLog.logBuffer.length).toBe(2);
   });
 
   test('It should buffer logs and keep them across instantiations', async () => {
@@ -762,9 +776,11 @@ describe('Log buffering', () => {
     MikroLog.start();
     MikroLog.start();
     logger.log('!!!');
-    const logger2 = MikroLog.start();
+    logger.log('Amazing');
+    MikroLog.start();
+    logger.log('   coool   ');
 
-    expect(logger2.logBuffer.length).toBe(3);
+    expect(MikroLog.logBuffer.length).toBe(5);
   });
 });
 
@@ -776,7 +792,7 @@ describe('Transports', () => {
     logger.log('Hello World');
 
     await logger.flushLogs();
-    expect(logger.logBuffer.length).toBe(0);
+    expect(MikroLog.logBuffer.length).toBe(0);
   });
 
   test('It should not do anything if flushing logs and there are no logs', async () => {
@@ -787,7 +803,7 @@ describe('Transports', () => {
     logger.setTransport(transport);
 
     await logger.flushLogs();
-    expect(logger.logBuffer.length).toBe(0);
+    expect(MikroLog.logBuffer.length).toBe(0);
   });
 
   test('It should throw a TransportError if using an unsupported transport', async () => {
@@ -812,9 +828,9 @@ describe('Transports', () => {
       logger.log('Hello');
       logger.log('World');
 
-      expect(logger.logBuffer.length).toBe(2);
+      expect(MikroLog.logBuffer.length).toBe(2);
       await logger.flushLogs();
-      expect(logger.logBuffer.length).toBe(0);
+      expect(MikroLog.logBuffer.length).toBe(0);
 
       resetTransportEndpoint();
     });
