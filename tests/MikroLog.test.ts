@@ -805,8 +805,6 @@ describe('Enrichment', () => {
     const responseFirst: Record<string, any> = logger.info(message);
     const responseSecond: Record<string, any> = logger.info(message);
 
-    console.log(responseFirst);
-
     expect(responseFirst.event).toBeUndefined();
     expect(responseSecond.hasOwnProperty('event')).toBe(false);
   });
