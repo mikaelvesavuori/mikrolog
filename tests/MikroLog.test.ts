@@ -766,6 +766,50 @@ describe('Enrichment', () => {
     expect(responseFirst.dd.trace_id).toBe('abc123');
     expect(responseSecond.hasOwnProperty('dd')).toBe(false);
   });
+
+  test('It should enrich a multi-level log and mask fields from it', () => {
+    MikroLog.reset();
+    const message = 'Hello World';
+
+    const logger = MikroLog.start({
+      metadataConfig: {
+        maskedValues: ['event.requestContext.lambda.authorizer.token']
+      }
+    });
+    logger.enrichNext({
+      event: { requestContext: { lambda: { authorizer: { token: 'abc123' } } } }
+    });
+
+    const responseFirst: Record<string, any> = logger.info(message);
+    const responseSecond: Record<string, any> = logger.info(message);
+
+    expect(responseFirst.event.requestContext.lambda.authorizer.token).toBe(
+      'MASKED'
+    );
+    expect(responseSecond.hasOwnProperty('event')).toBe(false);
+  });
+
+  test('It should enrich a multi-level log and redact fields from it', () => {
+    MikroLog.reset();
+    const message = 'Hello World';
+
+    const logger = MikroLog.start({
+      metadataConfig: {
+        redactedKeys: ['event.requestContext.lambda.authorizer.token']
+      }
+    });
+    logger.enrichNext({
+      event: { requestContext: { lambda: { authorizer: { token: 'abc123' } } } }
+    });
+
+    const responseFirst: Record<string, any> = logger.info(message);
+    const responseSecond: Record<string, any> = logger.info(message);
+
+    console.log(responseFirst);
+
+    expect(responseFirst.event).toBeUndefined();
+    expect(responseSecond.hasOwnProperty('event')).toBe(false);
+  });
 });
 
 describe('Log buffering', () => {
