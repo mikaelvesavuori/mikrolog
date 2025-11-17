@@ -57,11 +57,11 @@
   "devDependencies": {
     "@biomejs/biome": "1",
     "@types/node": "22",
-    "@vitest/coverage-v8": "2",
+    "@vitest/coverage-v8": "4",
     "husky": "9",
     "tsup": "8",
     "typescript": "5",
     "typedoc": "0",
-    "vitest": "2"
+    "vitest": "4"
   }
 }
