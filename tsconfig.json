@@ -19,7 +19,8 @@
     "sourceMap": false,
     "strict": true,
     "strictFunctionTypes": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "ignoreDeprecations": "6.0"
   },
   "include": ["./src/**/*.ts", "./tests/**/*.ts"],
   "exclude": ["./node_modules/", "./lib/"],
