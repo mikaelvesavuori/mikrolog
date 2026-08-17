@@ -12,8 +12,6 @@ _MikroLog is like serverless: There is still a logger ("server"), but you get to
 
 [![codecov](https://codecov.io/gh/mikaelvesavuori/mikrolog/branch/main/graph/badge.svg?token=S7D3RM9TO7)](https://codecov.io/gh/mikaelvesavuori/mikrolog)
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/d960f299a99a79f781d3/maintainability)](https://codeclimate.com/github/mikaelvesavuori/mikrolog/maintainability)
-
 ---
 
 Loggers have become too opinionated, bloated and complicated. MikroLog provides an option that is:
