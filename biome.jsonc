@@ -1,47 +1,70 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
-  "files": { "ignoreUnknown": false, "ignore": [] },
+  "$schema": "https://biomejs.dev/schemas/2.5.8/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**",
+      "!dist",
+      "!lib",
+      "!coverage",
+      "!node_modules",
+      "!app/mikro*.min.js",
+      "!package-lock.json",
+      "!mikrotext_*.zip",
+      "!mikrotext_latest.zip"
+    ]
+  },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineWidth": 80
+    "lineWidth": 100
   },
-  "organizeImports": { "enabled": true },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
       "complexity": {
+        "noImportantStyles": "off",
+        "noStaticOnlyClass": "off",
         "noUselessThisAlias": "error",
         "noUselessTypeConstraint": "error",
-        "useArrowFunction": "off"
+        "useArrowFunction": "off",
+        "useOptionalChain": "off"
       },
       "correctness": {
-        "noUnusedVariables": "error",
-        "useArrayLiterals": "off"
+        "noUnusedVariables": "error"
       },
       "style": {
         "noNamespace": "error",
         "useAsConstAssertion": "error",
-        "useBlockStatements": "off"
+        "useBlockStatements": "off",
+        "useConst": "error",
+        "noDescendingSpecificity": "off"
       },
       "suspicious": {
+        "noConsole": "off",
         "noExplicitAny": "off",
-        "noExtraNonNullAssertion": "error",
-        "noMisleadingInstantiator": "error",
-        "noUnsafeDeclarationMerging": "error",
-        "useNamespaceKeyword": "error"
+        "noDuplicateProperties": "off"
+      },
+      "a11y": {
+        "noAutofocus": "off",
+        "noRedundantAlt": "off",
+        "noSvgWithoutTitle": "off",
+        "useAnchorContent": "off",
+        "useButtonType": "off"
       }
-    },
-    "ignore": ["node_modules/**"]
+    }
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "single",
-      "trailingCommas": "none",
-      "semicolons": "always"
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "all"
     }
   },
   "json": {
@@ -49,24 +72,16 @@
       "trailingCommas": "none"
     }
   },
-  "overrides": [
-    {
-      "include": ["*.ts", "*.tsx", "*.mts", "*.cts", "*.mjs"],
-      "linter": {
-        "rules": {
-          "performance": {
-            "noDelete": "off"
-          },
-          "complexity": {
-            "noForEach": "off",
-            "noThisInStatic": "off"
-          },
-          "suspicious": {
-            "noAssignInExpressions": "off",
-            "noPrototypeBuiltins": "off"
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "off",
+          "options": {
+            "identifierOrder": "lexicographic"
           }
         }
       }
     }
-  ]
+  }
 }

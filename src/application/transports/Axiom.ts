@@ -1,7 +1,7 @@
-import type { LogOutput } from '../../interfaces/MikroLog.js';
-import type { Transport, TransportInput } from '../../interfaces/Transport.js';
+import type { LogOutput } from "../../interfaces/MikroLog.js";
+import type { Transport, TransportInput } from "../../interfaces/Transport.js";
 
-import { TransportError } from '../errors/TransportError.js';
+import { TransportError } from "../errors/TransportError.js";
 
 /**
  * @description The Axiom transport for MikroLog allows you to
@@ -14,7 +14,7 @@ export class AxiomTransport implements Transport {
 
   constructor(input: TransportInput) {
     if (!input?.auth || !input?.dataset)
-      throw new TransportError('Missing required one or more required inputs');
+      throw new TransportError("Missing required one or more required inputs");
 
     this.auth = input.auth;
     this.dataset = input.dataset;
@@ -33,16 +33,16 @@ export class AxiomTransport implements Transport {
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${this.auth}`,
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      method: 'POST',
-      body: JSON.stringify(logs)
+      method: "POST",
+      body: JSON.stringify(logs),
     });
 
     if (!response.ok) {
       const errorDetails = await response.text();
       throw new TransportError(
-        `Failed to flush logs: ${response.status} ${response.statusText} - ${errorDetails}`
+        `Failed to flush logs: ${response.status} ${response.statusText} - ${errorDetails}`,
       );
     }
   }

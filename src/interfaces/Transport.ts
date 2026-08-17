@@ -1,4 +1,4 @@
-import type { LogOutput } from './MikroLog.js';
+import type { LogOutput } from "./MikroLog.js";
 
 export interface Transport {
   flush: (logs: LogOutput[]) => Promise<void>;
@@ -18,4 +18,4 @@ export type TransportInput = {
 /**
  * @description Names of supported transports.
  */
-export type TransportName = 'axiom';
+export type TransportName = "axiom";

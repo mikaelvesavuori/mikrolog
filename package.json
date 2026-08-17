@@ -1,7 +1,7 @@
 {
   "name": "mikrolog",
   "description": "The JSON logger you always wanted for Lambda.",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "author": "Mikael Vesavuori",
   "license": "MIT",
   "type": "module",
@@ -55,13 +55,13 @@
     "aws-metadata-utils": "1"
   },
   "devDependencies": {
-    "@biomejs/biome": "1",
-    "@types/node": "22",
-    "@vitest/coverage-v8": "2",
+    "@biomejs/biome": "2",
+    "@types/node": "24",
+    "@vitest/coverage-v8": "4",
     "husky": "9",
     "tsup": "8",
-    "typescript": "5",
     "typedoc": "0",
-    "vitest": "2"
+    "typescript": "6",
+    "vitest": "4"
   }
 }

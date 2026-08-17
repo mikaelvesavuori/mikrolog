@@ -5,6 +5,7 @@
     "outDir": "lib",
     "target": "es2022",
     "lib": ["esnext"],
+    "types": ["node"],
     "declaration": true,
     "esModuleInterop": true,
     "importHelpers": false,
@@ -21,5 +22,5 @@
     "skipLibCheck": true
   },
   "include": ["./src/**/*.ts", "./tests/**/*.ts"],
-  "exclude": ["./node_modules/", "./lib/"]
+  "exclude": ["./node_modules/", "./lib/"],
 }
