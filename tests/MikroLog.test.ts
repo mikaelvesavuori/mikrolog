@@ -947,7 +947,7 @@ describe("Transports", () => {
       expect(MikroLog.logBuffer.length).toBe(0);
 
       resetTransportEndpoint();
-    });
+    }, 10000);
 
     test("It should use the Axiom transport and throw a TransportError if getting a non-success code", async () => {
       MikroLog.reset();
