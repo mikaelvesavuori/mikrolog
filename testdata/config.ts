@@ -3,7 +3,7 @@ import type { StaticMetadataConfigInput } from '../src/interfaces/Metadata.js';
 export const metadataConfig: StaticMetadataConfigInput = {
   version: 1,
   owner: 'MyCompany',
-  hostPlatform: 'aws',
+  hostPlatform: 'node',
   domain: 'CustomerAcquisition',
   system: 'ShowroomActivities',
   service: 'UserSignUp',

@@ -1,11 +1,11 @@
 import { randomUUID } from 'node:crypto';
 
-import { getMetadata } from 'aws-metadata-utils';
-
+import type { Formatter } from '../../interfaces/Formatter.js';
 import type {
   DynamicMetadataOutput,
   StaticMetadataConfigInput
 } from '../../interfaces/Metadata.js';
+import type { MetadataProvider } from '../../interfaces/MetadataProvider.js';
 import type {
   HttpStatusCode,
   LogInput,
@@ -16,7 +16,10 @@ import type {
 import type { Transport } from '../../interfaces/Transport.js';
 
 /**
- * @description MikroLog is a Lambda-oriented lightweight JSON logger.
+ * @description MikroLog is a minimal, structured JSON logger for Node.
+ * It is transport-agnostic and runtime-agnostic. Use a metadata provider
+ * (such as `AwsLambdaMetadataProvider`) to enrich logs with environment-specific
+ * dynamic metadata.
  *
  * @example
  * ```
@@ -48,10 +51,11 @@ export class MikroLog {
   private static correlationId: string;
   private static debugSamplingLevel: number;
   private static isDebugLogSampled: boolean;
-  private static isColdStart = true;
+  private static metadataProvider: MetadataProvider | null;
   private nextLogEnrichment: Record<string, any>;
 
   private transport: Transport | null;
+  private formatter: Formatter;
   static logBuffer: LogOutput[] = [];
 
   private constructor() {
@@ -61,9 +65,13 @@ export class MikroLog {
     MikroLog.correlationId = '';
     MikroLog.debugSamplingLevel = this.initDebugSampleLevel();
     MikroLog.isDebugLogSampled = true;
+    MikroLog.metadataProvider = null;
     MikroLog.logBuffer = [];
     this.nextLogEnrichment = {};
     this.transport = null;
+    this.formatter = {
+      format: (log: LogOutput) => `${JSON.stringify(log)}\n`
+    };
   }
 
   /**
@@ -74,8 +82,6 @@ export class MikroLog {
    * If the `start` method receives any input, that input will
    * overwrite any existing metadata, event, and context.
    *
-   * It will also, consequently, wipe the Lambda cold start state.
-   *
    * If you want to "add" to these, you should instead call
    * `enrich()` and pass in your additional data there.
    */
@@ -85,7 +91,8 @@ export class MikroLog {
     MikroLog.metadataConfig = input?.metadataConfig || this.metadataConfig;
     MikroLog.event = input?.event || this.event;
     MikroLog.context = input?.context || this.context;
-    MikroLog.context.isColdStart = MikroLog.getColdStart();
+    if (input?.metadataProvider)
+      MikroLog.metadataProvider = input.metadataProvider;
     MikroLog.correlationId =
       input?.correlationId ||
       this.correlationId ||
@@ -93,18 +100,6 @@ export class MikroLog {
       '';
 
     return MikroLog.instance;
-  }
-
-  /**
-   * @description Is this a Lambda cold start?
-   */
-  private static getColdStart(): boolean {
-    if (MikroLog.isColdStart) {
-      MikroLog.isColdStart = false;
-      return true;
-    }
-
-    return false;
   }
 
   /**
@@ -116,7 +111,9 @@ export class MikroLog {
   }
 
   /**
-   * @description Enrich MikroLog with metadata, AWS Lambda event and/or context.
+   * @description Enrich MikroLog with metadata, event and/or context.
+   * The `event` and `context` values are forwarded to the configured
+   * metadata provider (if any) for dynamic metadata extraction.
    */
   public static enrich(input: MikroLogInput) {
     MikroLog.metadataConfig = Object.assign(
@@ -125,6 +122,8 @@ export class MikroLog {
     );
     MikroLog.event = Object.assign(MikroLog.event, input.event || {});
     MikroLog.context = Object.assign(MikroLog.context, input.context || {});
+    if (input.metadataProvider)
+      MikroLog.metadataProvider = input.metadataProvider;
     MikroLog.correlationId =
       input?.correlationId ||
       this.correlationId ||
@@ -158,6 +157,24 @@ export class MikroLog {
    */
   public setCorrelationId(correlationId: string): void {
     MikroLog.correlationId = correlationId;
+  }
+
+  /**
+   * @description Set the metadata provider used to extract dynamic metadata.
+   * Pass an `AwsLambdaMetadataProvider` for AWS Lambda environments, or
+   * implement your own `MetadataProvider` for other runtimes.
+   */
+  public setMetadataProvider(provider: MetadataProvider): void {
+    MikroLog.metadataProvider = provider;
+  }
+
+  /**
+   * @description Set the formatter used to serialize log records before
+   * writing them to stdout. The default formatter outputs newline-delimited
+   * JSON. Use `PrettyFormatter` for human-readable console output.
+   */
+  public setFormatter(formatter: Formatter): void {
+    this.formatter = formatter;
   }
 
   /**
@@ -303,31 +320,37 @@ export class MikroLog {
   /**
    * @description Get dynamic metadata.
    */
-  private produceDynamicMetadata(): DynamicMetadataOutput {
+  private produceDynamicMetadata(): Partial<DynamicMetadataOutput> {
     const dynamicMetadata = this.getDynamicMetadata();
 
     const timeNow = Date.now();
 
     const metadata = {
+      ...dynamicMetadata,
       id: randomUUID(),
       timestamp: new Date(timeNow).toISOString(),
-      timestampEpoch: `${timeNow}`,
-      ...dynamicMetadata
+      timestampEpoch: `${timeNow}`
     };
 
     return this.filterMetadata(metadata);
   }
 
   /**
-   * @description Use `aws-metadata-utils` to get dynamic metadata.
-   * Restore manually-set `correlationId` if we have one.
+   * @description Use the configured metadata provider to get dynamic metadata.
+   * If no provider is set, returns an empty object (correlation ID is still
+   * applied from manual setting or environment variable).
    */
-  private getDynamicMetadata() {
-    const metadata = getMetadata(MikroLog.event, MikroLog.context);
+  private getDynamicMetadata(): Record<string, unknown> {
+    const providerMetadata = MikroLog.metadataProvider
+      ? MikroLog.metadataProvider.getMetadata({
+          event: MikroLog.event,
+          context: MikroLog.context
+        })
+      : {};
 
     return {
-      ...metadata,
-      correlationId: MikroLog.correlationId || metadata.correlationId
+      ...providerMetadata,
+      correlationId: MikroLog.correlationId || providerMetadata.correlationId
     };
   }
 
@@ -361,10 +384,11 @@ export class MikroLog {
   }
 
   /**
-   * @description Call `STDOUT` to write the log.
+   * @description Write the log to stdout using the configured formatter
+   * and push it into the log buffer for any transport.
    */
   private writeLog(createdLog: LogOutput) {
-    process.stdout.write(`${JSON.stringify(createdLog)}\n`);
+    process.stdout.write(this.formatter.format(createdLog));
 
     MikroLog.logBuffer.push(createdLog);
   }
@@ -394,8 +418,7 @@ export class MikroLog {
         message: log.message,
         error: log.level === 'ERROR',
         level: log.level,
-        httpStatusCode: log.httpStatusCode,
-        isColdStart: MikroLog.context.isColdStart
+        httpStatusCode: log.httpStatusCode
       };
 
       if (
@@ -474,7 +497,12 @@ export class MikroLog {
   /**
    * Utility function to set a nested value in an object.
    */
-  setNestedValue(target: any, path: string[], key: string, value: any): void {
+  private setNestedValue(
+    target: any,
+    path: string[],
+    key: string,
+    value: any
+  ): void {
     let current = target;
 
     // Traverse the path to ensure the hierarchy exists

@@ -12,6 +12,7 @@ export interface StaticMetadataConfigInput {
   owner: string;
   /**
    * @description The host platform or infrastructure that runs the system.
+   * @example `aws`, `gcp`, `azure`, `on-prem`
    */
   hostPlatform: string;
   /**
@@ -47,7 +48,10 @@ export interface StaticMetadataConfigInput {
 }
 
 /**
- * @description Dynamic metadata.
+ * @description Generic dynamic metadata produced by the core logger.
+ * `id`, `timestamp`, and `timestampEpoch` are always present.
+ * `correlationId`, `user`, and `resource` are only present when
+ * provided by a metadata provider or manual configuration.
  */
 export interface DynamicMetadataOutput {
   /**
@@ -56,8 +60,9 @@ export interface DynamicMetadataOutput {
   id: string;
   /**
    * @description Correlation ID for this function call.
+   * Only present when set manually or provided by a metadata provider.
    */
-  correlationId: string;
+  correlationId?: string;
   /**
    * @description Timestamp of this message in ISO 8601 (RFC 3339) format.
    */
@@ -67,18 +72,27 @@ export interface DynamicMetadataOutput {
    */
   timestampEpoch: string;
   /**
+   * @description The user in this log context.
+   * Only present when provided by a metadata provider.
+   */
+  user?: string;
+  /**
+   * @description The resource (channel, URL path...) that is responding.
+   * Only present when provided by a metadata provider.
+   * @example `/doSomething`
+   */
+  resource?: string;
+}
+
+/**
+ * @description AWS Lambda-specific dynamic metadata fields. These are only
+ * present when using the `AwsLambdaMetadataProvider` adapter.
+ */
+export interface AwsLambdaMetadata {
+  /**
    * @description Request time in Unix epoch of the incoming request.
    */
   timestampRequest: string;
-  /**
-   * @description The user in this log context.
-   */
-  user: string;
-  /**
-   * @description The resource (channel, URL path...) that is responding.
-   * @example `/doSomething`
-   */
-  resource: string;
   /**
    * @description The region of the responding function/system.
    */
@@ -121,3 +135,10 @@ export interface DynamicMetadataOutput {
  * @description Full metadata set using both dynamic and static sets.
  */
 export type FullMetadata = StaticMetadataConfigInput & DynamicMetadataOutput;
+
+/**
+ * @description Log output augmented with AWS Lambda-specific metadata fields.
+ * Use this type when the `AwsLambdaMetadataProvider` is configured.
+ */
+export type AwsLambdaLogOutput = import('./MikroLog.js').LogOutput &
+  Partial<AwsLambdaMetadata>;

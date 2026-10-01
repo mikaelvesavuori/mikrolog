@@ -2,9 +2,10 @@ import type {
   DynamicMetadataOutput,
   StaticMetadataConfigInput
 } from './Metadata.js';
+import type { MetadataProvider } from './MetadataProvider.js';
 
 /**
- * @description Input when instantiating a new MikroLog instance.
+ * @description Input when instantiating or enriching a MikroLog instance.
  */
 export interface MikroLogInput {
   /**
@@ -12,17 +13,28 @@ export interface MikroLogInput {
    */
   metadataConfig?: StaticMetadataConfigInput | Record<string, any>;
   /**
-   * AWS Lambda event object. Used to gather dynamic metadata.
+   * Event object forwarded to the metadata provider for dynamic metadata
+   * extraction. In AWS Lambda this is the Lambda event; in other runtimes
+   * it can be an HTTP request, message payload, or any relevant context.
    */
   event?: any;
   /**
-   * AWS Lambda context object. Used to gather dynamic metadata.
+   * Context object forwarded to the metadata provider for dynamic metadata
+   * extraction. In AWS Lambda this is the Lambda context; in other runtimes
+   * it can be any contextual information.
    */
   context?: any;
   /**
    * Manually set correlation ID.
    */
   correlationId?: string;
+  /**
+   * Pluggable metadata provider. Use `AwsLambdaMetadataProvider` for AWS
+   * Lambda environments, or implement your own `MetadataProvider` for
+   * other runtimes. When omitted, no dynamic metadata is extracted beyond
+   * the core fields (id, timestamp, correlationId).
+   */
+  metadataProvider?: MetadataProvider;
 }
 
 /**

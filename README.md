@@ -1,6 +1,6 @@
 # MikroLog
 
-**The JSON logger you always wanted for Lambda**.
+**A minimal, structured JSON logger for Node, with optional transports and pluggable metadata providers.**
 
 _MikroLog is like serverless: There is still a logger ("server"), but you get to think a lot less about it and you get the full "It Just Works"™ experience._
 
@@ -10,15 +10,11 @@ _MikroLog is like serverless: There is still a logger ("server"), but you get to
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mikaelvesavuori_mikrolog&metric=alert_status)](https://sonarcloud.io/dashboard?id=mikaelvesavuori_mikrolog)
 
-[![codecov](https://codecov.io/gh/mikaelvesavuori/mikrolog/branch/main/graph/badge.svg?token=S7D3RM9TO7)](https://codecov.io/gh/mikaelvesavuori/mikrolog)
-
-[![Maintainability](https://api.codeclimate.com/v1/badges/d960f299a99a79f781d3/maintainability)](https://codeclimate.com/github/mikaelvesavuori/mikrolog/maintainability)
-
 ---
 
 Loggers have become too opinionated, bloated and complicated. MikroLog provides an option that is:
 
-- Adapted out-of-the box for serverless Lambda environments (no requirement though!)
+- **Runtime-agnostic** — works in any Node.js context: Lambda, Express, CLI, workers, and more
 - Gives you multi-level, clean and structured logs
 - Easiest to grok logger that isn't pure `console.log()`
 - Familiar syntax using `log()`, `info()`, `debug()`, `warn()` and `error()`
@@ -26,17 +22,18 @@ Loggers have become too opinionated, bloated and complicated. MikroLog provides 
 - Cuts out all the stuff you won't need in cloud/serverless like storing logs or creating file output
 - None of the `pid` and other garbage fields you get from many other solutions
 - Flexible for most needs by loading your own static metadata that gets used in all logs
-- Outside of AWS itself, logs carry across perfectly to observability solutions like Datadog, New Relic, Honeycomb...
-- Has transport support
+- Logs carry across perfectly to observability solutions like Datadog, New Relic, Honeycomb...
+- Has transport support (e.g. Axiom)
+- **Pluggable metadata providers** — use `AwsLambdaMetadataProvider` for Lambda, or write your own for any runtime
+- **Pluggable formatters** — use `JsonFormatter` (default) for production, `PrettyFormatter` for local dev
 - Easy to redact or mask sensitive data
 - Uses `process.stdout.write()` rather than `console.log()` so you can safely use it in Lambda
-- Tiny (~2.4 KB gzipped)
-- Has only one dependency, [`aws-metadata-utils`](https://github.com/mikaelvesavuori/aws-metadata-utils) (for picking out metadata)
+- Tiny (~2.4 KB gzipped, zero required dependencies)
 - Has 100% test coverage
 
 ## Behavior
 
-MikroLog version 2.0 and later is implemented using a singleton pattern, meaning the instance is reused rather than necessitating that you spawn new instances of it everywhere you need it. This makes it easier for you to use, but also means the API is not exactly like it was in version 1.0. In the context of Lambda, where things in the global execution context (like imports and singletons) are reused across calls, you should be aware that the logger context may be reused. Read more in the `Security notes` section further down.
+MikroLog is implemented using a singleton pattern, meaning the instance is reused rather than necessitating that you spawn new instances of it everywhere you need it. In the context of Lambda, where things in the global execution context (like imports and singletons) are reused across calls, you should be aware that the logger context may be reused. Read more in the `Security notes` section further down.
 
 Logs will be sorted alphabetically by key.
 
@@ -44,7 +41,7 @@ MikroLog will throw away any fields that are undefined, null or empty.
 
 You may pass either strings or objects into each logging method. Messages will show up in the `message` field.
 
-MikroLog accepts certain static metadata from you (user input) and will infer dynamic metadata if you are in an AWS Lambda environment. See more in the [Metadata](#metadata) section.
+MikroLog accepts certain static metadata from you (user input) and will produce dynamic metadata (id, timestamp, correlationId) on every log. To enrich logs with environment-specific metadata (AWS Lambda fields, HTTP request details, etc.), configure a metadata provider. See more in the [Metadata](#metadata) section.
 
 ## Usage
 
@@ -129,19 +126,6 @@ const metadata = { service: 'MyService' };
 const logger = MikroLog.start({ metadataConfig: metadata });
 ```
 
-To use the full set of features, including deriving dynamic metadata from AWS Lambda, you would add the `event` and `context` objects like so:
-
-```typescript
-// Your Lambda handler doing whatever it does
-export async function handler(event: any, context: any) {
-  // {...}
-  const metadata = { service: 'MyService' };
-  const logger = MikroLog.start();
-  MikroLog.enrich({ metadataConfig: metadata, event, context });
-  // {...}
-}
-```
-
 By default, unless you manually provide a correlation ID, if there is a value stored at `process.env.CORRELATION_ID`, then MikroLog will automatically use it.
 
 You can set the correlation ID _manually_ as part of the `enrich()` call:
@@ -153,6 +137,59 @@ MikroLog.enrich({ correlationId: 'abc123' });
 Note how MikroLog, in this case, was enriched _after_ its initial start.
 
 See more in the [Metadata](#metadata) section.
+
+### Using in AWS Lambda
+
+MikroLog ships with an `AwsLambdaMetadataProvider` that extracts dynamic metadata (function name, region, account ID, cold start, etc.) from the Lambda event and context objects.
+
+```typescript
+import { MikroLog, AwsLambdaMetadataProvider } from 'mikrolog';
+
+const provider = new AwsLambdaMetadataProvider();
+
+export async function handler(event: any, context: any) {
+  const metadata = { service: 'MyService' };
+  const logger = MikroLog.start({ metadataConfig: metadata, metadataProvider: provider });
+  MikroLog.enrich({ event, context });
+  logger.info('Hello from Lambda!');
+  await logger.flushLogs();
+}
+```
+
+### Using in Express / HTTP servers
+
+MikroLog works anywhere. Here's an Express middleware example:
+
+```typescript
+import { MikroLog } from 'mikrolog';
+
+const logger = MikroLog.start({ metadataConfig: { service: 'api' } });
+
+app.use((req, res, next) => {
+  MikroLog.enrich({
+    correlationId: req.headers['x-request-id'] as string
+  });
+  next();
+});
+
+app.get('/', (req, res) => {
+  logger.info('Request received');
+  res.json({ ok: true });
+});
+```
+
+### Using in a CLI or worker
+
+```typescript
+import { MikroLog, PrettyFormatter } from 'mikrolog';
+
+const logger = MikroLog.start({ metadataConfig: { service: 'batch-job' } });
+logger.setFormatter(new PrettyFormatter());
+
+logger.info('Starting batch processing...');
+logger.warn('Memory usage high');
+logger.error('Failed to process item', 500);
+```
 
 ### Setting the correlation ID manually after initialization
 
@@ -239,7 +276,7 @@ headers['X-Log-Sampled'] ? logger.setDebugSamplingRate(100) : logger.setDebugSam
 
 A transport is a configuration that allows MikroLog to flush (i.e. send) logs to another service.
 
-As of version `2.2.0`, MikroLog supports [Axiom](https://axiom.co).
+MikroLog supports [Axiom](https://axiom.co) out of the box. You can implement your own transport by implementing the `Transport` interface.
 
 Transport support is based on a "log buffer" that keeps all logs in-memory. They are sent and removed from the buffer when flushed, which is done manually by you.
 
@@ -261,6 +298,74 @@ logger.log('Hello');
 logger.log('World');
 
 await logger.flushLogs(); // Send the logs
+```
+
+## Formatters
+
+MikroLog supports pluggable formatters to control how log records are serialized before being written to stdout.
+
+- `JsonFormatter` (default) — outputs newline-delimited JSON. Best for production and log aggregation platforms.
+- `PrettyFormatter` — outputs human-readable, colorized lines. Best for local development and CLI usage.
+
+```typescript
+import { MikroLog, PrettyFormatter } from 'mikrolog';
+
+const logger = MikroLog.start();
+logger.setFormatter(new PrettyFormatter());
+
+logger.info('Hello World');
+// INFO  2022-07-25T08:52:21.121Z  Hello World
+```
+
+You can disable colors by passing `{ colorize: false }`:
+
+```typescript
+logger.setFormatter(new PrettyFormatter({ colorize: false }));
+```
+
+You can also implement your own formatter by implementing the `Formatter` interface:
+
+```typescript
+import type { Formatter, LogOutput } from 'mikrolog';
+
+class MyFormatter implements Formatter {
+  format(log: LogOutput): string {
+    return `[${log.level}] ${log.message}\n`;
+  }
+}
+
+logger.setFormatter(new MyFormatter());
+```
+
+## Metadata providers
+
+Metadata providers supply dynamic metadata to MikroLog. The core logger always produces `id`, `timestamp`, `timestampEpoch`, and `correlationId`. A metadata provider can add environment-specific fields.
+
+### Built-in providers
+
+- `AwsLambdaMetadataProvider` — extracts AWS Lambda fields from the event and context objects, including cold-start detection.
+
+### Writing a custom metadata provider
+
+Implement the `MetadataProvider` interface to extract metadata from any source:
+
+```typescript
+import type { MetadataProvider, MetadataProviderInput } from 'mikrolog';
+
+class HttpMetadataProvider implements MetadataProvider {
+  getMetadata(input: MetadataProviderInput): Record<string, unknown> {
+    const req = input.event; // e.g. an Express Request
+    return {
+      resource: req?.path,
+      user: req?.headers?.['x-user-id'],
+      method: req?.method
+    };
+  }
+}
+
+const logger = MikroLog.start({
+  metadataProvider: new HttpMetadataProvider()
+});
 ```
 
 ## Metadata
@@ -315,30 +420,33 @@ Ideally you store this static metadata configuration in its own file and have un
 
 ### Dynamic metadata
 
-_MikroLog uses [`aws-metadata-utils`](https://github.com/mikaelvesavuori/aws-metadata-utils) to pick out metadata._
+Dynamic metadata is produced on every log emission. The core logger always provides the following fields:
 
-The dynamic metadata fields are picked up automatically if you pass them in during instantiation. Most of those metadata fields will relate to unique value types available in AWS Lambda.
+| Field            | Type   | Description                                              |
+| ---------------- | ------ | ------------------------------------------------------- |
+| `correlationId`  | string | Correlation ID for this function call.                  |
+| `id`             | string | ID of the log.                                          |
+| `timestamp`      | string | Timestamp of this message in ISO 8601 (RFC 3339) format. |
+| `timestampEpoch` | string | Timestamp of this message in Unix epoch.               |
+| `user`           | string | The user in this log context (if provided by a provider). |
+| `resource`       | string | The resource (channel, URL path...) that is responding (if provided by a provider). |
 
-If these values are not available, they will be dropped at the time of log output. In effect, this means you won't have to deal with them (being empty or otherwise) if you use MikroLog in another type of context.
+When using the `AwsLambdaMetadataProvider`, the following additional fields are available:
 
 | Field                | Type    | Description                                               |
 | -------------------- | ------- | --------------------------------------------------------- |
 | `accountId`          | string  | The AWS account ID that the system is running in.         |
-| `correlationId`      | string  | Correlation ID for this function call.                    |
 | `functionMemorySize` | string  | Memory size of the current function.                      |
 | `functionName`       | string  | The name of the function.                                 |
 | `functionVersion`    | string  | The version of the function.                              |
-| `id`                 | string  | ID of the log.                                            |
 | `isColdStart`        | boolean | Is this a Lambda cold start?                              |
 | `region`             | string  | The region of the responding function/system.             |
-| `resource`           | string  | The resource (channel, URL path...) that is responding.   |
 | `runtime`            | string  | What runtime is used?                                     |
 | `stage`              | string  | What AWS stage are we in?                                 |
-| `timestamp`          | string  | Timestamp of this message in ISO 8601 (RFC 3339) format.  |
-| `timestampEpoch`     | string  | Timestamp of this message in Unix epoch.                  |
 | `timestampRequest`   | string  | Request time in Unix epoch of the incoming request.       |
-| `user`               | string  | The user in this log context.                             |
 | `viewerCountry`      | string  | Which country did AWS CloudFront infer the user to be in? |
+
+If these values are not available, they will be dropped at the time of log output. In effect, this means you won't have to deal with them (being empty or otherwise) if you use MikroLog in another type of context.
 
 ## Redacting keys or masking values
 
@@ -375,9 +483,7 @@ const log = logger.log('Checking...');
 
 ## Security notes
 
-MikroLog version 1.0 used `process.env` to store values in order to make usage of the logger easier without having to pass around the same logger instance. This could be a security concern (albeit far-fetched) since the environment variables might leak across function calls. From a developer perspective, it was also a workable but not ideal implementation.
-
-MikroLog version 2.0 and later is instead implemented using a singleton pattern, meaning the instance is reused rather than necessitating that you spawn new instances of it everywhere you need it. This makes it easier for you to use, but also means the API is not exactly like it was in version 1.0. In the context of Lambda, where things in the global execution context (like imports and singletons) are reused across calls, you should be aware that the logger context may be reused.
+MikroLog is implemented using a singleton pattern, meaning the instance is reused rather than necessitating that you spawn new instances of it everywhere you need it. In the context of Lambda, where things in the global execution context (like imports and singletons) are reused across calls, you should be aware that the logger context may be reused.
 
 This should not be a significant problem since Lambda is reused in the same _function scope_, which means that for example static metadata that is reused will most likely be the same anyway. This can be validated with a simple experiment:
 
@@ -396,13 +502,16 @@ See below code for an example on how to wrap your implementation to always call 
 _**There are no promises that this type of reset will be effective!**_
 
 ```typescript
-import { MikroLog } from 'mikrolog';
+import { MikroLog, AwsLambdaMetadataProvider } from 'mikrolog';
 
 import { metadataConfig } from './config/metadata';
+
+const provider = new AwsLambdaMetadataProvider();
 
 export async function handler(event: any, awsContext: any): Promise<any> {
   const result = await wrappedHandler(event, awsContext);
   MikroLog.reset();
+  provider.reset();
   return result;
 }
 
@@ -410,7 +519,8 @@ async function wrappedHandler(event: any, awsContext: any) {
   const body = event.body && typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
   if (body && body.service) metadataConfig.service = body.service;
 
-  const logger = MikroLog.start({ metadataConfig, event, context: awsContext });
+  const logger = MikroLog.start({ metadataConfig, metadataProvider: provider });
+  MikroLog.enrich({ event, context: awsContext });
   const message = logger.info('info message');
 
   return {
@@ -423,6 +533,35 @@ async function wrappedHandler(event: any, awsContext: any) {
 ---
 
 At the end of the day you might wonder if this solution (v2 vs v1) is better? I would say overall it is more standardized in its approach as well as (now) documented better. Just keep this in mind when you work with MikroLog or any other logger.
+
+## Migrating to 3.0
+
+MikroLog 3.0 decouples the core logger from AWS Lambda. The core is now zero-dependency and runtime-agnostic. AWS Lambda support is provided through an optional `AwsLambdaMetadataProvider` adapter.
+
+### Breaking changes
+
+1. **`isColdStart` and AWS-specific fields are no longer emitted by default.** To get `functionName`, `region`, `accountId`, `stage`, `isColdStart`, etc., configure an `AwsLambdaMetadataProvider`:
+
+   ```typescript
+   // Before (v2)
+   const logger = MikroLog.start({ event, context });
+
+   // After (v3)
+   const provider = new AwsLambdaMetadataProvider();
+   const logger = MikroLog.start({ metadataProvider: provider });
+   MikroLog.enrich({ event, context });
+   ```
+
+2. **`aws-metadata-utils` is now an optional dependency.** It is installed by default but only loaded when `AwsLambdaMetadataProvider` is used. Non-Lambda users get a zero-dependency core.
+
+3. **New public type exports.** All interfaces (`LogOutput`, `MikroLogInput`, `Transport`, `MetadataProvider`, `Formatter`, etc.) are now re-exported from the package entry point.
+
+### New features
+
+- **`setMetadataProvider(provider)`** — plug in any metadata provider.
+- **`setFormatter(formatter)`** — plug in a formatter (`JsonFormatter`, `PrettyFormatter`, or your own).
+- **`PrettyFormatter`** — human-readable, colorized output for local development.
+- **`AwsLambdaMetadataProvider.reset()`** — reset cold-start state for testing.
 
 ## License
 

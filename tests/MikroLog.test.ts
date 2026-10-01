@@ -4,6 +4,8 @@ import { MikroLog } from '../src/domain/entities/MikroLog.js';
 
 import { TransportError } from '../src/application/errors/TransportError.js';
 
+import { JsonFormatter } from '../src/application/formatters/JsonFormatter.js';
+import { PrettyFormatter } from '../src/application/formatters/PrettyFormatter.js';
 import { AxiomTransport } from '../src/application/transports/Axiom.js';
 import { metadataConfig } from '../testdata/config.js';
 // @ts-ignore
@@ -18,7 +20,6 @@ function cleanObject(object: Record<string, any>) {
   delete object.id;
   delete object.timestamp;
   delete object.timestampEpoch;
-  delete object.isColdStart;
 
   return object;
 }
@@ -77,7 +78,6 @@ describe('Logs output', () => {
       message: 'Hello World',
       error: false,
       httpStatusCode: 200,
-      isColdStart: true,
       level: 'INFO',
       id: '1256767f-c875-4d82-813d-bc260bd0ba07',
       timestamp: '2022-07-25T08:52:21.121Z',
@@ -91,7 +91,6 @@ describe('Logs output', () => {
     expect(response.id).toBeDefined();
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -116,7 +115,6 @@ describe('Logs output', () => {
     expect(response.id).toBeDefined();
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -141,7 +139,6 @@ describe('Logs output', () => {
     expect(response.id).toBeDefined();
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -167,7 +164,6 @@ describe('Logs output', () => {
     expect(response.id).toBeDefined();
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -193,7 +189,6 @@ describe('Logs output', () => {
     expect(response.id).toBeDefined();
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -221,7 +216,6 @@ describe('Logs output', () => {
     expect(response.id).toBeDefined();
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -245,7 +239,6 @@ describe('Logs output', () => {
     const expected = {
       error: false,
       httpStatusCode: 200,
-      isColdStart: true,
       falsyTest1: false,
       falsyTest2: 0,
       level: 'INFO',
@@ -259,7 +252,6 @@ describe('Logs output', () => {
     expect(response.id).toBeDefined();
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -436,7 +428,7 @@ describe('Redact data', () => {
     const expected = {
       version: 1,
       owner: 'MyCompany',
-      hostPlatform: 'aws',
+      hostPlatform: 'node',
       domain: 'CustomerAcquisition',
       system: 'ShowroomActivities',
       service: 'UserSignUp',
@@ -445,7 +437,6 @@ describe('Redact data', () => {
       message: 'Hello World',
       error: true,
       httpStatusCode: 400,
-      isColdStart: true,
       level: 'ERROR',
       id: '1256767f-c875-4d82-813d-bc260bd0ba07',
       timestamp: '2022-07-25T08:52:21.121Z',
@@ -460,7 +451,6 @@ describe('Redact data', () => {
     //expect(response.id).toBeDefined(); // For some reason breaks after migrating to Vitest
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -483,7 +473,7 @@ describe('Redact data', () => {
     const expected = {
       version: 1,
       owner: 'MyCompany',
-      hostPlatform: 'aws',
+      hostPlatform: 'node',
       domain: 'CustomerAcquisition',
       system: 'ShowroomActivities',
       service: 'UserSignUp',
@@ -492,7 +482,6 @@ describe('Redact data', () => {
       message: 'Hello World',
       error: true,
       httpStatusCode: 400,
-      isColdStart: true,
       level: 'ERROR',
       id: '1256767f-c875-4d82-813d-bc260bd0ba07',
       timestamp: '2022-07-25T08:52:21.121Z',
@@ -508,7 +497,6 @@ describe('Redact data', () => {
     //expect(response.id).toBeDefined(); // For some reason breaks after migrating to Vitest
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -533,9 +521,8 @@ describe('Mask data', () => {
       dataSensitivity: 'public',
       domain: 'CustomerAcquisition',
       error: true,
-      hostPlatform: 'aws',
+      hostPlatform: 'node',
       httpStatusCode: 400,
-      isColdStart: true,
       level: 'ERROR',
       message: 'Hello World',
       owner: 'MyCompany',
@@ -554,7 +541,6 @@ describe('Mask data', () => {
     expect(response.id).toBeDefined();
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -598,9 +584,8 @@ describe('Mask data', () => {
       dataSensitivity: 'public',
       domain: 'CustomerAcquisition',
       error: true,
-      hostPlatform: 'aws',
+      hostPlatform: 'node',
       httpStatusCode: 400,
-      isColdStart: true,
       level: 'ERROR',
       message: 'Hello World',
       owner: 'MyCompany',
@@ -619,7 +604,6 @@ describe('Mask data', () => {
     expect(response.id).toBeDefined();
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -651,7 +635,6 @@ describe('Metadata', () => {
       },
       error: false,
       httpStatusCode: 200,
-      isColdStart: true,
       level: 'INFO',
       message: 'Hello World'
     };
@@ -663,7 +646,6 @@ describe('Metadata', () => {
     expect(response.id).toBeDefined();
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -685,7 +667,6 @@ describe('Enrichment', () => {
     const expected = {
       error: false,
       httpStatusCode: 200,
-      isColdStart: true,
       level: 'INFO',
       message: 'Hello World'
     };
@@ -697,7 +678,6 @@ describe('Enrichment', () => {
     expect(response.id).toBeDefined();
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -718,7 +698,6 @@ describe('Enrichment', () => {
       correlationId: 'abc123',
       error: false,
       httpStatusCode: 200,
-      isColdStart: true,
       level: 'INFO',
       message: 'Hello World'
     };
@@ -730,7 +709,6 @@ describe('Enrichment', () => {
     expect(response.id).toBeDefined();
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.isColdStart).toBeDefined();
 
     // Drop dynamic fields for test validation
     const cleanedResponse = cleanObject(response);
@@ -913,5 +891,141 @@ describe('Transports', () => {
         new AxiomTransport();
       }).toThrowError(TransportError);
     });
+  });
+});
+
+describe('Metadata providers', () => {
+  test('It should use a custom metadata provider', () => {
+    MikroLog.reset();
+
+    const customProvider = {
+      getMetadata: () => ({
+        customField: 'customValue',
+        resource: '/my-endpoint',
+        user: 'testuser'
+      })
+    };
+
+    const logger = MikroLog.start({ metadataProvider: customProvider });
+    const response: any = logger.info('Hello');
+
+    expect(response.customField).toBe('customValue');
+    expect(response.resource).toBe('/my-endpoint');
+    expect(response.user).toBe('testuser');
+  });
+
+  test('It should support setMetadataProvider after start', () => {
+    MikroLog.reset();
+
+    const customProvider = {
+      getMetadata: () => ({ injected: true })
+    };
+
+    const logger = MikroLog.start();
+    logger.setMetadataProvider(customProvider);
+    const response: any = logger.info('Hello');
+
+    expect(response.injected).toBe(true);
+  });
+
+  test('It should work without any metadata provider', () => {
+    MikroLog.reset();
+
+    const logger = MikroLog.start();
+    const response: any = logger.info('Hello');
+
+    expect(response.id).toBeDefined();
+    expect(response.timestamp).toBeDefined();
+    expect(response.timestampEpoch).toBeDefined();
+    expect(response.message).toBe('Hello');
+    expect(response.level).toBe('INFO');
+    expect(response.error).toBe(false);
+  });
+});
+
+describe('Formatters', () => {
+  test('It should use the default JSON formatter', () => {
+    MikroLog.reset();
+
+    const logger = MikroLog.start();
+    const response = logger.info('Hello');
+
+    expect(response.message).toBe('Hello');
+  });
+
+  test('It should use a custom formatter via setFormatter', () => {
+    MikroLog.reset();
+
+    const logger = MikroLog.start();
+    logger.setFormatter({
+      format: (log) => `[${log.level}] ${log.message}\n`
+    });
+
+    const response = logger.info('Hello');
+    expect(response.message).toBe('Hello');
+  });
+
+  test('It should use PrettyFormatter', () => {
+    MikroLog.reset();
+
+    const logger = MikroLog.start();
+    logger.setFormatter(new PrettyFormatter({ colorize: false }));
+
+    const response = logger.info('Hello');
+    expect(response.message).toBe('Hello');
+  });
+
+  test('It should use PrettyFormatter with colorize enabled', () => {
+    MikroLog.reset();
+
+    const logger = MikroLog.start();
+    logger.setFormatter(new PrettyFormatter({ colorize: true }));
+
+    const response = logger.info('Hello');
+    expect(response.message).toBe('Hello');
+  });
+
+  test('It should use PrettyFormatter with default options', () => {
+    MikroLog.reset();
+
+    const logger = MikroLog.start();
+    logger.setFormatter(new PrettyFormatter());
+
+    const response = logger.warn('Warning message');
+    expect(response.message).toBe('Warning message');
+  });
+
+  test('It should use PrettyFormatter with object message and extra fields', () => {
+    MikroLog.reset();
+
+    const logger = MikroLog.start({ metadataConfig: { service: 'api' } });
+    logger.setFormatter(new PrettyFormatter());
+
+    const response = logger.info({ key: 'value' });
+    expect(response.message).toEqual({ key: 'value' });
+  });
+
+  test('It should use JsonFormatter', () => {
+    MikroLog.reset();
+
+    const logger = MikroLog.start();
+    logger.setFormatter(new JsonFormatter());
+
+    const response = logger.info('Hello');
+    expect(response.message).toBe('Hello');
+  });
+
+  test('It should enrich with a metadata provider after start', () => {
+    MikroLog.reset();
+
+    const customProvider = {
+      getMetadata: () => ({ enriched: true })
+    };
+
+    const logger = MikroLog.start();
+    MikroLog.enrich({ metadataProvider: customProvider });
+    const response: any = logger.info('Hello');
+
+    expect(response.enriched).toBe(true);
   });
 });
