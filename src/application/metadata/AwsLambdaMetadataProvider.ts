@@ -1,12 +1,9 @@
-import { createRequire } from 'node:module';
+import { createRequire } from "node:module";
 
-import type {
-  MetadataProvider,
-  MetadataProviderInput
-} from '../../interfaces/MetadataProvider.js';
+import type { MetadataProvider, MetadataProviderInput } from "../../interfaces/MetadataProvider.js";
 
 const lazyRequire: (id: string) => any =
-  typeof (globalThis as any).require === 'function'
+  typeof (globalThis as any).require === "function"
     ? /* v8 ignore next */
       (globalThis as any).require
     : createRequire(import.meta.url);
@@ -38,20 +35,13 @@ const lazyRequire: (id: string) => any =
  */
 export class AwsLambdaMetadataProvider implements MetadataProvider {
   private isColdStart = true;
-  private getMetadataFn:
-    | ((event: unknown, context: unknown) => Record<string, unknown>)
-    | null = null;
+  private getMetadataFn: ((event: unknown, context: unknown) => Record<string, unknown>) | null =
+    null;
 
-  private loadGetMetadata(): (
-    event: unknown,
-    context: unknown
-  ) => Record<string, unknown> {
+  private loadGetMetadata(): (event: unknown, context: unknown) => Record<string, unknown> {
     if (this.getMetadataFn) return this.getMetadataFn;
-    const mod = lazyRequire('aws-metadata-utils');
-    const fn = mod.getMetadata as (
-      event: unknown,
-      context: unknown
-    ) => Record<string, unknown>;
+    const mod = lazyRequire("aws-metadata-utils");
+    const fn = mod.getMetadata as (event: unknown, context: unknown) => Record<string, unknown>;
     this.getMetadataFn = fn;
     return fn;
   }
@@ -74,7 +64,7 @@ export class AwsLambdaMetadataProvider implements MetadataProvider {
 
     return {
       ...metadata,
-      isColdStart: coldStart
+      isColdStart: coldStart,
     };
   }
 

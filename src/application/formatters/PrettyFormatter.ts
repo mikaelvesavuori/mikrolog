@@ -1,5 +1,5 @@
-import type { Formatter } from '../../interfaces/Formatter.js';
-import type { LogOutput } from '../../interfaces/MikroLog.js';
+import type { Formatter } from "../../interfaces/Formatter.js";
+import type { LogOutput } from "../../interfaces/MikroLog.js";
 
 /**
  * @description Human-readable formatter for local development and CLI usage.
@@ -27,45 +27,42 @@ export class PrettyFormatter implements Formatter {
     if (!this.colorize) return text;
 
     const colors: Record<string, string> = {
-      ERROR: '\x1b[31m',
-      WARN: '\x1b[33m',
-      INFO: '\x1b[36m',
-      DEBUG: '\x1b[90m'
+      ERROR: "\x1b[31m",
+      WARN: "\x1b[33m",
+      INFO: "\x1b[36m",
+      DEBUG: "\x1b[90m",
     };
 
-    const reset = '\x1b[0m';
-    const color = colors[level] || '';
+    const reset = "\x1b[0m";
+    const color = colors[level] || "";
 
     return `${color}${text}${reset}`;
   }
 
   public format(log: LogOutput): string {
-    const level = (log.level || 'INFO').padEnd(5);
-    const timestamp = log.timestamp || '';
-    const message =
-      typeof log.message === 'string'
-        ? log.message
-        : JSON.stringify(log.message);
+    const level = (log.level || "INFO").padEnd(5);
+    const timestamp = log.timestamp || "";
+    const message = typeof log.message === "string" ? log.message : JSON.stringify(log.message);
 
     const knownKeys = new Set([
-      'level',
-      'timestamp',
-      'timestampEpoch',
-      'message',
-      'error',
-      'httpStatusCode',
-      'id'
+      "level",
+      "timestamp",
+      "timestampEpoch",
+      "message",
+      "error",
+      "httpStatusCode",
+      "id",
     ]);
 
     const extras = Object.entries(log)
       .filter(([key]) => !knownKeys.has(key))
       .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
-      .join(' ');
+      .join(" ");
 
     const line = extras
       ? `${level}  ${timestamp}  ${message}  ${extras}`
       : `${level}  ${timestamp}  ${message}`;
 
-    return `${this.color(log.level || 'INFO', line)}\n`;
+    return `${this.color(log.level || "INFO", line)}\n`;
   }
 }

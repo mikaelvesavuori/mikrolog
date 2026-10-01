@@ -1,4 +1,4 @@
-import type { LogOutput } from './MikroLog.js';
+import type { LogOutput } from "./MikroLog.js";
 
 /**
  * @description A pluggable formatter. Implement this interface to control
@@ -15,4 +15,4 @@ export interface Formatter {
 /**
  * @description Names of built-in formatters.
  */
-export type FormatterName = 'json' | 'pretty';
+export type FormatterName = "json" | "pretty";

@@ -1,5 +1,5 @@
-import type { Formatter } from '../../interfaces/Formatter.js';
-import type { LogOutput } from '../../interfaces/MikroLog.js';
+import type { Formatter } from "../../interfaces/Formatter.js";
+import type { LogOutput } from "../../interfaces/MikroLog.js";
 
 /**
  * @description Default formatter. Outputs each log record as a

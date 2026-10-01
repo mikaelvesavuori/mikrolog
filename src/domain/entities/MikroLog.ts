@@ -1,19 +1,19 @@
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from "node:crypto";
 
-import type { Formatter } from '../../interfaces/Formatter.js';
+import type { Formatter } from "../../interfaces/Formatter.js";
 import type {
   DynamicMetadataOutput,
-  StaticMetadataConfigInput
-} from '../../interfaces/Metadata.js';
-import type { MetadataProvider } from '../../interfaces/MetadataProvider.js';
+  StaticMetadataConfigInput,
+} from "../../interfaces/Metadata.js";
+import type { MetadataProvider } from "../../interfaces/MetadataProvider.js";
 import type {
   HttpStatusCode,
   LogInput,
   LogOutput,
   Message,
-  MikroLogInput
-} from '../../interfaces/MikroLog.js';
-import type { Transport } from '../../interfaces/Transport.js';
+  MikroLogInput,
+} from "../../interfaces/MikroLog.js";
+import type { Transport } from "../../interfaces/Transport.js";
 
 /**
  * @description MikroLog is a minimal, structured JSON logger for Node.
@@ -43,9 +43,7 @@ logger.log({
 export class MikroLog {
   private static instance: MikroLog;
 
-  private static metadataConfig:
-    | StaticMetadataConfigInput
-    | Record<string, any> = {};
+  private static metadataConfig: StaticMetadataConfigInput | Record<string, any> = {};
   private static event: any = {};
   private static context: any = {};
   private static correlationId: string;
@@ -62,7 +60,7 @@ export class MikroLog {
     MikroLog.metadataConfig = {};
     MikroLog.event = {};
     MikroLog.context = {};
-    MikroLog.correlationId = '';
+    MikroLog.correlationId = "";
     MikroLog.debugSamplingLevel = this.initDebugSampleLevel();
     MikroLog.isDebugLogSampled = true;
     MikroLog.metadataProvider = null;
@@ -70,7 +68,7 @@ export class MikroLog {
     this.nextLogEnrichment = {};
     this.transport = null;
     this.formatter = {
-      format: (log: LogOutput) => `${JSON.stringify(log)}\n`
+      format: (log: LogOutput) => `${JSON.stringify(log)}\n`,
     };
   }
 
@@ -88,16 +86,12 @@ export class MikroLog {
   public static start(input?: MikroLogInput): MikroLog {
     if (!MikroLog.instance) MikroLog.instance = new MikroLog();
 
-    MikroLog.metadataConfig = input?.metadataConfig || this.metadataConfig;
-    MikroLog.event = input?.event || this.event;
-    MikroLog.context = input?.context || this.context;
-    if (input?.metadataProvider)
-      MikroLog.metadataProvider = input.metadataProvider;
+    MikroLog.metadataConfig = input?.metadataConfig || MikroLog.metadataConfig;
+    MikroLog.event = input?.event || MikroLog.event;
+    MikroLog.context = input?.context || MikroLog.context;
+    if (input?.metadataProvider) MikroLog.metadataProvider = input.metadataProvider;
     MikroLog.correlationId =
-      input?.correlationId ||
-      this.correlationId ||
-      process.env.CORRELATION_ID ||
-      '';
+      input?.correlationId || MikroLog.correlationId || process.env.CORRELATION_ID || "";
 
     return MikroLog.instance;
   }
@@ -116,19 +110,12 @@ export class MikroLog {
    * metadata provider (if any) for dynamic metadata extraction.
    */
   public static enrich(input: MikroLogInput) {
-    MikroLog.metadataConfig = Object.assign(
-      MikroLog.metadataConfig,
-      input.metadataConfig || {}
-    );
+    MikroLog.metadataConfig = Object.assign(MikroLog.metadataConfig, input.metadataConfig || {});
     MikroLog.event = Object.assign(MikroLog.event, input.event || {});
     MikroLog.context = Object.assign(MikroLog.context, input.context || {});
-    if (input.metadataProvider)
-      MikroLog.metadataProvider = input.metadataProvider;
+    if (input.metadataProvider) MikroLog.metadataProvider = input.metadataProvider;
     MikroLog.correlationId =
-      input?.correlationId ||
-      this.correlationId ||
-      process.env.CORRELATION_ID ||
-      '';
+      input?.correlationId || MikroLog.correlationId || process.env.CORRELATION_ID || "";
   }
 
   /**
@@ -182,7 +169,7 @@ export class MikroLog {
    */
   public setDebugSamplingRate(samplingPercent: number): number {
     let fixedValue = samplingPercent;
-    if (typeof samplingPercent !== 'number') return MikroLog.debugSamplingLevel;
+    if (typeof samplingPercent !== "number") return MikroLog.debugSamplingLevel;
 
     if (samplingPercent < 0) fixedValue = 0;
     if (samplingPercent > 100) fixedValue = 100;
@@ -236,8 +223,8 @@ export class MikroLog {
   public debug(message: Message, httpStatusCode?: HttpStatusCode): LogOutput {
     const createdLog = this.createLog({
       message,
-      level: 'DEBUG',
-      httpStatusCode: httpStatusCode || 200
+      level: "DEBUG",
+      httpStatusCode: httpStatusCode || 200,
     });
 
     if (this.shouldSampleLog()) this.writeLog(createdLog);
@@ -260,8 +247,8 @@ export class MikroLog {
   public log(message: Message, httpStatusCode?: HttpStatusCode): LogOutput {
     const createdLog = this.createLog({
       message,
-      level: 'INFO',
-      httpStatusCode: httpStatusCode || 200
+      level: "INFO",
+      httpStatusCode: httpStatusCode || 200,
     });
 
     this.writeLog(createdLog);
@@ -276,8 +263,8 @@ export class MikroLog {
   public warn(message: Message, httpStatusCode?: HttpStatusCode): LogOutput {
     const createdLog = this.createLog({
       message,
-      level: 'WARN',
-      httpStatusCode: httpStatusCode || 200
+      level: "WARN",
+      httpStatusCode: httpStatusCode || 200,
     });
 
     this.writeLog(createdLog);
@@ -292,8 +279,8 @@ export class MikroLog {
   public error(message: Message, httpStatusCode?: HttpStatusCode): LogOutput {
     const createdLog = this.createLog({
       message,
-      level: 'ERROR',
-      httpStatusCode: httpStatusCode || 400
+      level: "ERROR",
+      httpStatusCode: httpStatusCode || 400,
     });
 
     this.writeLog(createdLog);
@@ -309,8 +296,7 @@ export class MikroLog {
   private initDebugSampleLevel(): number {
     const envValue = process.env.MIKROLOG_SAMPLE_RATE;
     if (envValue) {
-      const isNumeric =
-        !Number.isNaN(envValue) && !Number.isNaN(Number.parseFloat(envValue));
+      const isNumeric = !Number.isNaN(envValue) && !Number.isNaN(Number.parseFloat(envValue));
       if (isNumeric) return Number.parseFloat(envValue);
     }
 
@@ -329,7 +315,7 @@ export class MikroLog {
       ...dynamicMetadata,
       id: randomUUID(),
       timestamp: new Date(timeNow).toISOString(),
-      timestampEpoch: `${timeNow}`
+      timestampEpoch: `${timeNow}`,
     };
 
     return this.filterMetadata(metadata);
@@ -344,13 +330,13 @@ export class MikroLog {
     const providerMetadata = MikroLog.metadataProvider
       ? MikroLog.metadataProvider.getMetadata({
           event: MikroLog.event,
-          context: MikroLog.context
+          context: MikroLog.context,
         })
       : {};
 
     return {
       ...providerMetadata,
-      correlationId: MikroLog.correlationId || providerMetadata.correlationId
+      correlationId: MikroLog.correlationId || providerMetadata.correlationId,
     };
   }
 
@@ -362,8 +348,7 @@ export class MikroLog {
 
     Object.entries(metadata).forEach((entry: any) => {
       const [key, value] = entry;
-      if (value || value === false || value === 0)
-        filteredMetadata[key] = value;
+      if (value || value === false || value === 0) filteredMetadata[key] = value;
     });
 
     return filteredMetadata;
@@ -397,15 +382,9 @@ export class MikroLog {
    * @description Create the log envelope.
    */
   private createLog(log: LogInput): LogOutput {
-    const staticMetadata: any = JSON.parse(
-      JSON.stringify(MikroLog.metadataConfig)
-    );
-    const redactedKeys = staticMetadata.redactedKeys
-      ? staticMetadata.redactedKeys
-      : undefined;
-    const maskedValues = staticMetadata.maskedValues
-      ? staticMetadata.maskedValues
-      : undefined;
+    const staticMetadata: any = JSON.parse(JSON.stringify(MikroLog.metadataConfig));
+    const redactedKeys = staticMetadata.redactedKeys ? staticMetadata.redactedKeys : undefined;
+    const maskedValues = staticMetadata.maskedValues ? staticMetadata.maskedValues : undefined;
     if (redactedKeys) delete staticMetadata.redactedKeys;
     if (maskedValues) delete staticMetadata.maskedValues;
 
@@ -416,27 +395,20 @@ export class MikroLog {
         ...dynamicMetadata,
         ...staticMetadata,
         message: log.message,
-        error: log.level === 'ERROR',
+        error: log.level === "ERROR",
         level: log.level,
-        httpStatusCode: log.httpStatusCode
+        httpStatusCode: log.httpStatusCode,
       };
 
-      if (
-        this.nextLogEnrichment &&
-        JSON.stringify(this.nextLogEnrichment) !== '{}'
-      )
-        return Object.assign(output, this.nextLogEnrichment);
+      if (this.nextLogEnrichment && JSON.stringify(this.nextLogEnrichment) !== "{}")
+        return { ...output, ...this.nextLogEnrichment };
 
       return output;
     })();
 
     this.nextLogEnrichment = {};
 
-    const filteredOutput = this.filterOutput(
-      logOutput,
-      redactedKeys,
-      maskedValues
-    );
+    const filteredOutput = this.filterOutput(logOutput, redactedKeys, maskedValues);
 
     return this.sortOutput(filteredOutput);
   }
@@ -447,7 +419,7 @@ export class MikroLog {
   private filterOutput(
     logOutput: LogOutput,
     redactedKeys?: string[],
-    maskedValues?: string[]
+    maskedValues?: string[],
   ): any {
     const filteredOutput: any = {};
 
@@ -455,26 +427,22 @@ export class MikroLog {
      * Recursive helper function to handle nested objects.
      */
     const processEntry = (key: string, value: any, path: string[] = []) => {
-      const fullPath = [...path, key].join('.'); // Construct the full path of the key
+      const fullPath = [...path, key].join("."); // Construct the full path of the key
 
       // Check for redaction
       if (redactedKeys?.includes(fullPath)) return;
 
       // Check for masking
       if (maskedValues?.includes(fullPath)) {
-        this.setNestedValue(filteredOutput, path, key, 'MASKED');
+        this.setNestedValue(filteredOutput, path, key, "MASKED");
         return;
       }
 
       // Handle nested objects
-      if (
-        typeof value === 'object' &&
-        value !== null &&
-        !Array.isArray(value)
-      ) {
-        Object.entries(value).forEach(([nestedKey, nestedValue]) =>
-          processEntry(nestedKey, nestedValue, [...path, key])
-        );
+      if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+        Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+          processEntry(nestedKey, nestedValue, [...path, key]);
+        });
       } else {
         // Only add non-nested keys if not undefined, null, or empty
         if (value || value === 0 || value === false) {
@@ -487,34 +455,35 @@ export class MikroLog {
       }
     };
 
-    Object.entries(logOutput).forEach(([key, value]) =>
-      processEntry(key, value)
-    );
+    Object.entries(logOutput).forEach(([key, value]) => {
+      processEntry(key, value);
+    });
 
     return filteredOutput;
   }
 
+  private static readonly PROTECTED_KEYS = new Set(["__proto__", "prototype", "constructor"]);
+
   /**
-   * Utility function to set a nested value in an object.
+   * @description Utility function to set a nested value in an object.
+   * Protects against prototype pollution by refusing to traverse into,
+   * or assign onto, keys that can reach the global `Object.prototype`.
    */
-  private setNestedValue(
-    target: any,
-    path: string[],
-    key: string,
-    value: any
-  ): void {
+  private setNestedValue(target: any, path: string[], key: string, value: any): void {
     let current = target;
 
     // Traverse the path to ensure the hierarchy exists
     for (let i = 0; i < path.length; i++) {
-      const segment = path[i];
-      if (!current[segment] || typeof current[segment] !== 'object') {
+      const segment = String(path[i]);
+      if (MikroLog.PROTECTED_KEYS.has(segment)) return;
+      if (!current[segment] || typeof current[segment] !== "object") {
         current[segment] = {}; // Create the object if it doesn't exist
       }
       current = current[segment];
     }
 
     // Set the final value
+    if (MikroLog.PROTECTED_KEYS.has(String(key))) return;
     current[key] = value;
   }
 
@@ -526,7 +495,9 @@ export class MikroLog {
 
     Object.entries(input)
       .sort()
-      .forEach(([key, value]) => (sortedOutput[key] = value));
+      .forEach(([key, value]) => {
+        sortedOutput[key] = value;
+      });
 
     return sortedOutput;
   }

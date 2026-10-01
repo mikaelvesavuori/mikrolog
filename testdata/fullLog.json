@@ -6,7 +6,9 @@
   "system": "ShowroomActivities",
   "service": "UserSignUp",
   "team": "MyDemoTeam",
-  "tags": [""],
+  "tags": [
+    ""
+  ],
   "dataSensitivity": "public",
   "message": "Hello World",
   "error": false,

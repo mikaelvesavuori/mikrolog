@@ -1,19 +1,19 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test } from "vitest";
 
-import { MikroLog } from '../src/domain/entities/MikroLog.js';
+import { MikroLog } from "../src/domain/entities/MikroLog.js";
 
-import { TransportError } from '../src/application/errors/TransportError.js';
+import { TransportError } from "../src/application/errors/TransportError.js";
 
-import { JsonFormatter } from '../src/application/formatters/JsonFormatter.js';
-import { PrettyFormatter } from '../src/application/formatters/PrettyFormatter.js';
-import { AxiomTransport } from '../src/application/transports/Axiom.js';
-import { metadataConfig } from '../testdata/config.js';
-// @ts-ignore
-import fullLog from '../testdata/fullLog.json';
+import { JsonFormatter } from "../src/application/formatters/JsonFormatter.js";
+import { PrettyFormatter } from "../src/application/formatters/PrettyFormatter.js";
+import { AxiomTransport } from "../src/application/transports/Axiom.js";
+import { metadataConfig } from "../testdata/config.js";
+// @ts-expect-error
+import fullLog from "../testdata/fullLog.json";
 
 const axiomConfig = {
-  auth: 'abc123',
-  dataset: 'test'
+  auth: "abc123",
+  dataset: "test",
 };
 
 function cleanObject(object: Record<string, any>) {
@@ -25,24 +25,22 @@ function cleanObject(object: Record<string, any>) {
 }
 
 function setSuccessEndpoint() {
-  process.env.TRANSPORT_ENDPOINT =
-    'https://www.mockachino.com/dfed2c32-a350-4c/success';
+  process.env.TRANSPORT_ENDPOINT = "https://www.mockachino.com/dfed2c32-a350-4c/success";
 }
 
 function setFailureEndpoint() {
-  process.env.TRANSPORT_ENDPOINT =
-    'https://www.mockachino.com/dfed2c32-a350-4c/error';
+  process.env.TRANSPORT_ENDPOINT = "https://www.mockachino.com/dfed2c32-a350-4c/error";
 }
 
 function resetTransportEndpoint() {
-  process.env.TRANSPORT_ENDPOINT = '';
+  process.env.TRANSPORT_ENDPOINT = "";
 }
 
 /**
  * POSITIVE TESTS
  */
-describe('Instantiation', () => {
-  test('Starting MikroLog will set the instance to a new one', () => {
+describe("Instantiation", () => {
+  test("Starting MikroLog will set the instance to a new one", () => {
     const expected = true;
     const logger = MikroLog.start();
 
@@ -51,13 +49,13 @@ describe('Instantiation', () => {
     expect(isInstance).toBe(expected);
   });
 
-  test('It should empty the log buffer when resetting', async () => {
+  test("It should empty the log buffer when resetting", async () => {
     MikroLog.reset();
 
     const logger = MikroLog.start();
-    logger.log('Hello World');
-    logger.log('Hello World');
-    logger.log('Hello World');
+    logger.log("Hello World");
+    logger.log("Hello World");
+    logger.log("Hello World");
 
     expect(MikroLog.logBuffer.length).toBe(3);
 
@@ -66,22 +64,22 @@ describe('Instantiation', () => {
   });
 });
 
-describe('Logs output', () => {
-  test('It should return (print out) a structured log when given a string message but having no custom static metadata or process environment', () => {
+describe("Logs output", () => {
+  test("It should return (print out) a structured log when given a string message but having no custom static metadata or process environment", () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const logger = MikroLog.start();
     const response = logger.log(message);
 
     const expected = {
-      message: 'Hello World',
+      message: "Hello World",
       error: false,
       httpStatusCode: 200,
-      level: 'INFO',
-      id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-      timestamp: '2022-07-25T08:52:21.121Z',
-      timestampEpoch: '1656438566041'
+      level: "INFO",
+      id: "1256767f-c875-4d82-813d-bc260bd0ba07",
+      timestamp: "2022-07-25T08:52:21.121Z",
+      timestampEpoch: "1656438566041",
     };
 
     // Ensure exactness of message field
@@ -99,9 +97,9 @@ describe('Logs output', () => {
     expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
-  test('It should return (print out) a structured log when given a string message', () => {
+  test("It should return (print out) a structured log when given a string message", () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const logger = MikroLog.start({ metadataConfig });
     const response = logger.log(message);
@@ -123,9 +121,9 @@ describe('Logs output', () => {
     expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
-  test('It should return (print out) a structured informational log when given a string message', () => {
+  test("It should return (print out) a structured informational log when given a string message", () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const logger = MikroLog.start({ metadataConfig });
     const response = logger.info(message);
@@ -147,15 +145,15 @@ describe('Logs output', () => {
     expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
-  test('It should return (print out) a structured debug log when given a string message', () => {
+  test("It should return (print out) a structured debug log when given a string message", () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const logger = MikroLog.start({ metadataConfig });
     const response = logger.debug(message);
 
     const expected = JSON.parse(JSON.stringify(fullLog));
-    expected.level = 'DEBUG';
+    expected.level = "DEBUG";
 
     // Ensure exactness of message field
     expect(response.message).toBe(message);
@@ -172,15 +170,15 @@ describe('Logs output', () => {
     expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
-  test('It should return (print out) a structured warning log when given a string message', () => {
+  test("It should return (print out) a structured warning log when given a string message", () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const logger = MikroLog.start({ metadataConfig });
     const response = logger.warn(message);
 
     const expected = JSON.parse(JSON.stringify(fullLog));
-    expected.level = 'WARN';
+    expected.level = "WARN";
 
     // Ensure exactness of message field
     expect(response.message).toBe(message);
@@ -197,15 +195,15 @@ describe('Logs output', () => {
     expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
-  test('It should return (print out) a structured error log when given a string message', () => {
+  test("It should return (print out) a structured error log when given a string message", () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const logger = MikroLog.start({ metadataConfig });
     const response = logger.error(message);
 
     const expected = JSON.parse(JSON.stringify(fullLog));
-    expected.level = 'ERROR';
+    expected.level = "ERROR";
     expected.error = true;
     expected.httpStatusCode = 400;
 
@@ -224,15 +222,15 @@ describe('Logs output', () => {
     expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
-  test('It should retain falsy but defined values in logs', () => {
+  test("It should retain falsy but defined values in logs", () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const logger = MikroLog.start({
       metadataConfig: {
         falsyTest1: false,
-        falsyTest2: 0
-      }
+        falsyTest2: 0,
+      },
     });
     const response = logger.info(message);
 
@@ -241,8 +239,8 @@ describe('Logs output', () => {
       httpStatusCode: 200,
       falsyTest1: false,
       falsyTest2: 0,
-      level: 'INFO',
-      message: 'Hello World'
+      level: "INFO",
+      message: "Hello World",
     };
 
     // Ensure exactness of message field
@@ -261,67 +259,67 @@ describe('Logs output', () => {
   });
 });
 
-describe('Configure correlation IDs', () => {
-  test('It should be configurable with a correlation ID at init time', () => {
-    const expected = 'abc123';
+describe("Configure correlation IDs", () => {
+  test("It should be configurable with a correlation ID at init time", () => {
+    const expected = "abc123";
     const logger = MikroLog.start({ correlationId: expected });
-    const log = logger.log('');
+    const log = logger.log("");
     const result = log.correlationId;
     expect(result).toBe(expected);
   });
 
-  test('It should be configurable with a correlation ID', () => {
-    const expected = 'abc123';
+  test("It should be configurable with a correlation ID", () => {
+    const expected = "abc123";
     const logger = MikroLog.start();
     logger.setCorrelationId(expected);
-    const log = logger.log('');
+    const log = logger.log("");
     const result = log.correlationId;
     expect(result).toBe(expected);
   });
 
-  test('It should retain the correlation ID across multiple logs', () => {
-    const expected = 'abc123';
+  test("It should retain the correlation ID across multiple logs", () => {
+    const expected = "abc123";
     const logger = MikroLog.start();
     logger.setCorrelationId(expected);
-    logger.log('');
-    logger.log('');
-    logger.log('');
-    const log = logger.log('');
+    logger.log("");
+    logger.log("");
+    logger.log("");
+    const log = logger.log("");
     const result = log.correlationId;
     expect(result).toBe(expected);
   });
 
-  test('It should pick the correlation ID from the environment', () => {
-    const expected = 'abc123';
+  test("It should pick the correlation ID from the environment", () => {
+    const expected = "abc123";
     process.env.CORRELATION_ID = expected;
     const logger = MikroLog.start();
-    const log = logger.log('');
+    const log = logger.log("");
     const result = log.correlationId;
     expect(result).toBe(expected);
-    process.env.CORRELATION_ID = '';
+    process.env.CORRELATION_ID = "";
   });
 
-  test('It should pick the correlation ID from the environment and keep it across multiple instances', () => {
-    const expected = 'abc123';
+  test("It should pick the correlation ID from the environment and keep it across multiple instances", () => {
+    const expected = "abc123";
     process.env.CORRELATION_ID = expected;
     const logger1 = MikroLog.start();
-    const log1 = logger1.log('');
-    process.env.CORRELATION_ID = '';
+    const log1 = logger1.log("");
+    process.env.CORRELATION_ID = "";
     const logger2 = MikroLog.start();
-    const log2 = logger2.log('');
+    const log2 = logger2.log("");
     expect(log1.correlationId).toBe(expected);
     expect(log2.correlationId).toBe(expected);
   });
 });
 
-describe('Sampling', () => {
-  test('It should set the debug sampling rate through an environment variable', () => {
+describe("Sampling", () => {
+  test("It should set the debug sampling rate through an environment variable", () => {
     const expected = 0.5;
     process.env.MIKROLOG_SAMPLE_RATE = `${expected}`;
 
     MikroLog.reset(); // Needed as `initDebugSampleLevel()` is only run at init-time
     const logger = MikroLog.start();
-    // @ts-ignore
+    // @ts-expect-error
     const result = logger.setDebugSamplingRate();
     expect(result).toBe(expected);
 
@@ -330,118 +328,118 @@ describe('Sampling', () => {
     process.env.MIKROLOG_SAMPLE_RATE = undefined;
   });
 
-  test('It should return the current DEBUG sampling rate when given a string value', () => {
+  test("It should return the current DEBUG sampling rate when given a string value", () => {
     const logger = MikroLog.start();
     const expected = 100;
-    // @ts-ignore
-    const newSamplingRate = logger.setDebugSamplingRate('10273124');
+    // @ts-expect-error
+    const newSamplingRate = logger.setDebugSamplingRate("10273124");
     expect(newSamplingRate).toBe(expected);
   });
 
-  test('It should return the current DEBUG sampling rate when given an object value', () => {
+  test("It should return the current DEBUG sampling rate when given an object value", () => {
     const logger = MikroLog.start();
     const expected = 100;
-    // @ts-ignore
+    // @ts-expect-error
     const newSamplingRate = logger.setDebugSamplingRate({ asdf: 123 });
     expect(newSamplingRate).toBe(expected);
   });
 
-  test('It should set a new DEBUG sampling rate when given a number between 0 and 100', () => {
+  test("It should set a new DEBUG sampling rate when given a number between 0 and 100", () => {
     const logger = MikroLog.start();
     const expected = 5;
     const newSamplingRate = logger.setDebugSamplingRate(expected);
     expect(newSamplingRate).toBe(expected);
   });
 
-  test('It should set the DEBUG sampling rate to 0 when given a number lower than 0', () => {
+  test("It should set the DEBUG sampling rate to 0 when given a number lower than 0", () => {
     const logger = MikroLog.start();
     const expected = 0;
     const newSamplingRate = logger.setDebugSamplingRate(-4);
     expect(newSamplingRate).toBe(expected);
   });
 
-  test('It should set the DEBUG sampling rate to 100 when given a number higher than than 100', () => {
+  test("It should set the DEBUG sampling rate to 100 when given a number higher than than 100", () => {
     const logger = MikroLog.start();
     const expected = 100;
     const newSamplingRate = logger.setDebugSamplingRate(10273124);
     expect(newSamplingRate).toBe(expected);
   });
 
-  test('It should have all logs being sampled at init time', () => {
+  test("It should have all logs being sampled at init time", () => {
     const logger = MikroLog.start();
     const expected = true;
     const sampling = logger.isDebugLogSampled();
     expect(sampling).toBe(expected);
   });
 
-  test('It should not sample logs when setting the sampling rate to 0', () => {
+  test("It should not sample logs when setting the sampling rate to 0", () => {
     const logger = MikroLog.start();
     const expected = false;
     logger.setDebugSamplingRate(0);
-    logger.debug('');
+    logger.debug("");
     const sampling = logger.isDebugLogSampled();
     expect(sampling).toBe(expected);
   });
 });
 
-describe('HTTP status codes', () => {
-  test('It should set a custom HTTP status code for informational logs', () => {
+describe("HTTP status codes", () => {
+  test("It should set a custom HTTP status code for informational logs", () => {
     const logger = MikroLog.start();
     const expected = 201;
-    const message = logger.info('Ny message!', 201);
+    const message = logger.info("Ny message!", 201);
     expect(message.httpStatusCode).toBe(expected);
   });
 
-  test('It should set a custom HTTP status code for debug logs', () => {
+  test("It should set a custom HTTP status code for debug logs", () => {
     const logger = MikroLog.start();
     const expected = 201;
-    const message = logger.debug('Ny message!', 201);
+    const message = logger.debug("Ny message!", 201);
     expect(message.httpStatusCode).toBe(expected);
   });
 
-  test('It should set a custom HTTP status code for warning logs', () => {
+  test("It should set a custom HTTP status code for warning logs", () => {
     const logger = MikroLog.start();
     const expected = 201;
-    const message = logger.warn('Ny message!', 201);
+    const message = logger.warn("Ny message!", 201);
     expect(message.httpStatusCode).toBe(expected);
   });
 
-  test('It should set a custom HTTP status code for error logs', () => {
+  test("It should set a custom HTTP status code for error logs", () => {
     const logger = MikroLog.start();
     const expected = 201;
-    const message = logger.error('Ny message!', 201);
+    const message = logger.error("Ny message!", 201);
     expect(message.httpStatusCode).toBe(expected);
   });
 });
 
-describe('Redact data', () => {
+describe("Redact data", () => {
   test('It should redact keys when given a "redactedKeys" list', () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const _metadataConfig = JSON.parse(JSON.stringify(metadataConfig));
-    _metadataConfig.redactedKeys = ['team', 'id'];
+    _metadataConfig.redactedKeys = ["team", "id"];
 
     const logger = MikroLog.start({ metadataConfig: _metadataConfig });
     const response = logger.error(message);
 
     const expected = {
       version: 1,
-      owner: 'MyCompany',
-      hostPlatform: 'node',
-      domain: 'CustomerAcquisition',
-      system: 'ShowroomActivities',
-      service: 'UserSignUp',
-      tags: [''],
-      dataSensitivity: 'public',
-      message: 'Hello World',
+      owner: "MyCompany",
+      hostPlatform: "node",
+      domain: "CustomerAcquisition",
+      system: "ShowroomActivities",
+      service: "UserSignUp",
+      tags: [""],
+      dataSensitivity: "public",
+      message: "Hello World",
       error: true,
       httpStatusCode: 400,
-      level: 'ERROR',
-      id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-      timestamp: '2022-07-25T08:52:21.121Z',
-      timestampEpoch: '1656438566041',
-      jurisdiction: 'EU'
+      level: "ERROR",
+      id: "1256767f-c875-4d82-813d-bc260bd0ba07",
+      timestamp: "2022-07-25T08:52:21.121Z",
+      timestampEpoch: "1656438566041",
+      jurisdiction: "EU",
     };
 
     // Ensure exactness of message field
@@ -461,33 +459,33 @@ describe('Redact data', () => {
 
   test('It should redact nested keys when given a "redactedKeys" list', () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const _metadataConfig = JSON.parse(JSON.stringify(metadataConfig));
-    _metadataConfig.auth = { token: 'abc123' };
-    _metadataConfig.redactedKeys = ['auth.token'];
+    _metadataConfig.auth = { token: "abc123" };
+    _metadataConfig.redactedKeys = ["auth.token"];
 
     const logger = MikroLog.start({ metadataConfig: _metadataConfig });
     const response = logger.error(message);
 
     const expected = {
       version: 1,
-      owner: 'MyCompany',
-      hostPlatform: 'node',
-      domain: 'CustomerAcquisition',
-      system: 'ShowroomActivities',
-      service: 'UserSignUp',
-      tags: [''],
-      dataSensitivity: 'public',
-      message: 'Hello World',
+      owner: "MyCompany",
+      hostPlatform: "node",
+      domain: "CustomerAcquisition",
+      system: "ShowroomActivities",
+      service: "UserSignUp",
+      tags: [""],
+      dataSensitivity: "public",
+      message: "Hello World",
       error: true,
       httpStatusCode: 400,
-      level: 'ERROR',
-      id: '1256767f-c875-4d82-813d-bc260bd0ba07',
-      timestamp: '2022-07-25T08:52:21.121Z',
-      timestampEpoch: '1656438566041',
-      team: 'MyDemoTeam',
-      jurisdiction: 'EU'
+      level: "ERROR",
+      id: "1256767f-c875-4d82-813d-bc260bd0ba07",
+      timestamp: "2022-07-25T08:52:21.121Z",
+      timestampEpoch: "1656438566041",
+      team: "MyDemoTeam",
+      jurisdiction: "EU",
     };
 
     // Ensure exactness of message field
@@ -506,32 +504,32 @@ describe('Redact data', () => {
   });
 });
 
-describe('Mask data', () => {
+describe("Mask data", () => {
   test('It should mask values when given a "maskedValues" list', () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const _metadataConfig = JSON.parse(JSON.stringify(metadataConfig));
-    _metadataConfig.maskedValues = ['team', 'id'];
+    _metadataConfig.maskedValues = ["team", "id"];
 
     const logger = MikroLog.start({ metadataConfig: _metadataConfig });
     const response = logger.error(message);
 
     const expected = {
-      dataSensitivity: 'public',
-      domain: 'CustomerAcquisition',
+      dataSensitivity: "public",
+      domain: "CustomerAcquisition",
       error: true,
-      hostPlatform: 'node',
+      hostPlatform: "node",
       httpStatusCode: 400,
-      level: 'ERROR',
-      message: 'Hello World',
-      owner: 'MyCompany',
-      service: 'UserSignUp',
-      system: 'ShowroomActivities',
-      tags: [''],
-      team: 'MASKED',
+      level: "ERROR",
+      message: "Hello World",
+      owner: "MyCompany",
+      service: "UserSignUp",
+      system: "ShowroomActivities",
+      tags: [""],
+      team: "MASKED",
       version: 1,
-      jurisdiction: 'EU'
+      jurisdiction: "EU",
     };
 
     // Ensure exactness of message field
@@ -549,52 +547,52 @@ describe('Mask data', () => {
     expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
-  test('It should persist masking settings values across multiple logs', () => {
+  test("It should persist masking settings values across multiple logs", () => {
     MikroLog.reset();
-    const expected = 'MASKED';
-    const message = 'Hello World';
+    const expected = "MASKED";
+    const message = "Hello World";
 
     const _metadataConfig = JSON.parse(JSON.stringify(metadataConfig));
-    _metadataConfig.auth = { token: 'abc123' };
-    _metadataConfig.maskedValues = ['auth.token'];
+    _metadataConfig.auth = { token: "abc123" };
+    _metadataConfig.maskedValues = ["auth.token"];
 
     const logger = MikroLog.start({ metadataConfig: _metadataConfig });
     const response = logger.error(message);
     const response2 = logger.error(message);
 
-    // @ts-ignore
+    // @ts-expect-error
     expect(response.auth.token).toBe(expected);
-    // @ts-ignore
+    // @ts-expect-error
     expect(response2.auth.token).toBe(expected);
   });
 
   test('It should mask nested values when given a "maskedValues" list', () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const _metadataConfig = JSON.parse(JSON.stringify(metadataConfig));
-    _metadataConfig.auth = { token: 'abc123' };
-    _metadataConfig.maskedValues = ['auth.token'];
+    _metadataConfig.auth = { token: "abc123" };
+    _metadataConfig.maskedValues = ["auth.token"];
 
     const logger = MikroLog.start({ metadataConfig: _metadataConfig });
     const response = logger.error(message);
 
     const expected = {
-      auth: { token: 'MASKED' },
-      dataSensitivity: 'public',
-      domain: 'CustomerAcquisition',
+      auth: { token: "MASKED" },
+      dataSensitivity: "public",
+      domain: "CustomerAcquisition",
       error: true,
-      hostPlatform: 'node',
+      hostPlatform: "node",
       httpStatusCode: 400,
-      level: 'ERROR',
-      message: 'Hello World',
-      owner: 'MyCompany',
-      service: 'UserSignUp',
-      system: 'ShowroomActivities',
-      tags: [''],
-      team: 'MyDemoTeam',
+      level: "ERROR",
+      message: "Hello World",
+      owner: "MyCompany",
+      service: "UserSignUp",
+      system: "ShowroomActivities",
+      tags: [""],
+      team: "MyDemoTeam",
       version: 1,
-      jurisdiction: 'EU'
+      jurisdiction: "EU",
     };
 
     // Ensure exactness of message field
@@ -613,16 +611,90 @@ describe('Mask data', () => {
   });
 });
 
-describe('Metadata', () => {
-  test('It should accept a custom metadata configuration', () => {
+describe("Prototype pollution protection", () => {
+  test('It should not pollute Object.prototype when logging nested "__proto__" keys', () => {
     MikroLog.reset();
-    const message = 'Hello World';
+
+    const payload = JSON.parse('{"user": {"name": "Ada", "__proto__": {"testValue": "123"}}}');
+
+    const logger = MikroLog.start();
+    logger.log(payload);
+
+    //@ts-expect-error
+    expect(Object.prototype.testValue).toBeUndefined();
+    expect(({} as Record<string, any>).polluted).toBeUndefined();
+  });
+
+  test('It should not pollute Object.prototype when logging "constructor" or "prototype" keys', () => {
+    MikroLog.reset();
+
+    const payload = JSON.parse('{"user": {"constructor": {"prototype": {"polluted": true}}}}');
+
+    const logger = MikroLog.start();
+    logger.log(payload);
+
+    //@ts-expect-error
+    expect(Object.prototype.polluted).toBeUndefined();
+    expect(({} as Record<string, any>).polluted).toBeUndefined();
+  });
+
+  test('It should ignore "__proto__" path segments even when they coerce to it', () => {
+    MikroLog.reset();
+
+    const logger = MikroLog.start();
+    const target: any = {};
+
+    // Mirrors the advisory payload: a segment coerced to "__proto__"
+    (logger as any).setNestedValue(
+      target,
+      [["__proto__"], "testValue"] as unknown as string[],
+      "123",
+      "123",
+    );
+
+    //@ts-expect-error
+    expect(Object.prototype.testValue).toBeUndefined();
+    expect(target.testValue).toBeUndefined();
+  });
+
+  test('It should not tamper object prototypes when enriching with "__proto__" keys', () => {
+    MikroLog.reset();
+
+    const enrichment = JSON.parse('{"__proto__": {"polluted": true}}');
+
+    const logger = MikroLog.start();
+    logger.enrichNext(enrichment);
+    const response = logger.log("Hello World");
+
+    //@ts-expect-error
+    expect(Object.prototype.polluted).toBeUndefined();
+    expect(({} as Record<string, any>).polluted).toBeUndefined();
+    expect(Object.getPrototypeOf(response)).toBe(Object.prototype);
+  });
+
+  test('It should reject "constructor" as the final key in setNestedValue', () => {
+    MikroLog.reset();
+
+    const logger = MikroLog.start();
+    const target: any = {};
+
+    (logger as any).setNestedValue(target, ["safePath"], "constructor", "polluted");
+
+    expect(target.safePath).toEqual({});
+    expect(target.safePath.constructor).toBe(Object);
+  });
+});
+
+describe("Metadata", () => {
+  test("It should accept a custom metadata configuration", () => {
+    MikroLog.reset();
+    const message = "Hello World";
 
     const customMetadata = {
       myCustomFields: {
         something: 123,
-        custom: 'Yep it works'
-      }
+        custom: "Yep it works",
+      },
     };
 
     const logger = MikroLog.start({ metadataConfig: customMetadata });
@@ -631,12 +703,12 @@ describe('Metadata', () => {
     const expected = {
       myCustomFields: {
         something: 123,
-        custom: 'Yep it works'
+        custom: "Yep it works",
       },
       error: false,
       httpStatusCode: 200,
-      level: 'INFO',
-      message: 'Hello World'
+      level: "INFO",
+      message: "Hello World",
     };
 
     // Ensure exactness of message field
@@ -655,10 +727,10 @@ describe('Metadata', () => {
   });
 });
 
-describe('Enrichment', () => {
-  test('It should be able to merge enrichment even if input is essentially empty', () => {
+describe("Enrichment", () => {
+  test("It should be able to merge enrichment even if input is essentially empty", () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const logger = MikroLog.start();
     MikroLog.enrich({});
@@ -667,8 +739,8 @@ describe('Enrichment', () => {
     const expected = {
       error: false,
       httpStatusCode: 200,
-      level: 'INFO',
-      message: 'Hello World'
+      level: "INFO",
+      message: "Hello World",
     };
 
     // Ensure exactness of message field
@@ -686,20 +758,20 @@ describe('Enrichment', () => {
     expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
-  test('It should be able to enrich with correlation ID', () => {
+  test("It should be able to enrich with correlation ID", () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const logger = MikroLog.start();
-    MikroLog.enrich({ correlationId: 'abc123' });
+    MikroLog.enrich({ correlationId: "abc123" });
     const response = logger.info(message);
 
     const expected = {
-      correlationId: 'abc123',
+      correlationId: "abc123",
       error: false,
       httpStatusCode: 200,
-      level: 'INFO',
-      message: 'Hello World'
+      level: "INFO",
+      message: "Hello World",
     };
 
     // Ensure exactness of message field
@@ -717,125 +789,127 @@ describe('Enrichment', () => {
     expect(cleanedResponse).toEqual(cleanedExpected);
   });
 
-  test('It should enrich a single-level log with a one-time root item and ensure it is not present in later calls', () => {
+  test("It should enrich a single-level log with a one-time root item and ensure it is not present in later calls", () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const logger = MikroLog.start();
-    logger.enrichNext({ myValue: 'abc123' });
+    logger.enrichNext({ myValue: "abc123" });
 
     const responseFirst: Record<string, any> = logger.info(message);
     const responseSecond: Record<string, any> = logger.info(message);
 
-    expect(responseFirst.hasOwnProperty('myValue')).toBe(true);
-    expect(responseSecond.hasOwnProperty('myValue')).toBe(false);
+    expect(Object.hasOwn(responseFirst, "myValue")).toBe(true);
+    expect(Object.hasOwn(responseSecond, "myValue")).toBe(false);
   });
 
-  test('It should enrich a multi-level log with a one-time root item and ensure it is not present in later calls', () => {
+  test("It should enrich a multi-level log with a one-time root item and ensure it is not present in later calls", () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const logger = MikroLog.start();
-    logger.enrichNext({ dd: { trace_id: 'abc123' } });
+    logger.enrichNext({ dd: { trace_id: "abc123" } });
 
     const responseFirst: Record<string, any> = logger.info(message);
     const responseSecond: Record<string, any> = logger.info(message);
 
-    expect(responseFirst.dd.trace_id).toBe('abc123');
-    expect(responseSecond.hasOwnProperty('dd')).toBe(false);
+    expect(responseFirst.dd.trace_id).toBe("abc123");
+    expect(Object.hasOwn(responseSecond, "dd")).toBe(false);
   });
 
-  test('It should enrich a multi-level log and mask fields from it', () => {
+  test("It should enrich a multi-level log and mask fields from it", () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const logger = MikroLog.start({
       metadataConfig: {
-        maskedValues: ['event.requestContext.lambda.authorizer.token']
-      }
+        maskedValues: ["event.requestContext.lambda.authorizer.token"],
+      },
     });
     logger.enrichNext({
-      event: { requestContext: { lambda: { authorizer: { token: 'abc123' } } } }
+      event: {
+        requestContext: { lambda: { authorizer: { token: "abc123" } } },
+      },
     });
 
     const responseFirst: Record<string, any> = logger.info(message);
     const responseSecond: Record<string, any> = logger.info(message);
 
-    expect(responseFirst.event.requestContext.lambda.authorizer.token).toBe(
-      'MASKED'
-    );
-    expect(responseSecond.hasOwnProperty('event')).toBe(false);
+    expect(responseFirst.event.requestContext.lambda.authorizer.token).toBe("MASKED");
+    expect(Object.hasOwn(responseSecond, "event")).toBe(false);
   });
 
-  test('It should enrich a multi-level log and redact fields from it', () => {
+  test("It should enrich a multi-level log and redact fields from it", () => {
     MikroLog.reset();
-    const message = 'Hello World';
+    const message = "Hello World";
 
     const logger = MikroLog.start({
       metadataConfig: {
-        redactedKeys: ['event.requestContext.lambda.authorizer.token']
-      }
+        redactedKeys: ["event.requestContext.lambda.authorizer.token"],
+      },
     });
     logger.enrichNext({
-      event: { requestContext: { lambda: { authorizer: { token: 'abc123' } } } }
+      event: {
+        requestContext: { lambda: { authorizer: { token: "abc123" } } },
+      },
     });
 
     const responseFirst: Record<string, any> = logger.info(message);
     const responseSecond: Record<string, any> = logger.info(message);
 
     expect(responseFirst.event).toBeUndefined();
-    expect(responseSecond.hasOwnProperty('event')).toBe(false);
+    expect(Object.hasOwn(responseSecond, "event")).toBe(false);
   });
 });
 
-describe('Log buffering', () => {
-  test('It should buffer logs if there is a transport', async () => {
+describe("Log buffering", () => {
+  test("It should buffer logs if there is a transport", async () => {
     MikroLog.reset();
 
     const logger = MikroLog.start({ metadataConfig });
     const transport = new AxiomTransport(axiomConfig);
     logger.setTransport(transport);
 
-    logger.log('Hello');
-    logger.log('World');
+    logger.log("Hello");
+    logger.log("World");
 
     expect(MikroLog.logBuffer.length).toBe(2);
   });
 
-  test('It should buffer logs and keep them across instantiations', async () => {
+  test("It should buffer logs and keep them across instantiations", async () => {
     MikroLog.reset();
 
     const logger = MikroLog.start({ metadataConfig });
     const transport = new AxiomTransport(axiomConfig);
     logger.setTransport(transport);
 
-    logger.log('Hello');
+    logger.log("Hello");
 
     MikroLog.start();
-    logger.log('World');
+    logger.log("World");
     MikroLog.start();
     MikroLog.start();
-    logger.log('!!!');
-    logger.log('Amazing');
+    logger.log("!!!");
+    logger.log("Amazing");
     MikroLog.start();
-    logger.log('   coool   ');
+    logger.log("   coool   ");
 
     expect(MikroLog.logBuffer.length).toBe(5);
   });
 });
 
-describe('Transports', () => {
-  test('It should not do anything if flushing logs without a transport', async () => {
+describe("Transports", () => {
+  test("It should not do anything if flushing logs without a transport", async () => {
     MikroLog.reset();
 
     const logger = MikroLog.start({ metadataConfig });
-    logger.log('Hello World');
+    logger.log("Hello World");
 
     await logger.flushLogs();
     expect(MikroLog.logBuffer.length).toBe(0);
   });
 
-  test('It should not do anything if flushing logs and there are no logs', async () => {
+  test("It should not do anything if flushing logs and there are no logs", async () => {
     MikroLog.reset();
 
     const logger = MikroLog.start({ metadataConfig });
@@ -846,8 +920,8 @@ describe('Transports', () => {
     expect(MikroLog.logBuffer.length).toBe(0);
   });
 
-  describe('Axiom transport', () => {
-    test('It should use the Axiom transport successfully', async () => {
+  describe("Axiom transport", () => {
+    test("It should use the Axiom transport successfully", async () => {
       MikroLog.reset();
       setSuccessEndpoint();
 
@@ -855,17 +929,17 @@ describe('Transports', () => {
       const transport = new AxiomTransport(axiomConfig);
       logger.setTransport(transport);
 
-      logger.log('Hello');
-      logger.log('World');
+      logger.log("Hello");
+      logger.log("World");
 
       expect(MikroLog.logBuffer.length).toBe(2);
       await logger.flushLogs();
       expect(MikroLog.logBuffer.length).toBe(0);
 
       resetTransportEndpoint();
-    });
+    }, 10000);
 
-    test('It should use the Axiom transport and throw a TransportError if getting a non-success code', async () => {
+    test("It should use the Axiom transport and throw a TransportError if getting a non-success code", async () => {
       MikroLog.reset();
       setFailureEndpoint();
 
@@ -873,158 +947,156 @@ describe('Transports', () => {
       const transport = new AxiomTransport(axiomConfig);
       logger.setTransport(transport);
 
-      logger.log('Hello');
-      logger.log('World');
+      logger.log("Hello");
+      logger.log("World");
 
-      expect(async () => await logger.flushLogs()).rejects.toThrowError(
-        TransportError
-      );
+      expect(async () => await logger.flushLogs()).rejects.toThrowError(TransportError);
 
       resetTransportEndpoint();
     });
 
-    test('It should throw a TransportError if missing a configuration in the Axiom transports', async () => {
+    test("It should throw a TransportError if missing a configuration in the Axiom transports", async () => {
       MikroLog.reset();
 
       expect(() => {
-        // @ts-ignore
+        // @ts-expect-error
         new AxiomTransport();
       }).toThrowError(TransportError);
     });
   });
 });
 
-describe('Metadata providers', () => {
-  test('It should use a custom metadata provider', () => {
+describe("Metadata providers", () => {
+  test("It should use a custom metadata provider", () => {
     MikroLog.reset();
 
     const customProvider = {
       getMetadata: () => ({
-        customField: 'customValue',
-        resource: '/my-endpoint',
-        user: 'testuser'
-      })
+        customField: "customValue",
+        resource: "/my-endpoint",
+        user: "testuser",
+      }),
     };
 
     const logger = MikroLog.start({ metadataProvider: customProvider });
-    const response: any = logger.info('Hello');
+    const response: any = logger.info("Hello");
 
-    expect(response.customField).toBe('customValue');
-    expect(response.resource).toBe('/my-endpoint');
-    expect(response.user).toBe('testuser');
+    expect(response.customField).toBe("customValue");
+    expect(response.resource).toBe("/my-endpoint");
+    expect(response.user).toBe("testuser");
   });
 
-  test('It should support setMetadataProvider after start', () => {
+  test("It should support setMetadataProvider after start", () => {
     MikroLog.reset();
 
     const customProvider = {
-      getMetadata: () => ({ injected: true })
+      getMetadata: () => ({ injected: true }),
     };
 
     const logger = MikroLog.start();
     logger.setMetadataProvider(customProvider);
-    const response: any = logger.info('Hello');
+    const response: any = logger.info("Hello");
 
     expect(response.injected).toBe(true);
   });
 
-  test('It should work without any metadata provider', () => {
+  test("It should work without any metadata provider", () => {
     MikroLog.reset();
 
     const logger = MikroLog.start();
-    const response: any = logger.info('Hello');
+    const response: any = logger.info("Hello");
 
     expect(response.id).toBeDefined();
     expect(response.timestamp).toBeDefined();
     expect(response.timestampEpoch).toBeDefined();
-    expect(response.message).toBe('Hello');
-    expect(response.level).toBe('INFO');
+    expect(response.message).toBe("Hello");
+    expect(response.level).toBe("INFO");
     expect(response.error).toBe(false);
   });
 });
 
-describe('Formatters', () => {
-  test('It should use the default JSON formatter', () => {
+describe("Formatters", () => {
+  test("It should use the default JSON formatter", () => {
     MikroLog.reset();
 
     const logger = MikroLog.start();
-    const response = logger.info('Hello');
+    const response = logger.info("Hello");
 
-    expect(response.message).toBe('Hello');
+    expect(response.message).toBe("Hello");
   });
 
-  test('It should use a custom formatter via setFormatter', () => {
+  test("It should use a custom formatter via setFormatter", () => {
     MikroLog.reset();
 
     const logger = MikroLog.start();
     logger.setFormatter({
-      format: (log) => `[${log.level}] ${log.message}\n`
+      format: (log) => `[${log.level}] ${log.message}\n`,
     });
 
-    const response = logger.info('Hello');
-    expect(response.message).toBe('Hello');
+    const response = logger.info("Hello");
+    expect(response.message).toBe("Hello");
   });
 
-  test('It should use PrettyFormatter', () => {
+  test("It should use PrettyFormatter", () => {
     MikroLog.reset();
 
     const logger = MikroLog.start();
     logger.setFormatter(new PrettyFormatter({ colorize: false }));
 
-    const response = logger.info('Hello');
-    expect(response.message).toBe('Hello');
+    const response = logger.info("Hello");
+    expect(response.message).toBe("Hello");
   });
 
-  test('It should use PrettyFormatter with colorize enabled', () => {
+  test("It should use PrettyFormatter with colorize enabled", () => {
     MikroLog.reset();
 
     const logger = MikroLog.start();
     logger.setFormatter(new PrettyFormatter({ colorize: true }));
 
-    const response = logger.info('Hello');
-    expect(response.message).toBe('Hello');
+    const response = logger.info("Hello");
+    expect(response.message).toBe("Hello");
   });
 
-  test('It should use PrettyFormatter with default options', () => {
+  test("It should use PrettyFormatter with default options", () => {
     MikroLog.reset();
 
     const logger = MikroLog.start();
     logger.setFormatter(new PrettyFormatter());
 
-    const response = logger.warn('Warning message');
-    expect(response.message).toBe('Warning message');
+    const response = logger.warn("Warning message");
+    expect(response.message).toBe("Warning message");
   });
 
-  test('It should use PrettyFormatter with object message and extra fields', () => {
+  test("It should use PrettyFormatter with object message and extra fields", () => {
     MikroLog.reset();
 
-    const logger = MikroLog.start({ metadataConfig: { service: 'api' } });
+    const logger = MikroLog.start({ metadataConfig: { service: "api" } });
     logger.setFormatter(new PrettyFormatter());
 
-    const response = logger.info({ key: 'value' });
-    expect(response.message).toEqual({ key: 'value' });
+    const response = logger.info({ key: "value" });
+    expect(response.message).toEqual({ key: "value" });
   });
 
-  test('It should use JsonFormatter', () => {
+  test("It should use JsonFormatter", () => {
     MikroLog.reset();
 
     const logger = MikroLog.start();
     logger.setFormatter(new JsonFormatter());
 
-    const response = logger.info('Hello');
-    expect(response.message).toBe('Hello');
+    const response = logger.info("Hello");
+    expect(response.message).toBe("Hello");
   });
 
-  test('It should enrich with a metadata provider after start', () => {
+  test("It should enrich with a metadata provider after start", () => {
     MikroLog.reset();
 
     const customProvider = {
-      getMetadata: () => ({ enriched: true })
+      getMetadata: () => ({ enriched: true }),
     };
 
     const logger = MikroLog.start();
     MikroLog.enrich({ metadataProvider: customProvider });
-    const response: any = logger.info('Hello');
+    const response: any = logger.info("Hello");
 
     expect(response.enriched).toBe(true);
   });

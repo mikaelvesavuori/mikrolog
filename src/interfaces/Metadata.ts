@@ -140,5 +140,4 @@ export type FullMetadata = StaticMetadataConfigInput & DynamicMetadataOutput;
  * @description Log output augmented with AWS Lambda-specific metadata fields.
  * Use this type when the `AwsLambdaMetadataProvider` is configured.
  */
-export type AwsLambdaLogOutput = import('./MikroLog.js').LogOutput &
-  Partial<AwsLambdaMetadata>;
+export type AwsLambdaLogOutput = import("./MikroLog.js").LogOutput & Partial<AwsLambdaMetadata>;
